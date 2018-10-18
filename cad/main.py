@@ -5,14 +5,14 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget
 
 
 class Workspace(QWidget):
-    lines = None
-    pressed = None
+    _lines = None
+    _point = None
 
     def __init__(self):
         super().__init__()
 
-        self.lines = []
-        self.pressed = None
+        self._lines = []
+        self._point = None
 
         self.setMouseTracking(True)
         self.setWindowTitle('Workspace')
@@ -33,37 +33,37 @@ class Workspace(QWidget):
             event.ignore()
 
     def isMousePressed(self):
-        return self.pressed is not None
+        return self._point is not None
 
     def mousePressEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonPress:
             if event.button() == QtCore.Qt.LeftButton:
-                self.pressed = event.pos()
+                self._point = event.pos()
 
     def mouseReleaseEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonRelease:
             if event.button() == QtCore.Qt.LeftButton:
-                line = QtCore.QLineF(self.pressed, event.pos())
-                self.pressed = None
+                line = QtCore.QLineF(self._point, event.pos())
+                self._point = None
                 self.draw(line)
 
     def mouseMoveEvent(self, event):
         if self.isMousePressed():
-            if self.lines:
-                self.lines.pop(-1)
-            line = QtCore.QLineF(self.pressed, event.pos())
+            if self._lines:
+                self._lines.pop(-1)
+            line = QtCore.QLineF(self._point, event.pos())
             self.draw(line)
 
     def draw(self, line):
-        self.lines.append(line)
+        self._lines.append(line)
         self.update()
 
     def paintEvent(self, event):
-        if self.lines:
+        if self._lines:
             painter = QtGui.QPainter()
             painter.begin(self)
             painter.setPen(QtGui.QPen(QtCore.Qt.red, 2))
-            painter.drawLines(self.lines)
+            painter.drawLines(self._lines)
             painter.end()
 
 
