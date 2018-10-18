@@ -62,7 +62,7 @@ class Workspace(QWidget):
         if self._lines:
             painter = QtGui.QPainter()
             painter.begin(self)
-            painter.setPen(QtGui.QPen(QtCore.Qt.red, 2))
+            painter.setPen(QtGui.QPen(QtCore.Qt.gray, 1))
             painter.drawLines(self._lines)
             painter.end()
 
