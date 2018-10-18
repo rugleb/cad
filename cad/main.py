@@ -14,6 +14,7 @@ class Workspace(QWidget):
         self.lines = []
         self.pressed = None
 
+        self.setMouseTracking(True)
         self.setWindowTitle('Workspace')
         self.setGeometry(QDesktopWidget().availableGeometry())
         self.show()
@@ -31,6 +32,9 @@ class Workspace(QWidget):
         else:
             event.ignore()
 
+    def isMousePressed(self):
+        return self.pressed is not None
+
     def mousePressEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonPress:
             if event.button() == QtCore.Qt.LeftButton:
@@ -40,7 +44,15 @@ class Workspace(QWidget):
         if event.type() == QtCore.QEvent.MouseButtonRelease:
             if event.button() == QtCore.Qt.LeftButton:
                 line = QtCore.QLineF(self.pressed, event.pos())
+                self.pressed = None
                 self.draw(line)
+
+    def mouseMoveEvent(self, event):
+        if self.isMousePressed():
+            if self.lines:
+                self.lines.pop(-1)
+            line = QtCore.QLineF(self.pressed, event.pos())
+            self.draw(line)
 
     def draw(self, line):
         self.lines.append(line)
