@@ -52,6 +52,9 @@ class Line(QtCore.QLineF):
     def hide(self):
         self.setLength(0.)
 
+    def isHidden(self):
+        return self.length() == 0.
+
 
 class Point(QtCore.QPointF):
 
