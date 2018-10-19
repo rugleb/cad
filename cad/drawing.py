@@ -21,6 +21,11 @@ def isPointOnLine(p, l):
     return l.p1().x() <= p.x() <= l.p2().x()
 
 
+class Pen:
+    active = QtGui.QPen(QtCore.Qt.gray, 3, QtCore.Qt.SolidLine)
+    stable = QtGui.QPen(QtCore.Qt.darkGray, 2, QtCore.Qt.SolidLine)
+
+
 class Line(QtCore.QLineF):
     _pen = None
 
