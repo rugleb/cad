@@ -36,6 +36,9 @@ class Line(QtCore.QLineF):
     def hasPoint(self, point):
         return isPointOnLine(point, self)
 
+    def hide(self):
+        self.setLength(0.)
+
 
 class Point(QtCore.QPointF):
 
