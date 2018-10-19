@@ -3,7 +3,7 @@ import sys
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget
 
-from .drawing import Line, Point
+from cad.drawing import Line, Point
 
 
 def isPointOnLine(point, line):
