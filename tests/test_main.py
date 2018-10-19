@@ -1,23 +1,21 @@
 import unittest
-from PyQt5 import QtCore
 
 from cad.main import isPointOnLine
+from cad.drawing import Line, Point
 
 
 class MainModuleTestCase(unittest.TestCase):
 
     def testIsPointOnLineMethod(self):
-        p1 = QtCore.QPointF(10, 10)
-        p2 = QtCore.QPointF(100, 100)
-        line = QtCore.QLineF(p1, p2)
+        line = Line(Point(10, 10), Point(100, 100))
 
-        self.assertTrue(isPointOnLine(QtCore.QPointF(10, 10), line))
-        self.assertTrue(isPointOnLine(QtCore.QPointF(50, 50), line))
-        self.assertTrue(isPointOnLine(QtCore.QPointF(100, 100), line))
+        self.assertTrue(isPointOnLine(Point(10, 10), line))
+        self.assertTrue(isPointOnLine(Point(50, 50), line))
+        self.assertTrue(isPointOnLine(Point(100, 100), line))
 
-        self.assertFalse(isPointOnLine(QtCore.QPointF(9, 9), line))
-        self.assertFalse(isPointOnLine(QtCore.QPointF(51, 50), line))
-        self.assertFalse(isPointOnLine(QtCore.QPointF(101, 101), line))
+        self.assertFalse(isPointOnLine(Point(9, 9), line))
+        self.assertFalse(isPointOnLine(Point(51, 50), line))
+        self.assertFalse(isPointOnLine(Point(101, 101), line))
 
 
 if __name__ == '__main__':

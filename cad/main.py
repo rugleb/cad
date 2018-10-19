@@ -3,10 +3,12 @@ import sys
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget
 
+from .drawing import Line, Point
+
 
 def isPointOnLine(point, line):
-    l1 = QtCore.QLineF(line.p1(), point)
-    l2 = QtCore.QLineF(line.p2(), point)
+    l1 = Line(line.p1(), point)
+    l2 = Line(line.p2(), point)
     return line.length() == l1.length() + l2.length()
 
 
@@ -49,7 +51,7 @@ class Workspace(QWidget):
     def mouseReleaseEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonRelease:
             if event.button() == QtCore.Qt.LeftButton:
-                line = QtCore.QLineF(self._point, event.pos())
+                line = Line(self._point, event.pos())
                 self._point = None
                 self.draw(line)
 
@@ -57,7 +59,7 @@ class Workspace(QWidget):
         if self.isMousePressed():
             if self._lines:
                 self._lines.pop(-1)
-            line = QtCore.QLineF(self._point, event.pos())
+            line = Line(self._point, event.pos())
             self.draw(line)
 
     def draw(self, line):
