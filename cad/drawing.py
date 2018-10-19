@@ -15,6 +15,12 @@ def isPointOnVector(p, l):
     return distancePointToVector(p, l) == 0.
 
 
+def isPointOnLine(p, l):
+    if not isPointOnVector(p, l):
+        return False
+    return l.p1().x() <= p.x() <= l.p2().x()
+
+
 class Line(QtCore.QLineF):
     _pen = None
 

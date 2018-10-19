@@ -33,6 +33,13 @@ class DrawingTestCase(unittest.TestCase):
         self.assertTrue(isPointOnVector(Point(10, 10), line))
         self.assertTrue(isPointOnVector(Point(45, 45), line))
 
+    def testIsPointOnLine(self):
+        line = Line(Point(10, 10), Point(30, 30))
+
+        self.assertTrue(isPointOnLine(Point(20, 20), line))
+        self.assertFalse(isPointOnLine(Point(29, 25), line))
+        self.assertFalse(isPointOnLine(Point(45, 45), line))
+
 
 if __name__ == '__main__':
     unittest.main()
