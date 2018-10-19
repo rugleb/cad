@@ -41,6 +41,17 @@ class DrawingTestCase(unittest.TestCase):
         self.assertFalse(isPointOnLine(Point(45, 45), line))
 
 
+class LineTestCase(unittest.TestCase):
+
+    def testHasPointMethod(self):
+        line = Line(Point(10, 10), Point(30, 30))
+
+        self.assertTrue(line.hasPoint(Point(10, 10)))
+        self.assertTrue(line.hasPoint(Point(15, 15)))
+        self.assertTrue(line.hasPoint(Point(30, 30)))
+        self.assertFalse(line.hasPoint(Point(15, 20)))
+
+
 class PointTestCase(unittest.TestCase):
 
     def testOnLineMethod(self):

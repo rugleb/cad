@@ -33,6 +33,9 @@ class Line(QtCore.QLineF):
     def hasPen(self):
         return isinstance(self.getPen(), QtGui.QPen)
 
+    def hasPoint(self, point):
+        return isPointOnLine(point, self)
+
 
 class Point(QtCore.QPointF):
 
