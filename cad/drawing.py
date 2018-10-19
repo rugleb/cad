@@ -21,9 +21,15 @@ def isPointOnLine(p, l):
     return l.p1().x() <= p.x() <= l.p2().x()
 
 
-class Pen:
-    active = QtGui.QPen(QtCore.Qt.gray, 3, QtCore.Qt.SolidLine)
-    stable = QtGui.QPen(QtCore.Qt.darkGray, 2, QtCore.Qt.SolidLine)
+class Pen(QtGui.QPen):
+
+    @classmethod
+    def active(cls):
+        return cls(QtCore.Qt.gray, 3, QtCore.Qt.SolidLine)
+
+    @classmethod
+    def stable(cls):
+        return cls(QtCore.Qt.darkGray, 2, QtCore.Qt.SolidLine)
 
 
 class Line(QtCore.QLineF):
@@ -31,10 +37,10 @@ class Line(QtCore.QLineF):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.setPen(Pen.stable)
+        self.setPen(Pen.stable())
 
     def setPen(self, pen):
-        if type(pen) is not QtGui.QPen:
+        if not isinstance(pen, QtGui.QPen):
             message = 'Invalid Pen type: expected QtGui.QPen object'
             raise Exception(message)
         self._pen = pen

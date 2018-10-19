@@ -60,13 +60,13 @@ class Workspace(QWidget):
         else:
             for line in self._lines:
                 if line.hasPoint(point):
-                    line.setPen(Pen.active)
+                    line.setPen(Pen.active())
                 else:
-                    line.setPen(Pen.stable)
+                    line.setPen(Pen.stable())
             self.update()
 
     def draw(self, line):
-        line.setPen(Pen.stable)
+        line.setPen(Pen.stable())
         self._lines.append(line)
         self.update()
 
