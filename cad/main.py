@@ -46,7 +46,7 @@ class Workspace(QWidget):
     def mousePressEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonPress:
             if event.button() == QtCore.Qt.LeftButton:
-                self._point = event.pos()
+                self._point = event.localPos()
 
     def mouseReleaseEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonRelease:
@@ -67,12 +67,12 @@ class Workspace(QWidget):
         self.update()
 
     def paintEvent(self, event):
-        if self._lines:
-            painter = QtGui.QPainter()
-            painter.begin(self)
-            painter.setPen(QtGui.QPen(QtCore.Qt.gray, 1))
-            painter.drawLines(self._lines)
-            painter.end()
+        painter = QtGui.QPainter()
+        painter.begin(self)
+        for line in self._lines:
+            painter.setPen(line.pen())
+            painter.drawLine(line)
+        painter.end()
 
 
 if __name__ == '__main__':
