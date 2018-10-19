@@ -3,13 +3,7 @@ import sys
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget
 
-from cad.drawing import Line, Point
-
-
-def isPointOnLine(point, line):
-    l1 = Line(line.p1(), point)
-    l2 = Line(line.p2(), point)
-    return line.length() == l1.length() + l2.length()
+from cad.drawing import Line, Point, Pen
 
 
 class Workspace(QWidget):
@@ -46,23 +40,33 @@ class Workspace(QWidget):
     def mousePressEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonPress:
             if event.button() == QtCore.Qt.LeftButton:
-                self._point = event.localPos()
+                self._point = Point(event.localPos())
 
     def mouseReleaseEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonRelease:
             if event.button() == QtCore.Qt.LeftButton:
-                line = Line(self._point, event.pos())
+                point = Point(event.localPos())
+                line = Line(self._point, point)
                 self._point = None
                 self.draw(line)
 
     def mouseMoveEvent(self, event):
+        point = Point(event.localPos())
         if self.isMousePressed():
             if self._lines:
                 self._lines.pop(-1)
-            line = Line(self._point, event.pos())
+            line = Line(self._point, point)
             self.draw(line)
+        else:
+            for line in self._lines:
+                if line.hasPoint(point):
+                    line.setPen(Pen.active)
+                else:
+                    line.setPen(Pen.stable)
+            self.update()
 
     def draw(self, line):
+        line.setPen(Pen.stable)
         self._lines.append(line)
         self.update()
 
@@ -70,7 +74,7 @@ class Workspace(QWidget):
         painter = QtGui.QPainter()
         painter.begin(self)
         for line in self._lines:
-            painter.setPen(line.pen())
+            painter.setPen(line.getPen())
             painter.drawLine(line)
         painter.end()
 
