@@ -6,6 +6,8 @@ def distancePointToPoint(p1, p2):
 
 
 def distancePointToVector(p, l):
+    if l.length() == 0.:
+        return distancePointToPoint(p, l.p1())
     p1, p2 = l.p1(), l.p2()
     s = l.dy() * p.x() - l.dx() * p.y() + p2.x() * p1.y() - p2.y() * p1.x()
     return abs(s) / l.length()
@@ -37,7 +39,7 @@ class Line(QtCore.QLineF):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.setPen(Pen.stable())
+        self.setPen(Pen().stable())
 
     def setPen(self, pen):
         if not isinstance(pen, QtGui.QPen):
@@ -53,7 +55,9 @@ class Line(QtCore.QLineF):
 
     def hasPoint(self, point):
         d = distancePointToVector(point, self)
-        return self.getPen().widthF() / 2 > d
+        if self.p1().x() <= point.x() <= self.p2().x():
+            return self.getPen().widthF() / 2 > d
+        return False
 
     def hide(self):
         self.setLength(0.)
