@@ -26,6 +26,13 @@ class DrawingTestCase(unittest.TestCase):
         d = distancePointToVector(Point(30, 30), line)
         self.assertEqual(0., d)
 
+    def testIsPointOnVector(self):
+        line = Line(Point(10, 10), Point(30, 30))
+
+        self.assertTrue(isPointOnVector(Point(0, 0), line))
+        self.assertTrue(isPointOnVector(Point(10, 10), line))
+        self.assertTrue(isPointOnVector(Point(45, 45), line))
+
 
 if __name__ == '__main__':
     unittest.main()

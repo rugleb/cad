@@ -11,6 +11,10 @@ def distancePointToVector(p, l):
     return abs(s) / l.length()
 
 
+def isPointOnVector(p, l):
+    return distancePointToVector(p, l) == 0.
+
+
 class Line(QtCore.QLineF):
     _pen = None
 
