@@ -56,27 +56,34 @@ class Workspace(QWidget):
             if self._lines:
                 self._lines.pop(-1)
             line = Line(self._point, point)
-            self.draw(line)
-        else:
-            for line in self._lines:
-                if line.hasPoint(point):
-                    line.setPen(Pen.active())
-                else:
-                    line.setPen(Pen.stable())
-            self.update()
+            self._lines.append(line)
+        for line in self._lines:
+            if line.hasPoint(point):
+                line.setPen(Pen.active())
+            else:
+                line.setPen(Pen.stable())
+        self.update()
 
     def draw(self, line):
-        line.setPen(Pen.stable())
         self._lines.append(line)
         self.update()
 
     def paintEvent(self, event):
         painter = QtGui.QPainter()
         painter.begin(self)
-        for line in self._lines:
-            painter.setPen(line.getPen())
-            painter.drawLine(line)
+        self._drawLines(painter)
         painter.end()
+
+    def _drawLines(self, painter):
+        for line in self._lines:
+            pen = line.getPen()
+            painter.setPen(pen)
+            painter.drawLine(line)
+            width = pen.widthF()
+            pen.setWidthF(width * 2)
+            painter.setPen(pen)
+            painter.drawPoints(line.p1(), line.p2())
+            pen.setWidthF(width)
 
 
 if __name__ == '__main__':
