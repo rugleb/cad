@@ -55,8 +55,12 @@ class Line(QtCore.QLineF):
 
     def hasPoint(self, point):
         d = distancePointToVector(point, self)
-        if self.p1().x() <= point.x() <= self.p2().x():
-            return self.getPen().widthF() / 2 > d
+        if self.getPen().widthF() / 2 > d:
+            if self.x1() <= point.x() <= self.x2():
+                return True
+            if self.x2() <= point.x() <= self.x1():
+                return True
+            return False
         return False
 
     def hide(self):
