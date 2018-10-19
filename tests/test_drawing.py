@@ -50,6 +50,14 @@ class PointTestCase(unittest.TestCase):
         self.assertFalse(Point(10, 11).onLine(line))
         self.assertFalse(Point(25, 25).onLine(line))
 
+    def testOnVectorMethod(self):
+        line = Line(Point(10, 10), Point(20, 20))
+
+        self.assertTrue(Point(0, 0).onVector(line))
+        self.assertTrue(Point(15, 15).onVector(line))
+        self.assertTrue(Point(30, 30).onVector(line))
+        self.assertFalse(Point(20, 25).onVector(line))
+
 
 if __name__ == '__main__':
     unittest.main()

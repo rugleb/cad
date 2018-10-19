@@ -38,3 +38,6 @@ class Point(QtCore.QPointF):
 
     def onLine(self, line):
         return isPointOnLine(self, line)
+
+    def onVector(self, line):
+        return isPointOnVector(self, line)
