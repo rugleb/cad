@@ -35,4 +35,6 @@ class Line(QtCore.QLineF):
 
 
 class Point(QtCore.QPointF):
-    pass
+
+    def onLine(self, line):
+        return isPointOnLine(self, line)
