@@ -4,6 +4,12 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget
 
 
+def isPointOnLine(point, line):
+    l1 = QtCore.QLineF(line.p1(), point)
+    l2 = QtCore.QLineF(line.p2(), point)
+    return line.length() == l1.length() + l2.length()
+
+
 class Workspace(QWidget):
     _lines = None
     _point = None
