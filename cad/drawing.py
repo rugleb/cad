@@ -29,7 +29,14 @@ class Pen:
 class Line(QtCore.QLineF):
     _pen = None
 
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setPen(Pen.stable)
+
     def setPen(self, pen):
+        if type(pen) is not QtGui.QPen:
+            message = 'Invalid Pen type: expected QtGui.QPen object'
+            raise Exception(message)
         self._pen = pen
 
     def getPen(self):
