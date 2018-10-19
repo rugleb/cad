@@ -39,7 +39,8 @@ class Line(QtCore.QLineF):
         return isinstance(self.getPen(), QtGui.QPen)
 
     def hasPoint(self, point):
-        return isPointOnLine(point, self)
+        d = distancePointToVector(point, self)
+        return self.getPen().widthF() / 2 > d
 
     def hide(self):
         self.setLength(0.)
