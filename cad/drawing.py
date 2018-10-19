@@ -1,8 +1,17 @@
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 
 
 class Line(QtCore.QLineF):
-    pass
+    _pen = None
+
+    def setPen(self, pen):
+        self._pen = pen
+
+    def getPen(self):
+        return self._pen
+
+    def hasPen(self):
+        return isinstance(self.getPen(), QtGui.QPen)
 
 
 class Point(QtCore.QPointF):
