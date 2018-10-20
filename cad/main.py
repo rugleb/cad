@@ -21,19 +21,6 @@ class Workspace(QWidget):
         self.setGeometry(QDesktopWidget().availableGeometry())
         self.show()
 
-    def closeEvent(self, event):
-        title = 'Close application'
-        question = 'Are you sure you want to quit?'
-
-        default = QMessageBox.No
-        buttons = QMessageBox.No | QMessageBox.Yes
-
-        answer = QMessageBox.question(self, title, question, buttons, default)
-        if answer == QMessageBox.Yes:
-            event.accept()
-        else:
-            event.ignore()
-
     def isMousePressed(self):
         return self._point is not None
 
@@ -111,6 +98,19 @@ class Application(QMainWindow):
 
     def _setStatusBar(self):
         self.statusBar().showMessage('Ready')
+
+    def closeEvent(self, event):
+        title = 'Close application'
+        question = 'Are you sure you want to quit?'
+
+        default = QMessageBox.No
+        buttons = QMessageBox.No | QMessageBox.Yes
+
+        answer = QMessageBox.question(self, title, question, buttons, default)
+        if answer == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
 
 
 if __name__ == '__main__':
