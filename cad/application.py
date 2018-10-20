@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QAction, \
     QDesktopWidget, QMessageBox, QFileDialog, QPushButton, QLabel
 
-from cad.workspace import Workspace
+from cad.sketch import Sketch
 
 
 class Application(QMainWindow):
@@ -14,9 +14,9 @@ class Application(QMainWindow):
         self._setRestrictionsBar()
         self._setStatusBar()
         self._setGeometry()
-        self.setCentralWidget(Workspace())
+        self.setCentralWidget(Sketch())
 
-        self.setWindowTitle('Workspace')
+        self.setWindowTitle('Sketch')
         self.show()
 
     def _setMenuBar(self):

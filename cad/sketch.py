@@ -1,10 +1,9 @@
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QWidget
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from cad.drawing import Line, Point, Pen
 
 
-class Workspace(QWidget):
+class Sketch(QtWidgets.QWidget):
     _lines = None
     _point = None
 
@@ -15,7 +14,7 @@ class Workspace(QWidget):
         self._point = None
 
         self.setMouseTracking(True)
-        self.setWindowTitle('Workspace')
+        self.setWindowTitle('Sketch')
         self.show()
 
     def isMousePressed(self):
