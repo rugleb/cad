@@ -88,6 +88,7 @@ class Application(QMainWindow):
         menu = self.menuBar()
         file = menu.addMenu('File')
         file.addAction(self._exitAction())
+        file.addAction(self._openAction())
         file.addAction(self._saveAction())
 
     def _exitAction(self):
@@ -101,6 +102,12 @@ class Application(QMainWindow):
         action = QAction('Save As', self)
         action.setShortcut('Ctrl+S')
         action.setStatusTip('Saving')
+        return action
+
+    def _openAction(self):
+        action = QAction('Open', self)
+        action.setShortcut('Ctrl+O')
+        action.setStatusTip('Open file')
         return action
 
     def _setStatusBar(self):
