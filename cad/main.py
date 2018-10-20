@@ -18,7 +18,6 @@ class Workspace(QWidget):
 
         self.setMouseTracking(True)
         self.setWindowTitle('Workspace')
-        self.setGeometry(QDesktopWidget().availableGeometry())
         self.show()
 
     def isMousePressed(self):
@@ -80,6 +79,7 @@ class Application(QMainWindow):
 
         self._setMenuBar()
         self._setStatusBar()
+        self._setGeometry()
 
         self.setWindowTitle('Workspace')
         self.show()
@@ -98,6 +98,10 @@ class Application(QMainWindow):
 
     def _setStatusBar(self):
         self.statusBar().showMessage('Ready')
+
+    def _setGeometry(self):
+        desktop = QDesktopWidget()
+        self.setGeometry(desktop.availableGeometry())
 
     def closeEvent(self, event):
         title = 'Close application'
