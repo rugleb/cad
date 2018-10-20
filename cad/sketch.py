@@ -4,13 +4,13 @@ from cad.drawing import Line, Point, Pen
 
 
 class Sketch(QtWidgets.QWidget):
-    _lines = None
+    _segments = None
     _point = None
 
     def __init__(self):
         super().__init__()
 
-        self._lines = []
+        self._segments = []
         self._point = None
 
         self.setMouseTracking(True)
@@ -36,11 +36,11 @@ class Sketch(QtWidgets.QWidget):
     def mouseMoveEvent(self, event):
         point = Point(event.localPos())
         if self.isMousePressed():
-            if self._lines:
-                self._lines.pop(-1)
+            if self._segments:
+                self._segments.pop(-1)
             line = Line(self._point, point)
-            self._lines.append(line)
-        for line in self._lines:
+            self._segments.append(line)
+        for line in self._segments:
             if line.hasPoint(point):
                 line.setPen(Pen.active())
             else:
@@ -48,7 +48,7 @@ class Sketch(QtWidgets.QWidget):
         self.update()
 
     def draw(self, line):
-        self._lines.append(line)
+        self._segments.append(line)
         self.update()
 
     def paintEvent(self, event):
@@ -58,7 +58,7 @@ class Sketch(QtWidgets.QWidget):
         painter.end()
 
     def _drawLines(self, painter):
-        for line in self._lines:
+        for line in self._segments:
             pen = line.getPen()
             painter.setPen(pen)
             painter.drawLine(line)
