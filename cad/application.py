@@ -1,12 +1,14 @@
-from PyQt5.QtWidgets import QMainWindow, \
-    QDesktopWidget, QMessageBox, QFileDialog, \
-    QAction, QInputDialog, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QAction, \
+    QDesktopWidget, QMessageBox, QFileDialog, QPushButton
 
 
 class Application(QMainWindow):
 
     def __init__(self, *args):
         super().__init__(*args)
+
+        self.pointButton = QPushButton('Point')
+        self.segmentButton = QPushButton('Segment')
 
         self._setMenuBar()
         self._setToolBar()
@@ -44,29 +46,22 @@ class Application(QMainWindow):
         return action
 
     def _setToolBar(self):
-        toolbar = self.addToolBar('Exit')
-        toolbar.addAction(self._pointAction())
-        toolbar.addAction(QAction('Line', self))
+        toolbar = self.addToolBar('Drawing')
 
-    def _pointAction(self):
-        action = QAction('Point', self)
-        action.setStatusTip('Draw point')
-        action.setStatusTip('Ctrl+P')
-        action.triggered.connect(self._enableDrawingPoint)
-        return action
+        self.pointButton = QPushButton('Point', self)
+        self.segmentButton = QPushButton('Segment', self)
 
-    def _segmentAction(self):
-        action = QAction('Segment', self)
-        action.setStatusTip('Draw segment')
-        action.setStatusTip('Ctrl+S')
-        action.triggered.connect(self._enableDrawingSegment)
-        return action
+        self.pointButton.clicked.connect(self._handlePointClick)
+        self.segmentButton.clicked.connect(self._handleSegmentClick)
 
-    def _enableDrawingPoint(self):
-        pass
+        toolbar.addWidget(self.pointButton)
+        toolbar.addWidget(self.segmentButton)
 
-    def _enableDrawingSegment(self):
-        pass
+    def _handlePointClick(self):
+        self.segmentButton.setDown(False)
+
+    def _handleSegmentClick(self):
+        self.pointButton.setDown(False)
 
     def _setStatusBar(self):
         self.statusBar().showMessage('Ready')
