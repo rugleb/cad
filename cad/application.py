@@ -55,7 +55,17 @@ class Application(QMainWindow):
         action.triggered.connect(self._enableDrawingPoint)
         return action
 
+    def _segmentAction(self):
+        action = QAction('Segment', self)
+        action.setStatusTip('Draw segment')
+        action.setStatusTip('Ctrl+S')
+        action.triggered.connect(self._enableDrawingSegment)
+        return action
+
     def _enableDrawingPoint(self):
+        pass
+
+    def _enableDrawingSegment(self):
         pass
 
     def _setStatusBar(self):
