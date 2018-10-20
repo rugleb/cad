@@ -7,15 +7,14 @@ class Sketch(QtWidgets.QWidget):
     _segments = None
     _point = None
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args):
+        super().__init__(*args)
 
         self._segments = []
         self._point = None
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
-        self.show()
 
     def isMousePressed(self):
         return self._point is not None

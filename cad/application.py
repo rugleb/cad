@@ -1,3 +1,4 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QAction, \
     QDesktopWidget, QMessageBox, QFileDialog, QPushButton, QLabel
 
@@ -14,10 +15,14 @@ class Application(QMainWindow):
         self._setRestrictionsBar()
         self._setStatusBar()
         self._setGeometry()
-        self.setCentralWidget(Sketch())
+        self._setSketch()
 
         self.setWindowTitle('Sketch')
         self.show()
+
+    def _setSketch(self):
+        sketch = Sketch(self)
+        self.setCentralWidget(sketch)
 
     def _setMenuBar(self):
         file = self.menuBar().addMenu('File')
