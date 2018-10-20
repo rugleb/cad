@@ -63,6 +63,12 @@ class Application(QMainWindow):
             with open(files[0], 'w') as fp:
                 fp.write('')
 
+    def _showSaveDialog(self):
+        files = QFileDialog.getSaveFileName(self, 'Save As', '/home/cad.json', '*.json')
+
+        with open(files[0], 'w') as fp:
+            fp.write('')
+
     def closeEvent(self, event):
         title = 'Close application'
         question = 'Are you sure you want to quit?'
