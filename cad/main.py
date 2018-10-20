@@ -86,14 +86,21 @@ class Application(QMainWindow):
 
     def _setMenuBar(self):
         menu = self.menuBar()
-        menu = menu.addMenu('File')
-        menu.addAction(self._exitAction())
+        file = menu.addMenu('File')
+        file.addAction(self._exitAction())
+        file.addAction(self._saveAction())
 
     def _exitAction(self):
         action = QAction('Exit', self)
         action.setShortcut('Ctrl+Q')
         action.setStatusTip('Exit application')
         action.triggered.connect(self.close)
+        return action
+
+    def _saveAction(self):
+        action = QAction('Save As', self)
+        action.setShortcut('Ctrl+S')
+        action.setStatusTip('Saving')
         return action
 
     def _setStatusBar(self):
