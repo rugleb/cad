@@ -10,8 +10,8 @@ class Application(QMainWindow):
         super().__init__(*args)
 
         self._setMenuBar()
-        self._setToolBar()
-        self._setRestrictionsToolBar()
+        self._setDrawingBar()
+        self._setRestrictionsBar()
         self._setStatusBar()
         self._setGeometry()
         self.setCentralWidget(Workspace())
@@ -46,7 +46,7 @@ class Application(QMainWindow):
         action.triggered.connect(self._showOpenDialog)
         return action
 
-    def _setToolBar(self):
+    def _setDrawingBar(self):
         toolbar = self.addToolBar('Drawing')
 
         self.pointButton = QPushButton('Point', toolbar)
@@ -59,7 +59,7 @@ class Application(QMainWindow):
         toolbar.addWidget(self.pointButton)
         toolbar.addWidget(self.segmentButton)
 
-    def _setRestrictionsToolBar(self):
+    def _setRestrictionsBar(self):
         toolbar = self.addToolBar('Restrictions')
 
         self._restrictions = {
