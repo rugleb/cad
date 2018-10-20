@@ -1,19 +1,19 @@
 from PyQt5.QtWidgets import QMainWindow, QAction, \
     QDesktopWidget, QMessageBox, QFileDialog, QPushButton
 
+from cad.workspace import Workspace
+
 
 class Application(QMainWindow):
 
     def __init__(self, *args):
         super().__init__(*args)
 
-        self.pointButton = QPushButton('Point')
-        self.segmentButton = QPushButton('Segment')
-
         self._setMenuBar()
         self._setToolBar()
         self._setStatusBar()
         self._setGeometry()
+        self.setCentralWidget(Workspace())
 
         self.setWindowTitle('Workspace')
         self.show()
@@ -59,9 +59,11 @@ class Application(QMainWindow):
 
     def _handlePointClick(self):
         self.segmentButton.setDown(False)
+        self.pointButton.setDown(not self.pointButton.isDown())
 
     def _handleSegmentClick(self):
         self.pointButton.setDown(False)
+        self.segmentButton.setDown(not self.segmentButton.isDown())
 
     def _setStatusBar(self):
         self.statusBar().showMessage('Ready')
