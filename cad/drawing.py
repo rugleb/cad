@@ -27,11 +27,11 @@ class Pen(QtGui.QPen):
 
     @classmethod
     def active(cls):
-        return cls(QtCore.Qt.gray, 4, QtCore.Qt.SolidLine)
+        return cls(QtCore.Qt.gray, 6, QtCore.Qt.SolidLine)
 
     @classmethod
     def stable(cls):
-        return cls(QtCore.Qt.darkGray, 3, QtCore.Qt.SolidLine)
+        return cls(QtCore.Qt.darkGray, 4, QtCore.Qt.SolidLine)
 
 
 class Line(QtCore.QLineF):
