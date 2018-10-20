@@ -31,13 +31,14 @@ class Application(QMainWindow):
         action = QAction('Save As', self)
         action.setShortcut('Ctrl+S')
         action.setStatusTip('Saving')
+        action.triggered.connect(self._showSaveDialog)
         return action
 
     def _openAction(self):
         action = QAction('Open', self)
         action.setShortcut('Ctrl+O')
         action.setStatusTip('Open file')
-        action.triggered.connect(self._showOpenFileDialog)
+        action.triggered.connect(self._showOpenDialog)
         return action
 
     def _setStatusBar(self):
@@ -47,11 +48,17 @@ class Application(QMainWindow):
         desktop = QDesktopWidget()
         self.setGeometry(desktop.availableGeometry())
 
-    def _showOpenFileDialog(self):
-        files = QFileDialog.getOpenFileName(self, 'Open file', '/home', '*.py')
+    def _showOpenDialog(self):
+        files = QFileDialog.getOpenFileName(self, 'Open file', '/home', '*.json')
 
         with open(files[0], 'r') as fp:
             data = fp.read()
+
+    def _showSaveDialog(self):
+        files = QFileDialog.getSaveFileName(self, 'Save As', '/home/cad.json', '*.json')
+
+        with open(files[0], 'w') as fp:
+            fp.write('')
 
     def closeEvent(self, event):
         title = 'Close application'
