@@ -5,19 +5,21 @@ from cad.drawing import Line, Point, Pen
 
 class Sketch(QtWidgets.QWidget):
     _segments = None
-    _point = None
+    _p1 = None
+    _p2 = None
 
     def __init__(self, *args):
         super().__init__(*args)
 
         self._segments = []
-        self._point = None
+        self._p1 = None
+        self._p2 = None
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
 
     def isMousePressed(self):
-        return self._point is not None
+        return self._p1 is not None
 
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == QtCore.Qt.Key_Delete:
@@ -27,14 +29,14 @@ class Sketch(QtWidgets.QWidget):
     def mousePressEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonPress:
             if event.button() == QtCore.Qt.LeftButton:
-                self._point = Point(event.localPos())
+                self._p1 = Point(event.localPos())
 
     def mouseReleaseEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonRelease:
             if event.button() == QtCore.Qt.LeftButton:
                 point = Point(event.localPos())
-                line = Line(self._point, point)
-                self._point = None
+                line = Line(self._p1, point)
+                self._p1 = None
                 self.draw(line)
 
     def mouseMoveEvent(self, event):
@@ -43,7 +45,7 @@ class Sketch(QtWidgets.QWidget):
         if self.isMousePressed():
             if self._segments:
                 self._segments.pop(-1)
-            line = Line(self._point, point)
+            line = Line(self._p1, point)
             self._segments.append(line)
         for line in self._segments:
             if line.hasPoint(point):
