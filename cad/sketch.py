@@ -19,6 +19,11 @@ class Sketch(QtWidgets.QWidget):
     def isMousePressed(self):
         return self._point is not None
 
+    def keyPressEvent(self, QKeyEvent):
+        if QKeyEvent.key() == QtCore.Qt.Key_Delete:
+            self._segments = [s for s in self._segments if not s.hasPoint(self._p2)]
+        self.update()
+
     def mousePressEvent(self, event):
         if event.type() == QtCore.QEvent.MouseButtonPress:
             if event.button() == QtCore.Qt.LeftButton:
@@ -34,6 +39,7 @@ class Sketch(QtWidgets.QWidget):
 
     def mouseMoveEvent(self, event):
         point = Point(event.localPos())
+        self._p2 = point
         if self.isMousePressed():
             if self._segments:
                 self._segments.pop(-1)

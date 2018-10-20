@@ -21,8 +21,8 @@ class Application(QMainWindow):
         self.show()
 
     def _setSketch(self):
-        sketch = Sketch(self)
-        self.setCentralWidget(sketch)
+        self.sketch = Sketch(self)
+        self.setCentralWidget(self.sketch)
 
     def _setMenuBar(self):
         file = self.menuBar().addMenu('File')
@@ -105,6 +105,9 @@ class Application(QMainWindow):
         if files and files[0]:
             with open(files[0], 'w') as fp:
                 fp.write('')
+
+    def keyPressEvent(self, QKeyEvent):
+        self.sketch.keyPressEvent(QKeyEvent)
 
     def closeEvent(self, event):
         title = 'Close application'
