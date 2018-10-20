@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, \
-    QDesktopWidget, QMessageBox, QFileDialog, QAction
+    QDesktopWidget, QMessageBox, QFileDialog, \
+    QAction, QInputDialog, QPushButton
 
 
 class Application(QMainWindow):
@@ -16,8 +17,7 @@ class Application(QMainWindow):
         self.show()
 
     def _setMenuBar(self):
-        menu = self.menuBar()
-        file = menu.addMenu('File')
+        file = self.menuBar().addMenu('File')
         file.addAction(self._exitAction())
         file.addAction(self._openAction())
         file.addAction(self._saveAction())
