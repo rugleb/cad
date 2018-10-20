@@ -1,6 +1,4 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QAction, \
-    QDesktopWidget, QMessageBox, QFileDialog, QPushButton, QLabel
+from PyQt5.QtWidgets import *
 
 from cad.sketch import Sketch
 
@@ -65,17 +63,22 @@ class Application(QMainWindow):
         toolbar.addWidget(self.segmentButton)
 
     def _setRestrictionsBar(self):
-        toolbar = self.addToolBar('Restrictions')
+        self._restrictionBar = self.addToolBar('Restrictions')
 
-        self._restrictions = {
-            'angle': QPushButton('Angle', toolbar),
-            'length': QPushButton('Length', toolbar),
-            'parallels': QPushButton('Parallels', toolbar),
-        }
+        self._restrictionBar.addWidget(QLabel('Restrictions: '))
+        self._setAngleRestriction()
 
-        toolbar.addWidget(QLabel('Restrictions ', toolbar))
-        for k in self._restrictions:
-            toolbar.addWidget(self._restrictions[k])
+    def _setAngleRestriction(self):
+        self._angleButton = QPushButton('Angle')
+        self._angleButton.clicked.connect(self._angleClickHandler)
+
+        self._angleButton.setParent(self._restrictionBar)
+        self._restrictionBar.addWidget(self._angleButton)
+
+    def _angleClickHandler(self):
+        angle, pressed = QInputDialog.getInt(self, 'Angle restriction', 'Value: ', min=-360, max=360)
+        if pressed and angle:
+            print(angle)
 
     def _handlePointClick(self):
         self.segmentButton.setDown(False)
