@@ -8,6 +8,7 @@ class Application(QMainWindow):
         super().__init__(*args)
 
         self._setMenuBar()
+        self._setToolBar()
         self._setStatusBar()
         self._setGeometry()
 
@@ -41,6 +42,11 @@ class Application(QMainWindow):
         action.setStatusTip('Open file')
         action.triggered.connect(self._showOpenDialog)
         return action
+
+    def _setToolBar(self):
+        toolbar = self.addToolBar('Exit')
+        toolbar.addAction(QAction('Point', self))
+        toolbar.addAction(QAction('Line', self))
 
     def _setStatusBar(self):
         self.statusBar().showMessage('Ready')
