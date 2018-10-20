@@ -68,6 +68,17 @@ class Application(QMainWindow):
         self._restrictionBar.addWidget(QLabel('Restrictions: '))
         self._setAngleRestriction()
         self._setLengthRestriction()
+        self._setParallelsRestriction()
+
+    def _setParallelsRestriction(self):
+        self._parallelsButton = QPushButton('Parallels')
+        self._parallelsButton.clicked.connect(self._parallelsClickHandler)
+
+        self._parallelsButton.setParent(self._restrictionBar)
+        self._restrictionBar.addWidget(self._parallelsButton)
+
+    def _parallelsClickHandler(self):
+        self.setStatusTip('Select line')
 
     def _setLengthRestriction(self):
         self._lengthButton = QPushButton('Length')
