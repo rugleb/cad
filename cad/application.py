@@ -67,6 +67,19 @@ class Application(QMainWindow):
 
         self._restrictionBar.addWidget(QLabel('Restrictions: '))
         self._setAngleRestriction()
+        self._setLengthRestriction()
+
+    def _setLengthRestriction(self):
+        self._lengthButton = QPushButton('Length')
+        self._lengthButton.clicked.connect(self._lengthClickHandler)
+
+        self._lengthButton.setParent(self._restrictionBar)
+        self._restrictionBar.addWidget(self._lengthButton)
+
+    def _lengthClickHandler(self):
+        length, pressed = QInputDialog.getDouble(self, 'Length restriction', 'Value: ', min=0.)
+        if pressed and length:
+            print(length)
 
     def _setAngleRestriction(self):
         self._angleButton = QPushButton('Angle')
