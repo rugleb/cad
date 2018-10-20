@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget, QMainWindow
+from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget, QMainWindow, QAction
 
 from cad.drawing import Line, Point, Pen
 
@@ -91,12 +91,25 @@ class Application(QMainWindow):
     def __init__(self, *args):
         super().__init__(*args)
 
-        self._initStatusBar()
+        self._setMenuBar()
+        self._setStatusBar()
 
         self.setWindowTitle('Workspace')
         self.show()
 
-    def _initStatusBar(self):
+    def _setMenuBar(self):
+        menu = self.menuBar()
+        menu = menu.addMenu('File')
+        menu.addAction(self._exitAction())
+
+    def _exitAction(self):
+        action = QAction('Exit', self)
+        action.setShortcut('Ctrl+Q')
+        action.setStatusTip('Exit application')
+        action.triggered.connect(self.close)
+        return action
+
+    def _setStatusBar(self):
         self.statusBar().showMessage('Ready')
 
 
