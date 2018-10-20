@@ -45,8 +45,18 @@ class Application(QMainWindow):
 
     def _setToolBar(self):
         toolbar = self.addToolBar('Exit')
-        toolbar.addAction(QAction('Point', self))
+        toolbar.addAction(self._pointAction())
         toolbar.addAction(QAction('Line', self))
+
+    def _pointAction(self):
+        action = QAction('Point', self)
+        action.setStatusTip('Draw point')
+        action.setStatusTip('Ctrl+P')
+        action.triggered.connect(self._enableDrawingPoint)
+        return action
+
+    def _enableDrawingPoint(self):
+        pass
 
     def _setStatusBar(self):
         self.statusBar().showMessage('Ready')
