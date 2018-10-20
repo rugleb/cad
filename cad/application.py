@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QAction, QDesktopWidget, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, \
+    QDesktopWidget, QMessageBox, QFileDialog, QAction
 
 
 class Application(QMainWindow):
