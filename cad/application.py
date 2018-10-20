@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QAction, \
-    QDesktopWidget, QMessageBox, QFileDialog, QPushButton
+    QDesktopWidget, QMessageBox, QFileDialog, QPushButton, QLabel
 
 from cad.workspace import Workspace
 
@@ -11,6 +11,7 @@ class Application(QMainWindow):
 
         self._setMenuBar()
         self._setToolBar()
+        self._setRestrictionsToolBar()
         self._setStatusBar()
         self._setGeometry()
         self.setCentralWidget(Workspace())
@@ -48,14 +49,28 @@ class Application(QMainWindow):
     def _setToolBar(self):
         toolbar = self.addToolBar('Drawing')
 
-        self.pointButton = QPushButton('Point', self)
-        self.segmentButton = QPushButton('Segment', self)
+        self.pointButton = QPushButton('Point', toolbar)
+        self.segmentButton = QPushButton('Segment', toolbar)
 
         self.pointButton.clicked.connect(self._handlePointClick)
         self.segmentButton.clicked.connect(self._handleSegmentClick)
 
+        toolbar.addWidget(QLabel('Drawing ', toolbar))
         toolbar.addWidget(self.pointButton)
         toolbar.addWidget(self.segmentButton)
+
+    def _setRestrictionsToolBar(self):
+        toolbar = self.addToolBar('Restrictions')
+
+        self._restrictions = {
+            'angle': QPushButton('Angle', toolbar),
+            'length': QPushButton('Length', toolbar),
+            'parallels': QPushButton('Parallels', toolbar),
+        }
+
+        toolbar.addWidget(QLabel('Restrictions ', toolbar))
+        for k in self._restrictions:
+            toolbar.addWidget(self._restrictions[k])
 
     def _handlePointClick(self):
         self.segmentButton.setDown(False)
