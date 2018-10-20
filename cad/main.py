@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget
+from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication, QDesktopWidget, QMainWindow
 
 from cad.drawing import Line, Point, Pen
 
@@ -86,8 +86,22 @@ class Workspace(QWidget):
             pen.setWidthF(width)
 
 
+class Application(QMainWindow):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+
+        self._initStatusBar()
+
+        self.setWindowTitle('Workspace')
+        self.show()
+
+    def _initStatusBar(self):
+        self.statusBar().showMessage('Ready')
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    workspace = Workspace()
+    workspace = Application()
 
     sys.exit(app.exec_())
