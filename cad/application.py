@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QAction, QDesktopWidget, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QAction, QDesktopWidget, QMessageBox, QFileDialog
 
 
 class Application(QMainWindow):
@@ -37,6 +37,7 @@ class Application(QMainWindow):
         action = QAction('Open', self)
         action.setShortcut('Ctrl+O')
         action.setStatusTip('Open file')
+        action.triggered.connect(self._showOpenFileDialog)
         return action
 
     def _setStatusBar(self):
@@ -45,6 +46,12 @@ class Application(QMainWindow):
     def _setGeometry(self):
         desktop = QDesktopWidget()
         self.setGeometry(desktop.availableGeometry())
+
+    def _showOpenFileDialog(self):
+        files = QFileDialog.getOpenFileName(self, 'Open file', '/home', '*.py')
+
+        with open(files[0], 'r') as fp:
+            data = fp.read()
 
     def closeEvent(self, event):
         title = 'Close application'
