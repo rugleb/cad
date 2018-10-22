@@ -18,7 +18,6 @@ class Application(QMainWindow):
         self.initGeometry()
 
         self.setWindowTitle('Sketch')
-        self.show()
 
     def initSketch(self):
         self.sketch = Sketch(self)
