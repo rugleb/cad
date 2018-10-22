@@ -21,8 +21,8 @@ class Sketch(QtWidgets.QWidget):
     def isMousePressed(self):
         return self._p1 is not None
 
-    def keyPressEvent(self, QKeyEvent):
-        if QKeyEvent.key() == QtCore.Qt.Key_Delete:
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Delete:
             self._segments = [s for s in self._segments if not s.hasPoint(self._p2)]
         self.update()
 
