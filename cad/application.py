@@ -8,6 +8,7 @@ class Application(QMainWindow):
     def __init__(self, *args):
         super().__init__(*args)
 
+        self.menu = None
         self.sketch = None
 
         self.initMenuBar()
@@ -24,7 +25,8 @@ class Application(QMainWindow):
         self.setCentralWidget(self.sketch)
 
     def initMenuBar(self):
-        file = self.menuBar().addMenu('File')
+        self.menu = self.menuBar()
+        file = self.menu.addMenu('File')
         file.addAction(self.exitAction())
         file.addAction(self.openAction())
         file.addAction(self.saveAction())
