@@ -10,6 +10,7 @@ class Application(QMainWindow):
 
         self.menu = None
         self.sketch = None
+        self.drawBar = None
 
         self.initMenuBar()
         self.initStatusBar()
@@ -53,17 +54,17 @@ class Application(QMainWindow):
         return action
 
     def initDrawingBar(self):
-        toolbar = self.addToolBar('Drawing')
+        self.drawBar = self.addToolBar('Drawing')
+        pointAction = self.drawBar.addAction('Point')
+        lineAction = self.drawBar.addAction('Line')
 
-        self.pointButton = QPushButton('Point', toolbar)
-        self.segmentButton = QPushButton('Segment', toolbar)
+        group = QActionGroup(self.drawBar)
+        group.addAction(pointAction)
+        group.addAction(lineAction)
 
-        self.pointButton.clicked.connect(self._handlePointClick)
-        self.segmentButton.clicked.connect(self._handleSegmentClick)
-
-        toolbar.addWidget(QLabel('Drawing ', toolbar))
-        toolbar.addWidget(self.pointButton)
-        toolbar.addWidget(self.segmentButton)
+        lineAction.setCheckable(True)
+        pointAction.setCheckable(True)
+        lineAction.setChecked(True)
 
     def initRestrictionsBar(self):
         self._restrictionBar = self.addToolBar('Restrictions')
