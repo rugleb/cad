@@ -8,48 +8,50 @@ class Application(QMainWindow):
     def __init__(self, *args):
         super().__init__(*args)
 
-        self._setMenuBar()
-        self._setDrawingBar()
-        self._setRestrictionsBar()
-        self._setStatusBar()
-        self._setGeometry()
-        self._setSketch()
+        self.sketch = None
+
+        self.initMenuBar()
+        self.initStatusBar()
+        self.initDrawingBar()
+        self.initRestrictionsBar()
+        self.initSketch()
+        self.initGeometry()
 
         self.setWindowTitle('Sketch')
         self.show()
 
-    def _setSketch(self):
+    def initSketch(self):
         self.sketch = Sketch(self)
         self.setCentralWidget(self.sketch)
 
-    def _setMenuBar(self):
+    def initMenuBar(self):
         file = self.menuBar().addMenu('File')
-        file.addAction(self._exitAction())
-        file.addAction(self._openAction())
-        file.addAction(self._saveAction())
+        file.addAction(self.exitAction())
+        file.addAction(self.openAction())
+        file.addAction(self.saveAction())
 
-    def _exitAction(self):
+    def exitAction(self):
         action = QAction('Exit', self)
         action.setShortcut('Ctrl+Q')
         action.setStatusTip('Exit application')
         action.triggered.connect(self.close)
         return action
 
-    def _saveAction(self):
+    def saveAction(self):
         action = QAction('Save As', self)
         action.setShortcut('Ctrl+S')
         action.setStatusTip('Saving')
-        action.triggered.connect(self._showSaveDialog)
+        action.triggered.connect(self.showSaveDialog)
         return action
 
-    def _openAction(self):
+    def openAction(self):
         action = QAction('Open', self)
         action.setShortcut('Ctrl+O')
         action.setStatusTip('Open file')
-        action.triggered.connect(self._showOpenDialog)
+        action.triggered.connect(self.showOpenDialog)
         return action
 
-    def _setDrawingBar(self):
+    def initDrawingBar(self):
         toolbar = self.addToolBar('Drawing')
 
         self.pointButton = QPushButton('Point', toolbar)
@@ -62,7 +64,7 @@ class Application(QMainWindow):
         toolbar.addWidget(self.pointButton)
         toolbar.addWidget(self.segmentButton)
 
-    def _setRestrictionsBar(self):
+    def initRestrictionsBar(self):
         self._restrictionBar = self.addToolBar('Restrictions')
 
         self._restrictionBar.addWidget(QLabel('Restrictions: '))
@@ -112,21 +114,21 @@ class Application(QMainWindow):
         self.pointButton.setDown(False)
         self.segmentButton.setDown(not self.segmentButton.isDown())
 
-    def _setStatusBar(self):
+    def initStatusBar(self):
         self.statusBar().showMessage('Ready')
 
-    def _setGeometry(self):
+    def initGeometry(self):
         desktop = QDesktopWidget()
         self.setGeometry(desktop.availableGeometry())
 
-    def _showOpenDialog(self):
+    def showOpenDialog(self):
         files = QFileDialog.getOpenFileName(self, 'Open file', '/home', '*.json')
 
         if files and files[0]:
             with open(files[0], 'r') as fp:
                 data = fp.read()
 
-    def _showSaveDialog(self):
+    def showSaveDialog(self):
         files = QFileDialog.getSaveFileName(self, 'Save As', '/home/cad.json', '*.json')
 
         if files and files[0]:
