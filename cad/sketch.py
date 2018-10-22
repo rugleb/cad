@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from cad.drawing import Line, Point, Pen
+from cad.drawing import Line, Pen
 
 
 class Sketch(QtWidgets.QWidget):
