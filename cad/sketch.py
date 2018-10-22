@@ -4,12 +4,12 @@ from cad.drawing import Line, Point, Pen
 
 
 class Sketch(QtWidgets.QWidget):
-    _segments = None
+    segments = None
 
     def __init__(self, *args):
         super().__init__(*args)
 
-        self._segments = []
+        self.segments = []
 
         self.cursorPos = None
         self.pressedPos = None
@@ -22,7 +22,7 @@ class Sketch(QtWidgets.QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Delete:
-            self._segments = [s for s in self._segments if not s.hasPoint(self.cursorPos)]
+            self.segments = [s for s in self.segments if not s.hasPoint(self.cursorPos)]
         self.update()
 
     def mousePressEvent(self, event):
@@ -38,11 +38,11 @@ class Sketch(QtWidgets.QWidget):
     def mouseMoveEvent(self, event):
         self.cursorPos = event.localPos()
         if self.isMousePressed():
-            if self._segments:
-                self._segments.pop(-1)
+            if self.segments:
+                self.segments.pop(-1)
             line = Line(self.pressedPos, self.cursorPos)
-            self._segments.append(line)
-        for line in self._segments:
+            self.segments.append(line)
+        for line in self.segments:
             if line.hasPoint(self.cursorPos):
                 line.setPen(Pen.active())
             else:
@@ -50,7 +50,7 @@ class Sketch(QtWidgets.QWidget):
         self.update()
 
     def draw(self, line):
-        self._segments.append(line)
+        self.segments.append(line)
         self.update()
 
     def paintEvent(self, event):
@@ -60,7 +60,7 @@ class Sketch(QtWidgets.QWidget):
         painter.end()
 
     def _drawLines(self, painter):
-        for line in self._segments:
+        for line in self.segments:
             pen = line.getPen()
             painter.setPen(pen)
             painter.drawLine(line)
