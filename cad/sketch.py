@@ -3,8 +3,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from cad.drawing import Segment, Pen, Point
 
 
-DRAWING_LINE_MODE = 0
-DRAWING_POINT_MODE = 1
+DRAWING_LINE_MODE   = 0
+DRAWING_POINT_MODE  = 1
+ANGLE_SCOPE_MODE    = 3
 
 
 class Sketch(QtWidgets.QWidget):
@@ -21,6 +22,7 @@ class Sketch(QtWidgets.QWidget):
         self.pressedPos = None
 
         self.mode = DRAWING_LINE_MODE
+        self.scope = None
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
@@ -46,6 +48,11 @@ class Sketch(QtWidgets.QWidget):
             point = Point(self.pressedPos)
             self.points.append(point)
 
+        if self.mode == ANGLE_SCOPE_MODE:
+            for segment in self.segments:
+                if segment.hasPoint(self.cursorPos):
+                    segment.setAngle(self.scope)
+
     def mouseReleaseEvent(self, event):
         self.cursorPos = event.localPos()
 
@@ -57,9 +64,10 @@ class Sketch(QtWidgets.QWidget):
     def mouseMoveEvent(self, event):
         self.cursorPos = event.localPos()
 
-        if self.isMousePressed():
-            if self.mode == DRAWING_LINE_MODE:
-                self.segments[-1].setP2(self.cursorPos)
+        if self.mode == DRAWING_LINE_MODE:
+            if self.isMousePressed():
+                if self.mode == DRAWING_LINE_MODE:
+                    self.segments[-1].setP2(self.cursorPos)
 
         for segment in self.segments:
             if segment.hasPoint(self.cursorPos):
@@ -87,10 +95,12 @@ class Sketch(QtWidgets.QWidget):
             pen.setWidthF(width)
 
     def enableAngleScope(self, value):
-        pass
+        self.mode = ANGLE_SCOPE_MODE
+        self.scope = value
 
     def disableAngleScope(self):
-        pass
+        self.mode = DRAWING_LINE_MODE
+        self.scope = None
 
     def enableLengthScope(self, value):
         pass
