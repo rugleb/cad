@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from cad.drawing import Segment, Pen
+from cad.drawing import Segment, Pen, Point
 
 
 DRAWING_LINE_MODE = 0
@@ -30,44 +30,52 @@ class Sketch(QtWidgets.QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Delete:
-            self.segments = [s for s in self.segments if not s.hasPoint(self.cursorPos)]
+            for segment in self.segments:
+                if segment.hasPoint(self.cursorPos):
+                    self.segments.remove(segment)
         self.update()
 
     def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.pressedPos = event.localPos()
+        self.pressedPos = event.localPos()
+
+        if self.mode == DRAWING_LINE_MODE:
+            segment = Segment(self.pressedPos, self.pressedPos)
+            self.segments.append(segment)
+
+        if self.mode == DRAWING_POINT_MODE:
+            point = Point(self.pressedPos)
+            self.points.append(point)
 
     def mouseReleaseEvent(self, event):
+        self.cursorPos = event.localPos()
+
         if event.button() == QtCore.Qt.LeftButton:
-            line = Segment(self.pressedPos, self.cursorPos)
             self.pressedPos = None
-            self.draw(line)
+
+        self.update()
 
     def mouseMoveEvent(self, event):
         self.cursorPos = event.localPos()
-        if self.isMousePressed():
-            if self.segments:
-                self.segments.pop(-1)
-            line = Segment(self.pressedPos, self.cursorPos)
-            self.segments.append(line)
-        for line in self.segments:
-            if line.hasPoint(self.cursorPos):
-                line.setPen(Pen.active())
-            else:
-                line.setPen(Pen.stable())
-        self.update()
 
-    def draw(self, line):
-        self.segments.append(line)
+        if self.isMousePressed():
+            if self.mode == DRAWING_LINE_MODE:
+                self.segments[-1].setP2(self.cursorPos)
+
+        for segment in self.segments:
+            if segment.hasPoint(self.cursorPos):
+                segment.setPen(Pen.active())
+            else:
+                segment.setPen(Pen.stable())
+
         self.update()
 
     def paintEvent(self, event):
         painter = QtGui.QPainter()
         painter.begin(self)
-        self._drawLines(painter)
+        self.drawLines(painter)
         painter.end()
 
-    def _drawLines(self, painter):
+    def drawLines(self, painter):
         for line in self.segments:
             pen = line.getPen()
             painter.setPen(pen)
