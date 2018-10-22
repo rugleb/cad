@@ -82,7 +82,7 @@ class Application(QMainWindow):
         return action
 
     def lineAction(self):
-        action = QAction('Line', self.drawBar)
+        action = QAction('Segment', self.drawBar)
         action.setShortcut('Ctrl+L')
         action.setToolTip('Draw line')
         action.setStatusTip('Draw line')

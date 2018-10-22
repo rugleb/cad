@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from cad.drawing import Line, Pen
+from cad.drawing import Segment, Pen
 
 
 class Sketch(QtWidgets.QWidget):
@@ -33,7 +33,7 @@ class Sketch(QtWidgets.QWidget):
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            line = Line(self.pressedPos, self.cursorPos)
+            line = Segment(self.pressedPos, self.cursorPos)
             self.pressedPos = None
             self.draw(line)
 
@@ -42,7 +42,7 @@ class Sketch(QtWidgets.QWidget):
         if self.isMousePressed():
             if self.segments:
                 self.segments.pop(-1)
-            line = Line(self.pressedPos, self.cursorPos)
+            line = Segment(self.pressedPos, self.cursorPos)
             self.segments.append(line)
         for line in self.segments:
             if line.hasPoint(self.cursorPos):

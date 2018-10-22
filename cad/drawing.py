@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui
 
 
 def distancePointToPoint(p1, p2):
-    return Line(p1, p2).length()
+    return Segment(p1, p2).length()
 
 
 def distancePointToVector(p, l):
@@ -34,7 +34,7 @@ class Pen(QtGui.QPen):
         return cls(QtCore.Qt.darkGray, 4, QtCore.Qt.SolidLine)
 
 
-class Line(QtCore.QLineF):
+class Segment(QtCore.QLineF):
     _pen = None
 
     def __init__(self, *args):
