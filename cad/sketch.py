@@ -11,8 +11,6 @@ class Sketch(QtWidgets.QWidget):
     def __init__(self, *args):
         super().__init__(*args)
 
-        self.angle = None
-
         self._segments = []
         self._p1 = None
         self._p2 = None
