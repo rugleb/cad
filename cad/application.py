@@ -39,20 +39,23 @@ class Application(QMainWindow):
     def exitAction(self):
         action = QAction('Exit', self.menu)
         action.setShortcut('Ctrl+Q')
-        action.setStatusTip('Exit application')
+        action.setToolTip('Close application')
+        action.setStatusTip('Close application')
         action.triggered.connect(self.close)
         return action
 
     def saveAction(self):
         action = QAction('Save As', self.menu)
         action.setShortcut('Ctrl+S')
-        action.setStatusTip('Saving')
+        action.setToolTip('Save current application')
+        action.setStatusTip('Save current application')
         action.triggered.connect(self.showSaveDialog)
         return action
 
     def openAction(self):
         action = QAction('Open', self.menu)
         action.setShortcut('Ctrl+O')
+        action.setToolTip('Open file')
         action.setStatusTip('Open file')
         action.triggered.connect(self.showOpenDialog)
         return action
@@ -74,12 +77,14 @@ class Application(QMainWindow):
     def pointAction(self):
         action = QAction('Point', self.drawBar)
         action.setShortcut('Ctrl+P')
+        action.setToolTip('Draw point')
         action.setStatusTip('Draw point')
         return action
 
     def lineAction(self):
         action = QAction('Line', self.drawBar)
         action.setShortcut('Ctrl+L')
+        action.setToolTip('Draw line')
         action.setStatusTip('Draw line')
         return action
 
@@ -101,22 +106,26 @@ class Application(QMainWindow):
 
     def angleAction(self):
         action = QAction('Angle', self.scopesBar)
-        action.setStatusTip('Set angle scope')
+        action.setStatusTip('Set up angle scope')
+        action.setToolTip('Set up angle scope')
         return action
 
     def lengthAction(self):
         action = QAction('Length', self.scopesBar)
-        action.setStatusTip('Set length scope')
+        action.setStatusTip('Set up length scope')
+        action.setToolTip('Set up length scope')
         return action
 
     def parallelsAction(self):
         action = QAction('Parallels', self.scopesBar)
-        action.setStatusTip('Set parallels scope')
+        action.setStatusTip('Set up parallels scope')
+        action.setToolTip('Set up parallels scope')
         return action
 
     def disableScopeAction(self):
         action = QAction('Disable', self.scopesBar)
-        action.setStatusTip('Disable scopes')
+        action.setStatusTip('Disable all scopes')
+        action.setToolTip('Disable all scopes')
         action.triggered.connect(self.disableScopes)
         return action
 
