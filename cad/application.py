@@ -33,21 +33,21 @@ class Application(QMainWindow):
         file.addAction(self.saveAction())
 
     def exitAction(self):
-        action = QAction('Exit', self)
+        action = QAction('Exit', self.menu)
         action.setShortcut('Ctrl+Q')
         action.setStatusTip('Exit application')
         action.triggered.connect(self.close)
         return action
 
     def saveAction(self):
-        action = QAction('Save As', self)
+        action = QAction('Save As', self.menu)
         action.setShortcut('Ctrl+S')
         action.setStatusTip('Saving')
         action.triggered.connect(self.showSaveDialog)
         return action
 
     def openAction(self):
-        action = QAction('Open', self)
+        action = QAction('Open', self.menu)
         action.setShortcut('Ctrl+O')
         action.setStatusTip('Open file')
         action.triggered.connect(self.showOpenDialog)
