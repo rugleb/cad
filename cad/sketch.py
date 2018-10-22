@@ -82,3 +82,9 @@ class Sketch(QtWidgets.QWidget):
 
     def disableAngleScope(self):
         pass
+
+    def enableLengthScope(self, value):
+        pass
+
+    def disableLengthScope(self):
+        pass

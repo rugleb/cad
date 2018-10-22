@@ -131,7 +131,24 @@ class Application(QMainWindow):
         action = QAction('Length', self.scopesBar)
         action.setStatusTip('Set up length scope')
         action.setToolTip('Set up length scope')
+        action.changed.connect(self.lengthActionHandler)
         return action
+
+    def lengthActionHandler(self):
+        if self.sender().isChecked():
+            length, ok = self.askLengthValue()
+            if ok:
+                self.sketch.enableLengthScope(length)
+            else:
+                self.disableScopes()
+        else:
+            self.sketch.disableAngleScope()
+
+    def askLengthValue(self):
+        s1 = 'Set length scope'
+        s2 = 'Input length value:'
+        length, ok = QInputDialog.getDouble(self, s1, s2, min=0)
+        return length, ok
 
     def parallelsAction(self):
         action = QAction('Parallels', self.scopesBar)
