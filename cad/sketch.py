@@ -3,6 +3,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from cad.drawing import Segment, Pen
 
 
+DRAWING_LINE_MODE = 0
+DRAWING_POINT_MODE = 1
+
+
 class Sketch(QtWidgets.QWidget):
     points = None
     segments = None
@@ -15,6 +19,8 @@ class Sketch(QtWidgets.QWidget):
 
         self.cursorPos = None
         self.pressedPos = None
+
+        self.mode = DRAWING_LINE_MODE
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
