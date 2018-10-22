@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt
 
 from cad.sketch import Sketch
 
@@ -144,8 +145,11 @@ class Application(QMainWindow):
             with open(files[0], 'w') as fp:
                 fp.write('')
 
-    def keyPressEvent(self, QKeyEvent):
-        self.sketch.keyPressEvent(QKeyEvent)
+    def keyPressEvent(self, event):
+        self.sketch.keyPressEvent(event)
+
+        if event.key() == Qt.Key_Escape:
+            return self.disableScopes()
 
     def closeEvent(self, event):
         title = 'Close application'
