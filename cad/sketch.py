@@ -4,11 +4,13 @@ from cad.drawing import Line, Point, Pen
 
 
 class Sketch(QtWidgets.QWidget):
+    points = None
     segments = None
 
     def __init__(self, *args):
         super().__init__(*args)
 
+        self.points = []
         self.segments = []
 
         self.cursorPos = None
