@@ -3,9 +3,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from cad.drawing import Segment, Pen, Point
 
 
-DRAWING_LINE_MODE   = 0
-DRAWING_POINT_MODE  = 1
-ANGLE_SCOPE_MODE    = 3
+DRAWING_LINE_MODE = 0
+DRAWING_POINT_MODE = 1
+ANGLE_SCOPE_MODE = 3
+LENGTH_SCOPE_MODE = 4
 
 
 class Sketch(QtWidgets.QWidget):
@@ -52,6 +53,11 @@ class Sketch(QtWidgets.QWidget):
             for segment in self.segments:
                 if segment.hasPoint(self.cursorPos):
                     segment.setAngle(self.scope)
+
+        if self.mode == LENGTH_SCOPE_MODE:
+            for segment in self.segments:
+                if segment.hasPoint(self.cursorPos):
+                    segment.setLength(self.scope)
 
     def mouseReleaseEvent(self, event):
         self.cursorPos = event.localPos()
@@ -103,10 +109,12 @@ class Sketch(QtWidgets.QWidget):
         self.scope = None
 
     def enableLengthScope(self, value):
-        pass
+        self.mode = LENGTH_SCOPE_MODE
+        self.scope = value
 
     def disableLengthScope(self):
-        pass
+        self.mode = DRAWING_LINE_MODE
+        self.scope = None
 
     def enableParallelsAction(self):
         pass
