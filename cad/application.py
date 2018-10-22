@@ -145,7 +145,7 @@ class Application(QMainWindow):
 
         if files and files[0]:
             with open(files[0], 'r') as fp:
-                data = fp.read()
+                fp.read()
 
     def showSaveDialog(self):
         files = QFileDialog.getSaveFileName(self, 'Save As', '/home/cad.json', '*.json')
