@@ -96,6 +96,7 @@ class Application(QMainWindow):
             self.angleAction(),
             self.lengthAction(),
             self.parallelsAction(),
+            self.horizontalAction(),
             self.disableScopeAction(),
         ]
 
@@ -103,6 +104,19 @@ class Application(QMainWindow):
             action.setCheckable(True)
             self.scopesBar.addAction(action)
             self.scopesBarGroup.addAction(action)
+
+    def horizontalAction(self):
+        action = QAction('Horizontal', self.scopesBar)
+        action.setStatusTip('Set up horizontal scope')
+        action.setToolTip('Set up horizontal scope')
+        action.changed.connect(self.horizontalActionHandler)
+        return action
+
+    def horizontalActionHandler(self):
+        if self.sender().isChecked():
+            self.sketch.enableAngleScope(0)
+        else:
+            self.sketch.disableAngleScope()
 
     def angleAction(self):
         action = QAction('Angle', self.scopesBar)
