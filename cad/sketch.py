@@ -88,3 +88,9 @@ class Sketch(QtWidgets.QWidget):
 
     def disableLengthScope(self):
         pass
+
+    def enableParallelsAction(self):
+        pass
+
+    def disableParallelsAction(self):
+        pass

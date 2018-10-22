@@ -154,7 +154,14 @@ class Application(QMainWindow):
         action = QAction('Parallels', self.scopesBar)
         action.setStatusTip('Set up parallels scope')
         action.setToolTip('Set up parallels scope')
+        action.changed.connect(self.parallelsActionHandler)
         return action
+
+    def parallelsActionHandler(self):
+        if self.sender().isChecked():
+            self.sketch.enableParallelsAction()
+        else:
+            self.sketch.disableParallelsAction()
 
     def disableScopeAction(self):
         action = QAction('Disable', self.scopesBar)
