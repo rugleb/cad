@@ -90,6 +90,7 @@ class Application(QMainWindow):
             self.angleAction(),
             self.lengthAction(),
             self.parallelsAction(),
+            self.disableScopeAction(),
         ]
 
         for action in actions:
@@ -112,18 +113,15 @@ class Application(QMainWindow):
         action.setStatusTip('Set parallels scope')
         return action
 
-    def _parallelsClickHandler(self):
-        self.setStatusTip('Select line')
+    def disableScopeAction(self):
+        action = QAction('Disable', self.scopesBar)
+        action.setStatusTip('Disable scopes')
+        action.triggered.connect(self.disableScopes)
+        return action
 
-    def _lengthClickHandler(self):
-        length, pressed = QInputDialog.getDouble(self, 'Length restriction', 'Value: ', min=0.)
-        if pressed and length:
-            print(length)
-
-    def _angleClickHandler(self):
-        angle, pressed = QInputDialog.getInt(self, 'Angle restriction', 'Value: ', min=-360, max=360)
-        if pressed and angle:
-            print(angle)
+    def disableScopes(self):
+        for action in self.scopesBarGroup.actions():
+            action.setChecked(False)
 
     def initStatusBar(self):
         self.statusBar().showMessage('Ready')
