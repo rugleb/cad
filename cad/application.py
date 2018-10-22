@@ -12,11 +12,13 @@ class Application(QMainWindow):
         self.sketch = None
         self.drawBar = None
         self.drawBarGroup = None
+        self.scopesBar = None
+        self.scopesBarGroup = None
 
         self.initMenuBar()
         self.initStatusBar()
         self.initDrawingBar()
-        self.initRestrictionsBar()
+        self.initScopesBar()
         self.initSketch()
         self.initGeometry()
 
@@ -57,10 +59,16 @@ class Application(QMainWindow):
     def initDrawingBar(self):
         self.drawBar = self.addToolBar('Drawing')
         self.drawBarGroup = QActionGroup(self.drawBar)
-        for action in (self.pointAction(), self.lineAction()):
-            self.drawBarGroup.addAction(action)
-            self.drawBar.addAction(action)
+
+        lineAction = self.lineAction()
+        pointAction = self.pointAction()
+
+        for action in (lineAction, pointAction):
             action.setCheckable(True)
+            self.drawBar.addAction(action)
+            self.drawBarGroup.addAction(action)
+
+        lineAction.setChecked(True)
 
     def pointAction(self):
         action = QAction('Point', self.drawBar)
@@ -69,60 +77,53 @@ class Application(QMainWindow):
         return action
 
     def lineAction(self):
-        action = QAction('Point', self.drawBar)
+        action = QAction('Line', self.drawBar)
         action.setShortcut('Ctrl+L')
         action.setStatusTip('Draw line')
         return action
 
-    def initRestrictionsBar(self):
-        self._restrictionBar = self.addToolBar('Restrictions')
+    def initScopesBar(self):
+        self.scopesBar = self.addToolBar('Scopes')
+        self.scopesBarGroup = QActionGroup(self.scopesBar)
 
-        self._restrictionBar.addWidget(QLabel('Restrictions: '))
-        self._setAngleRestriction()
-        self._setLengthRestriction()
-        self._setParallelsRestriction()
+        actions = [
+            self.angleAction(),
+            self.lengthAction(),
+            self.parallelsAction(),
+        ]
 
-    def _setParallelsRestriction(self):
-        self._parallelsButton = QPushButton('Parallels')
-        self._parallelsButton.clicked.connect(self._parallelsClickHandler)
+        for action in actions:
+            action.setCheckable(True)
+            self.scopesBar.addAction(action)
+            self.scopesBarGroup.addAction(action)
 
-        self._parallelsButton.setParent(self._restrictionBar)
-        self._restrictionBar.addWidget(self._parallelsButton)
+    def angleAction(self):
+        action = QAction('Angle', self.scopesBar)
+        action.setStatusTip('Set angle scope')
+        return action
+
+    def lengthAction(self):
+        action = QAction('Length', self.scopesBar)
+        action.setStatusTip('Set length scope')
+        return action
+
+    def parallelsAction(self):
+        action = QAction('Parallels', self.scopesBar)
+        action.setStatusTip('Set parallels scope')
+        return action
 
     def _parallelsClickHandler(self):
         self.setStatusTip('Select line')
-
-    def _setLengthRestriction(self):
-        self._lengthButton = QPushButton('Length')
-        self._lengthButton.clicked.connect(self._lengthClickHandler)
-
-        self._lengthButton.setParent(self._restrictionBar)
-        self._restrictionBar.addWidget(self._lengthButton)
 
     def _lengthClickHandler(self):
         length, pressed = QInputDialog.getDouble(self, 'Length restriction', 'Value: ', min=0.)
         if pressed and length:
             print(length)
 
-    def _setAngleRestriction(self):
-        self._angleButton = QPushButton('Angle')
-        self._angleButton.clicked.connect(self._angleClickHandler)
-
-        self._angleButton.setParent(self._restrictionBar)
-        self._restrictionBar.addWidget(self._angleButton)
-
     def _angleClickHandler(self):
         angle, pressed = QInputDialog.getInt(self, 'Angle restriction', 'Value: ', min=-360, max=360)
         if pressed and angle:
             print(angle)
-
-    def _handlePointClick(self):
-        self.segmentButton.setDown(False)
-        self.pointButton.setDown(not self.pointButton.isDown())
-
-    def _handleSegmentClick(self):
-        self.pointButton.setDown(False)
-        self.segmentButton.setDown(not self.segmentButton.isDown())
 
     def initStatusBar(self):
         self.statusBar().showMessage('Ready')
