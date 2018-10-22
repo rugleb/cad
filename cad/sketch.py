@@ -5,50 +5,45 @@ from cad.drawing import Line, Point, Pen
 
 class Sketch(QtWidgets.QWidget):
     _segments = None
-    _p1 = None
-    _p2 = None
 
     def __init__(self, *args):
         super().__init__(*args)
 
         self._segments = []
-        self._p1 = None
-        self._p2 = None
+
+        self.cursorPos = None
+        self.pressedPos = None
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
 
     def isMousePressed(self):
-        return self._p1 is not None
+        return self.pressedPos is not None
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Delete:
-            self._segments = [s for s in self._segments if not s.hasPoint(self._p2)]
+            self._segments = [s for s in self._segments if not s.hasPoint(self.cursorPos)]
         self.update()
 
     def mousePressEvent(self, event):
-        if event.type() == QtCore.QEvent.MouseButtonPress:
-            if event.button() == QtCore.Qt.LeftButton:
-                self._p1 = Point(event.localPos())
+        if event.button() == QtCore.Qt.LeftButton:
+            self.pressedPos = event.localPos()
 
     def mouseReleaseEvent(self, event):
-        if event.type() == QtCore.QEvent.MouseButtonRelease:
-            if event.button() == QtCore.Qt.LeftButton:
-                point = Point(event.localPos())
-                line = Line(self._p1, point)
-                self._p1 = None
-                self.draw(line)
+        if event.button() == QtCore.Qt.LeftButton:
+            line = Line(self.pressedPos, self.cursorPos)
+            self.pressedPos = None
+            self.draw(line)
 
     def mouseMoveEvent(self, event):
-        point = Point(event.localPos())
-        self._p2 = point
+        self.cursorPos = event.localPos()
         if self.isMousePressed():
             if self._segments:
                 self._segments.pop(-1)
-            line = Line(self._p1, point)
+            line = Line(self.pressedPos, self.cursorPos)
             self._segments.append(line)
         for line in self._segments:
-            if line.hasPoint(point):
+            if line.hasPoint(self.cursorPos):
                 line.setPen(Pen.active())
             else:
                 line.setPen(Pen.stable())
