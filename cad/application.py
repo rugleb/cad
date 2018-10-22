@@ -16,11 +16,11 @@ class Application(QMainWindow):
         self.scopesBar = None
         self.scopesBarGroup = None
 
+        self.initSketch()
         self.initMenuBar()
         self.initStatusBar()
         self.initDrawingBar()
         self.initScopesBar()
-        self.initSketch()
         self.initGeometry()
 
         self.setWindowTitle('Sketch')
@@ -108,7 +108,24 @@ class Application(QMainWindow):
         action = QAction('Angle', self.scopesBar)
         action.setStatusTip('Set up angle scope')
         action.setToolTip('Set up angle scope')
+        action.changed.connect(self.angleActionHandler)
         return action
+
+    def angleActionHandler(self):
+        if self.sender().isChecked():
+            angle, ok = self.askAngleValue()
+            if ok:
+                self.sketch.enableAngleScope(angle)
+            else:
+                self.disableScopes()
+        else:
+            self.sketch.disableAngleScope()
+
+    def askAngleValue(self):
+        s1 = 'Set angle scope'
+        s2 = 'Input angle value:'
+        angle, ok = QInputDialog.getInt(self, s1, s2, min=-360, max=360)
+        return angle, ok
 
     def lengthAction(self):
         action = QAction('Length', self.scopesBar)

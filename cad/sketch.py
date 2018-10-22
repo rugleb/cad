@@ -11,6 +11,8 @@ class Sketch(QtWidgets.QWidget):
     def __init__(self, *args):
         super().__init__(*args)
 
+        self.angle = None
+
         self._segments = []
         self._p1 = None
         self._p2 = None
@@ -74,3 +76,9 @@ class Sketch(QtWidgets.QWidget):
             painter.setPen(pen)
             painter.drawPoints(line.p1(), line.p2())
             pen.setWidthF(width)
+
+    def enableAngleScope(self, value):
+        pass
+
+    def disableAngleScope(self):
+        pass
