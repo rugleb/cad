@@ -126,7 +126,7 @@ class Sketch(QtWidgets.QWidget):
             painter.setPen(pen)
             painter.drawPoint(point)
 
-    def setMode(self, mode=PARALLELS_SCOPE_MODE):
+    def setMode(self, mode=DRAWING_LINE_MODE):
         if mode not in self.modes:
             message = 'Given mode is invalid. Unexpected: {}'.format(mode)
             raise Exception(message)
