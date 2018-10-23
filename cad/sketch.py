@@ -42,6 +42,9 @@ class Sketch(QtWidgets.QWidget):
     def isMousePressed(self):
         return self.pressedPos is not None
 
+    def getCursorPosition(self):
+        return self.cursorPos
+
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Delete:
             segment = self.getActive()
