@@ -44,9 +44,9 @@ class Sketch(QtWidgets.QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Delete:
-            for segment in self.segments:
-                if segment.hasPoint(self.cursorPos):
-                    self.segments.remove(segment)
+            segment = self.getActive()
+            if segment:
+                self.segments.remove(segment)
         self.update()
 
     def mousePressEvent(self, event):
@@ -60,27 +60,22 @@ class Sketch(QtWidgets.QWidget):
             point = Point(self.pressedPos)
             self.points.append(point)
 
+        segment = self.getActive()
+        if segment is None:
+            return None
+
         if self.mode == ANGLE_SCOPE_MODE:
-            for segment in self.segments:
-                if segment.hasPoint(self.cursorPos):
-                    segment.setAngle(self.scope)
+            segment.setAngle(self.scope)
 
         if self.mode == LENGTH_SCOPE_MODE:
-            for segment in self.segments:
-                if segment.hasPoint(self.cursorPos):
-                    segment.setLength(self.scope)
+            segment.setLength(self.scope)
 
         if self.mode == PARALLELS_SCOPE_MODE:
             if self.scope is None:
-                for segment in self.segments:
-                    if segment.hasPoint(self.cursorPos):
-                        self.scope = segment
-                        break
+                self.scope = segment
             else:
-                for segment in self.segments:
-                    if segment.hasPoint(self.cursorPos):
-                        segment.setAngle(self.scope.angle())
-                        self.scope = None
+                segment.setAngle(self.scope.angle())
+                self.scope = None
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
@@ -134,6 +129,12 @@ class Sketch(QtWidgets.QWidget):
             raise Exception(message)
 
         self.mode = mode
+
+    def getActive(self):
+        for segment in self.segments:
+            if segment.hasPoint(self.cursorPos):
+                return segment
+        return None
 
     def enableDrawLineMode(self):
         self.setMode(DRAWING_LINE_MODE)
