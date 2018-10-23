@@ -7,6 +7,7 @@ DRAWING_LINE_MODE = 0
 DRAWING_POINT_MODE = 1
 ANGLE_SCOPE_MODE = 3
 LENGTH_SCOPE_MODE = 4
+PARALLELS_SCOPE_MODE = 5
 
 
 class Sketch(QtWidgets.QWidget):
@@ -58,6 +59,18 @@ class Sketch(QtWidgets.QWidget):
             for segment in self.segments:
                 if segment.hasPoint(self.cursorPos):
                     segment.setLength(self.scope)
+
+        if self.mode == PARALLELS_SCOPE_MODE:
+            if self.scope is None:
+                for segment in self.segments:
+                    if segment.hasPoint(self.cursorPos):
+                        self.scope = segment
+                        break
+            else:
+                for segment in self.segments:
+                    if segment.hasPoint(self.cursorPos):
+                        segment.setAngle(self.scope.angle())
+                        self.scope = None
 
     def mouseReleaseEvent(self, event):
         self.cursorPos = event.localPos()
@@ -117,7 +130,9 @@ class Sketch(QtWidgets.QWidget):
         self.scope = None
 
     def enableParallelsAction(self):
-        pass
+        self.mode = PARALLELS_SCOPE_MODE
+        self.scope = None
 
     def disableParallelsAction(self):
-        pass
+        self.mode = DRAWING_LINE_MODE
+        self.scope = None
