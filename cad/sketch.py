@@ -73,8 +73,6 @@ class Sketch(QtWidgets.QWidget):
                         self.scope = None
 
     def mouseReleaseEvent(self, event):
-        self.cursorPos = event.localPos()
-
         if event.button() == QtCore.Qt.LeftButton:
             self.pressedPos = None
 
