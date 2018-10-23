@@ -108,6 +108,7 @@ class Sketch(QtWidgets.QWidget):
         painter = QtGui.QPainter()
         painter.begin(self)
         self.drawLines(painter)
+        self.drawPoints(painter)
         painter.end()
 
     def drawLines(self, painter):
@@ -120,6 +121,12 @@ class Sketch(QtWidgets.QWidget):
             painter.setPen(pen)
             painter.drawPoints(line.p1(), line.p2())
             pen.setWidthF(width)
+
+    def drawPoints(self, painter):
+        for point in self.points:
+            pen = Pen.stable()
+            painter.setPen(pen)
+            painter.drawPoint(point)
 
     def setMode(self, mode=PARALLELS_SCOPE_MODE):
         if mode not in self.modes:
