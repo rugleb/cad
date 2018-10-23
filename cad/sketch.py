@@ -14,6 +14,16 @@ class Sketch(QtWidgets.QWidget):
     points = None
     segments = None
 
+    modes = [
+        # drawing modes
+        DRAWING_LINE_MODE,
+        DRAWING_POINT_MODE,
+        # scope modes
+        ANGLE_SCOPE_MODE,
+        LENGTH_SCOPE_MODE,
+        PARALLELS_SCOPE_MODE,
+    ]
+
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -110,6 +120,13 @@ class Sketch(QtWidgets.QWidget):
             painter.setPen(pen)
             painter.drawPoints(line.p1(), line.p2())
             pen.setWidthF(width)
+
+    def setMode(self, mode=PARALLELS_SCOPE_MODE):
+        if mode not in self.modes:
+            message = 'Given mode is invalid. Unexpected: {}'.format(mode)
+            raise Exception(message)
+
+        self.mode = mode
 
     def enableAngleScope(self, value):
         self.mode = ANGLE_SCOPE_MODE
