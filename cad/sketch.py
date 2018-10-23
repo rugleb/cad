@@ -98,10 +98,11 @@ class Sketch(QtWidgets.QWidget):
                     self.segments[-1].setP2(self.cursorPos)
 
         for segment in self.segments:
-            if segment.hasPoint(self.cursorPos):
-                segment.setPen(Pen.active())
-            else:
-                segment.setPen(Pen.stable())
+            segment.setPen(Pen.stable())
+
+        active = self.getActive()
+        if active:
+            active.setPen(Pen.active())
 
         self.update()
 
