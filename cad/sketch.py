@@ -53,6 +53,7 @@ class Sketch(QtWidgets.QWidget):
             segment = self.getActive()
             if segment:
                 self.segments.remove(segment)
+
         self.update()
 
     def mousePressEvent(self, event):
