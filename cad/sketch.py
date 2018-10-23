@@ -139,22 +139,14 @@ class Sketch(QtWidgets.QWidget):
         self.mode = ANGLE_SCOPE_MODE
         self.scope = value
 
-    def disableAngleScope(self):
-        self.mode = DRAWING_LINE_MODE
-        self.scope = None
-
     def enableLengthScope(self, value):
         self.mode = LENGTH_SCOPE_MODE
         self.scope = value
-
-    def disableLengthScope(self):
-        self.mode = DRAWING_LINE_MODE
-        self.scope = None
 
     def enableParallelsAction(self):
         self.mode = PARALLELS_SCOPE_MODE
         self.scope = None
 
-    def disableParallelsAction(self):
-        self.mode = DRAWING_LINE_MODE
+    def disableScope(self, mode=DRAWING_LINE_MODE):
+        self.setMode(mode)
         self.scope = None

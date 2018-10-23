@@ -116,8 +116,6 @@ class Application(QMainWindow):
     def horizontalActionHandler(self):
         if self.sender().isChecked():
             self.sketch.enableAngleScope(0)
-        else:
-            self.sketch.disableAngleScope()
 
     def verticalAction(self):
         action = QAction('Vertical', self.scopesBar)
@@ -129,8 +127,6 @@ class Application(QMainWindow):
     def verticalActionHandler(self):
         if self.sender().isChecked():
             self.sketch.enableAngleScope(90)
-        else:
-            self.sketch.disableAngleScope()
 
     def angleAction(self):
         action = QAction('Angle', self.scopesBar)
@@ -146,8 +142,6 @@ class Application(QMainWindow):
                 self.sketch.enableAngleScope(angle)
             else:
                 self.disableScopes()
-        else:
-            self.sketch.disableAngleScope()
 
     def askAngleValue(self):
         s1 = 'Set angle scope'
@@ -169,8 +163,6 @@ class Application(QMainWindow):
                 self.sketch.enableLengthScope(length)
             else:
                 self.disableScopes()
-        else:
-            self.sketch.disableAngleScope()
 
     def askLengthValue(self):
         s1 = 'Set length scope'
@@ -188,8 +180,6 @@ class Application(QMainWindow):
     def parallelsActionHandler(self):
         if self.sender().isChecked():
             self.sketch.enableParallelsAction()
-        else:
-            self.sketch.disableParallelsAction()
 
     def disableScopeAction(self):
         action = QAction('Disable', self.scopesBar)
@@ -201,6 +191,7 @@ class Application(QMainWindow):
     def disableScopes(self):
         for action in self.scopesBarGroup.actions():
             action.setChecked(False)
+        self.sketch.disableScope()
 
     def initStatusBar(self):
         self.statusBar().showMessage('Ready')
