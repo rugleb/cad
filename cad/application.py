@@ -80,6 +80,7 @@ class Application(QMainWindow):
         action.setToolTip('Draw point')
         action.setStatusTip('Draw point')
         action.changed.connect(self.pointActionHandler)
+        action.setDisabled(True)
         return action
 
     def pointActionHandler(self):
