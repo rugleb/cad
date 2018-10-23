@@ -15,10 +15,8 @@ class Sketch(QtWidgets.QWidget):
     segments = None
 
     modes = [
-        # drawing modes
         DRAWING_LINE_MODE,
         DRAWING_POINT_MODE,
-        # scope modes
         ANGLE_SCOPE_MODE,
         LENGTH_SCOPE_MODE,
         PARALLELS_SCOPE_MODE,
