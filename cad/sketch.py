@@ -133,6 +133,12 @@ class Sketch(QtWidgets.QWidget):
 
         self.mode = mode
 
+    def enableDrawLineMode(self):
+        self.setMode(DRAWING_LINE_MODE)
+
+    def enableDrawPointMode(self):
+        self.setMode(DRAWING_POINT_MODE)
+
     def enableAngleScope(self, value):
         self.mode = ANGLE_SCOPE_MODE
         self.scope = value

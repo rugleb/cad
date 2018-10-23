@@ -79,14 +79,24 @@ class Application(QMainWindow):
         action.setShortcut('Ctrl+P')
         action.setToolTip('Draw point')
         action.setStatusTip('Draw point')
+        action.changed.connect(self.pointActionHandler)
         return action
+
+    def pointActionHandler(self):
+        if self.sender().isChecked():
+            self.sketch.enableDrawPointMode()
 
     def lineAction(self):
         action = QAction('Segment', self.drawBar)
         action.setShortcut('Ctrl+L')
         action.setToolTip('Draw line')
         action.setStatusTip('Draw line')
+        action.changed.connect(self.lineActionHandler)
         return action
+
+    def lineActionHandler(self):
+        if self.sender().isChecked():
+            self.sketch.enableDrawLineMode()
 
     def initScopesBar(self):
         self.scopesBar = self.addToolBar('Scopes')
