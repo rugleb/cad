@@ -22,6 +22,8 @@ class Sketch(QtWidgets.QWidget):
         PARALLELS_SCOPE_MODE,
     ]
 
+    DEFAULT_MODE = DRAWING_LINE_MODE
+
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -31,7 +33,7 @@ class Sketch(QtWidgets.QWidget):
         self.cursorPos = None
         self.pressedPos = None
 
-        self.mode = DRAWING_LINE_MODE
+        self.mode = self.DEFAULT_MODE
         self.scope = None
 
         self.setMouseTracking(True)
@@ -126,7 +128,7 @@ class Sketch(QtWidgets.QWidget):
             painter.setPen(pen)
             painter.drawPoint(point)
 
-    def setMode(self, mode=DRAWING_LINE_MODE):
+    def setMode(self, mode):
         if mode not in self.modes:
             message = 'Given mode is invalid. Unexpected: {}'.format(mode)
             raise Exception(message)
@@ -140,17 +142,17 @@ class Sketch(QtWidgets.QWidget):
         self.setMode(DRAWING_POINT_MODE)
 
     def enableAngleScope(self, value):
-        self.mode = ANGLE_SCOPE_MODE
+        self.setMode(ANGLE_SCOPE_MODE)
         self.scope = value
 
     def enableLengthScope(self, value):
-        self.mode = LENGTH_SCOPE_MODE
+        self.setMode(LENGTH_SCOPE_MODE)
         self.scope = value
 
     def enableParallelsAction(self):
-        self.mode = PARALLELS_SCOPE_MODE
+        self.setMode(PARALLELS_SCOPE_MODE)
         self.scope = None
 
-    def disableScope(self, mode=DRAWING_LINE_MODE):
+    def disableScope(self, mode=DEFAULT_MODE):
         self.setMode(mode)
         self.scope = None
