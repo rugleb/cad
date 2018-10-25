@@ -30,7 +30,7 @@ class Sketch(QtWidgets.QWidget):
         self.points = []
         self.segments = []
 
-        self.cursorPos = None
+        self.currentPos = None
         self.pressedPos = None
 
         self.mode = self.DEFAULT_MODE
@@ -43,7 +43,7 @@ class Sketch(QtWidgets.QWidget):
         return self.pressedPos is not None
 
     def getCursorPosition(self):
-        return self.cursorPos
+        return self.currentPos
 
     def releasedMouse(self):
         self.pressedPos = None
@@ -91,12 +91,12 @@ class Sketch(QtWidgets.QWidget):
         self.update()
 
     def mouseMoveEvent(self, event):
-        self.cursorPos = event.localPos()
+        self.currentPos = event.localPos()
 
         if self.mode == DRAWING_LINE_MODE:
             if self.isMousePressed():
                 if self.mode == DRAWING_LINE_MODE:
-                    self.segments[-1].setP2(self.cursorPos)
+                    self.segments[-1].setP2(self.currentPos)
 
         for segment in self.segments:
             segment.setPen(Pen.stable())
@@ -140,7 +140,7 @@ class Sketch(QtWidgets.QWidget):
 
     def getActive(self):
         for segment in self.segments:
-            if segment.hasPoint(self.cursorPos):
+            if segment.hasPoint(self.currentPos):
                 return segment
         return None
 
