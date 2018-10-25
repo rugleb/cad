@@ -98,7 +98,7 @@ class Application(QMainWindow):
             self.sketch.enableDrawPointMode()
 
     def lineAction(self):
-        action = QAction('Segment')
+        action = QAction('Line')
         action.setShortcut('Ctrl+L')
         action.setToolTip('Draw line')
         action.setStatusTip('Draw line')
