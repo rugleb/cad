@@ -39,6 +39,7 @@ class Application(QMainWindow):
         edit = self.__menu.addMenu('Edit')
         edit.addAction(self.undoAction())
         edit.addAction(self.copyAction())
+        edit.addAction(self.pasteAction())
 
     def undoAction(self):
         action = QAction('Undo', self.__menu)
@@ -52,6 +53,13 @@ class Application(QMainWindow):
         action.setShortcut('Ctrl+C')
         action.setStatusTip('Copy')
         action.setToolTip('Copy')
+        return action
+
+    def pasteAction(self):
+        action = QAction('Paste', self.__menu)
+        action.setShortcut('Ctrl+V')
+        action.setStatusTip('Paste')
+        action.setToolTip('Paste')
         return action
 
     def exitAction(self):
