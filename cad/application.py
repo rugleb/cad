@@ -151,10 +151,9 @@ class Application(QMainWindow):
                 self.disableScopes()
 
     def askAngleValue(self):
-        s1 = 'Set angle scope'
-        s2 = 'Input angle value:'
-        angle, ok = QInputDialog.getInt(self, s1, s2, min=-360, max=360)
-        return angle, ok
+        label = 'Input angle value:'
+        title = 'Set angle constraint'
+        return QInputDialog.getDouble(self, title, label, 0)
 
     def lengthAction(self):
         action = QAction('Length')
