@@ -66,7 +66,7 @@ class Application(QMainWindow):
             self.pointAction(),
             self.angleAction(),
             self.lengthAction(),
-            self.parallelsAction(),
+            self.parallelAction(),
             self.verticalAction(),
             self.horizontalAction(),
             self.disableScopeAction(),
@@ -166,7 +166,7 @@ class Application(QMainWindow):
         length, ok = QInputDialog.getDouble(self, s1, s2, min=0)
         return length, ok
 
-    def parallelsAction(self):
+    def parallelAction(self):
         action = QAction('Parallels')
         action.setStatusTip('Set up parallels scope')
         action.setToolTip('Set up parallels scope')
