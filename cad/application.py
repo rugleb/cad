@@ -13,14 +13,11 @@ class Application(QMainWindow):
         self.sketch = None
         self.drawBar = None
         self.drawBarGroup = None
-        self.scopesBar = None
-        self.scopesBarGroup = None
 
         self.initSketch()
         self.initMenuBar()
         self.initStatusBar()
         self.initDrawingBar()
-        self.initScopesBar()
         self.initGeometry()
 
         self.setWindowTitle('Sketch')
@@ -64,23 +61,29 @@ class Application(QMainWindow):
         self.drawBar = self.addToolBar('Drawing')
         self.drawBarGroup = QActionGroup(self.drawBar)
 
-        lineAction = self.lineAction()
-        pointAction = self.pointAction()
+        actions = [
+            self.lineAction(),
+            self.pointAction(),
+            self.angleAction(),
+            self.lengthAction(),
+            self.parallelsAction(),
+            self.verticalAction(),
+            self.horizontalAction(),
+            self.disableScopeAction(),
+        ]
 
-        for action in (lineAction, pointAction):
+        for action in actions:
+            action.setParent(self.drawBar)
             action.setCheckable(True)
             self.drawBar.addAction(action)
             self.drawBarGroup.addAction(action)
 
-        lineAction.setChecked(True)
-
     def pointAction(self):
-        action = QAction('Point', self.drawBar)
+        action = QAction('Point')
         action.setShortcut('Ctrl+P')
         action.setToolTip('Draw point')
         action.setStatusTip('Draw point')
         action.changed.connect(self.pointActionHandler)
-        action.setDisabled(True)
         return action
 
     def pointActionHandler(self):
@@ -88,7 +91,7 @@ class Application(QMainWindow):
             self.sketch.enableDrawPointMode()
 
     def lineAction(self):
-        action = QAction('Segment', self.drawBar)
+        action = QAction('Segment')
         action.setShortcut('Ctrl+L')
         action.setToolTip('Draw line')
         action.setStatusTip('Draw line')
@@ -99,26 +102,8 @@ class Application(QMainWindow):
         if self.sender().isChecked():
             self.sketch.enableDrawLineMode()
 
-    def initScopesBar(self):
-        self.scopesBar = self.addToolBar('Scopes')
-        self.scopesBarGroup = QActionGroup(self.scopesBar)
-
-        actions = [
-            self.angleAction(),
-            self.lengthAction(),
-            self.parallelsAction(),
-            self.verticalAction(),
-            self.horizontalAction(),
-            self.disableScopeAction(),
-        ]
-
-        for action in actions:
-            action.setCheckable(True)
-            self.scopesBar.addAction(action)
-            self.scopesBarGroup.addAction(action)
-
     def horizontalAction(self):
-        action = QAction('Horizontal', self.scopesBar)
+        action = QAction('Horizontal')
         action.setStatusTip('Set up horizontal scope')
         action.setToolTip('Set up horizontal scope')
         action.changed.connect(self.horizontalActionHandler)
@@ -129,7 +114,7 @@ class Application(QMainWindow):
             self.sketch.enableAngleScope(0)
 
     def verticalAction(self):
-        action = QAction('Vertical', self.scopesBar)
+        action = QAction('Vertical')
         action.setStatusTip('Set up vertical scope')
         action.setToolTip('Set up vertical scope')
         action.changed.connect(self.verticalActionHandler)
@@ -140,7 +125,7 @@ class Application(QMainWindow):
             self.sketch.enableAngleScope(90)
 
     def angleAction(self):
-        action = QAction('Angle', self.scopesBar)
+        action = QAction('Angle')
         action.setStatusTip('Set up angle scope')
         action.setToolTip('Set up angle scope')
         action.changed.connect(self.angleActionHandler)
@@ -161,7 +146,7 @@ class Application(QMainWindow):
         return angle, ok
 
     def lengthAction(self):
-        action = QAction('Length', self.scopesBar)
+        action = QAction('Length')
         action.setStatusTip('Set up length scope')
         action.setToolTip('Set up length scope')
         action.changed.connect(self.lengthActionHandler)
@@ -182,7 +167,7 @@ class Application(QMainWindow):
         return length, ok
 
     def parallelsAction(self):
-        action = QAction('Parallels', self.scopesBar)
+        action = QAction('Parallels')
         action.setStatusTip('Set up parallels scope')
         action.setToolTip('Set up parallels scope')
         action.changed.connect(self.parallelsActionHandler)
@@ -193,14 +178,14 @@ class Application(QMainWindow):
             self.sketch.enableParallelsAction()
 
     def disableScopeAction(self):
-        action = QAction('Disable', self.scopesBar)
+        action = QAction('Disable')
         action.setStatusTip('Disable all scopes')
         action.setToolTip('Disable all scopes')
         action.triggered.connect(self.disableScopes)
         return action
 
     def disableScopes(self):
-        for action in self.scopesBarGroup.actions():
+        for action in self.drawBarGroup.actions():
             action.setChecked(False)
         self.sketch.disableScope()
 
