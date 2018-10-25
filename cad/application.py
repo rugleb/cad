@@ -112,8 +112,8 @@ class Application(QMainWindow):
 
     def horizontalAction(self):
         action = QAction('Horizontal')
-        action.setStatusTip('Set up horizontal scope')
-        action.setToolTip('Set up horizontal scope')
+        action.setToolTip('Horizontal constraint')
+        action.setStatusTip('Horizontal constraint')
         action.setIcon(QIcon('icons/horizontal.png'))
         action.changed.connect(self.horizontalActionHandler)
         return action
@@ -124,8 +124,8 @@ class Application(QMainWindow):
 
     def verticalAction(self):
         action = QAction('Vertical')
-        action.setStatusTip('Set up vertical scope')
-        action.setToolTip('Set up vertical scope')
+        action.setToolTip('Vertical constraint')
+        action.setStatusTip('Vertical constraint')
         action.setIcon(QIcon('icons/vertical.png'))
         action.changed.connect(self.verticalActionHandler)
         return action
@@ -136,8 +136,8 @@ class Application(QMainWindow):
 
     def angleAction(self):
         action = QAction('Angle')
-        action.setStatusTip('Set up angle scope')
-        action.setToolTip('Set up angle scope')
+        action.setToolTip('Angle constraint')
+        action.setStatusTip('Angle constraint')
         action.setIcon(QIcon('icons/angle.png'))
         action.changed.connect(self.angleActionHandler)
         return action
@@ -158,8 +158,8 @@ class Application(QMainWindow):
 
     def lengthAction(self):
         action = QAction('Length')
-        action.setStatusTip('Set up length scope')
-        action.setToolTip('Set up length scope')
+        action.setToolTip('Length constraint')
+        action.setStatusTip('Length constraint')
         action.setIcon(QIcon('icons/length.png'))
         action.changed.connect(self.lengthActionHandler)
         return action
@@ -180,8 +180,8 @@ class Application(QMainWindow):
 
     def parallelAction(self):
         action = QAction('Parallel')
-        action.setStatusTip('Set up parallel scope')
-        action.setToolTip('Set up parallel scope')
+        action.setToolTip('Parallel constraint')
+        action.setStatusTip('Parallel constraint')
         action.setIcon(QIcon('icons/parallel.png'))
         action.changed.connect(self.parallelsActionHandler)
         return action
@@ -192,8 +192,8 @@ class Application(QMainWindow):
 
     def disableScopeAction(self):
         action = QAction('Disable')
-        action.setStatusTip('Disable all scopes')
-        action.setToolTip('Disable all scopes')
+        action.setToolTip('Choose action')
+        action.setStatusTip('Choose action')
         action.setIcon(QIcon('icons/cursor.png'))
         action.triggered.connect(self.disableScopes)
         return action
