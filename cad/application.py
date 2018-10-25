@@ -245,7 +245,10 @@ class Application(QMainWindow):
         self.setGeometry(desktop.availableGeometry())
 
     def showOpenDialog(self):
-        files = QFileDialog.getOpenFileName(self, 'Open file', '/home', '*.json')
+        ext = '*.json'
+        title = 'Open from'
+        default = '/home/cad.json'
+        files = QFileDialog.getOpenFileName(self, title, default, ext)
 
         if files and files[0]:
             with open(files[0], 'r') as fp:
