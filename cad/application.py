@@ -10,32 +10,33 @@ class Application(QMainWindow):
     def __init__(self, *args):
         super().__init__(*args)
 
-        self.menu = None
         self.sketch = None
-        self.instrumentsBar = None
-        self.instrumentsBarGroup = None
 
-        self.initSketch()
-        self.initMenuBar()
-        self.initStatusBar()
-        self.initInstruments()
-        self.initGeometry()
+        self.__menu = None
+        self.__toolBar = None
+        self.__toolBarGroup = None
+
+        self.__initSketch()
+        self.__initMenuBar()
+        self.__initToolBar()
+        self.__initStatusBar()
+        self.__initGeometry()
 
         self.setWindowTitle('Sketch')
 
-    def initSketch(self):
+    def __initSketch(self):
         self.sketch = Sketch(self)
         self.setCentralWidget(self.sketch)
 
-    def initMenuBar(self):
-        self.menu = self.menuBar()
-        file = self.menu.addMenu('File')
+    def __initMenuBar(self):
+        self.__menu = self.menuBar()
+        file = self.__menu.addMenu('File')
         file.addAction(self.exitAction())
         file.addAction(self.openAction())
         file.addAction(self.saveAction())
 
     def exitAction(self):
-        action = QAction('Exit', self.menu)
+        action = QAction('Exit', self.__menu)
         action.setShortcut('Ctrl+Q')
         action.setToolTip('Close application')
         action.setStatusTip('Close application')
@@ -43,7 +44,7 @@ class Application(QMainWindow):
         return action
 
     def saveAction(self):
-        action = QAction('Save As', self.menu)
+        action = QAction('Save As', self.__menu)
         action.setShortcut('Ctrl+S')
         action.setToolTip('Save current application')
         action.setStatusTip('Save current application')
@@ -51,16 +52,16 @@ class Application(QMainWindow):
         return action
 
     def openAction(self):
-        action = QAction('Open', self.menu)
+        action = QAction('Open', self.__menu)
         action.setShortcut('Ctrl+O')
         action.setToolTip('Open file')
         action.setStatusTip('Open file')
         action.triggered.connect(self.showOpenDialog)
         return action
 
-    def initInstruments(self):
-        self.instrumentsBar = self.addToolBar('Drawing')
-        self.instrumentsBarGroup = QActionGroup(self.instrumentsBar)
+    def __initToolBar(self):
+        self.__toolBar = self.addToolBar('Drawing')
+        self.__toolBarGroup = QActionGroup(self.__toolBar)
 
         default = self.disableScopeAction()
 
@@ -77,9 +78,9 @@ class Application(QMainWindow):
 
         for action in actions:
             action.setCheckable(True)
-            action.setParent(self.instrumentsBar)
-            self.instrumentsBar.addAction(action)
-            self.instrumentsBarGroup.addAction(action)
+            action.setParent(self.__toolBar)
+            self.__toolBar.addAction(action)
+            self.__toolBarGroup.addAction(action)
 
         default.setChecked(True)
 
@@ -198,15 +199,15 @@ class Application(QMainWindow):
         return action
 
     def disableScopes(self):
-        for action in self.instrumentsBarGroup.actions():
+        for action in self.__toolBarGroup.actions():
             action.setChecked(False)
         self.sketch.disableScope()
-        self.instrumentsBarGroup.actions()[0].setChecked(True)
+        self.__toolBarGroup.actions()[0].setChecked(True)
 
-    def initStatusBar(self):
+    def __initStatusBar(self):
         self.statusBar().showMessage('Ready')
 
-    def initGeometry(self):
+    def __initGeometry(self):
         desktop = QDesktopWidget()
         self.setGeometry(desktop.availableGeometry())
 
