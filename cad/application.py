@@ -38,12 +38,20 @@ class Application(QMainWindow):
 
         edit = self.__menu.addMenu('Edit')
         edit.addAction(self.undoAction())
+        edit.addAction(self.copyAction())
 
     def undoAction(self):
         action = QAction('Undo', self.__menu)
         action.setShortcut('Ctrl+Z')
         action.setStatusTip('Undo')
         action.setToolTip('Undo')
+        return action
+
+    def copyAction(self):
+        action = QAction('Copy', self.__menu)
+        action.setShortcut('Ctrl+C')
+        action.setStatusTip('Copy')
+        action.setToolTip('Copy')
         return action
 
     def exitAction(self):
