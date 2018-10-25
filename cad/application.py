@@ -62,8 +62,10 @@ class Application(QMainWindow):
         self.instrumentsBar = self.addToolBar('Drawing')
         self.instrumentsBarGroup = QActionGroup(self.instrumentsBar)
 
+        default = self.disableScopeAction()
+
         actions = [
-            self.disableScopeAction(),
+            default,
             self.lineAction(),
             self.pointAction(),
             self.angleAction(),
@@ -78,6 +80,8 @@ class Application(QMainWindow):
             action.setParent(self.instrumentsBar)
             self.instrumentsBar.addAction(action)
             self.instrumentsBarGroup.addAction(action)
+
+        default.setChecked(True)
 
     def pointAction(self):
         action = QAction('Point')
@@ -197,6 +201,7 @@ class Application(QMainWindow):
         for action in self.instrumentsBarGroup.actions():
             action.setChecked(False)
         self.sketch.disableScope()
+        self.instrumentsBarGroup.actions()[0].setChecked(True)
 
     def initStatusBar(self):
         self.statusBar().showMessage('Ready')

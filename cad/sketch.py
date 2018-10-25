@@ -3,8 +3,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from cad.drawing import Segment, Pen, Point
 
 
-DRAWING_LINE_MODE = 0
-DRAWING_POINT_MODE = 1
+DISABLE_MODE = 0
+DRAWING_LINE_MODE = 1
+DRAWING_POINT_MODE = 2
 ANGLE_SCOPE_MODE = 3
 LENGTH_SCOPE_MODE = 4
 PARALLELS_SCOPE_MODE = 5
@@ -13,6 +14,7 @@ PARALLELS_SCOPE_MODE = 5
 class Sketch(QtWidgets.QWidget):
 
     modes = [
+        DISABLE_MODE,
         DRAWING_LINE_MODE,
         DRAWING_POINT_MODE,
         ANGLE_SCOPE_MODE,
@@ -20,7 +22,7 @@ class Sketch(QtWidgets.QWidget):
         PARALLELS_SCOPE_MODE,
     ]
 
-    DEFAULT_MODE = DRAWING_LINE_MODE
+    DEFAULT_MODE = DISABLE_MODE
 
     def __init__(self, *args):
         super().__init__(*args)
