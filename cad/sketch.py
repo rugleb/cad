@@ -11,8 +11,6 @@ PARALLELS_SCOPE_MODE = 5
 
 
 class Sketch(QtWidgets.QWidget):
-    points = None
-    segments = None
 
     modes = [
         DRAWING_LINE_MODE,
