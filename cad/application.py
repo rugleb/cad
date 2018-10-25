@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 
@@ -62,6 +63,7 @@ class Application(QMainWindow):
         self.instrumentsBarGroup = QActionGroup(self.instrumentsBar)
 
         actions = [
+            self.disableScopeAction(),
             self.lineAction(),
             self.pointAction(),
             self.angleAction(),
@@ -69,7 +71,6 @@ class Application(QMainWindow):
             self.parallelAction(),
             self.verticalAction(),
             self.horizontalAction(),
-            self.disableScopeAction(),
         ]
 
         for action in actions:
@@ -83,6 +84,7 @@ class Application(QMainWindow):
         action.setShortcut('Ctrl+P')
         action.setToolTip('Draw point')
         action.setStatusTip('Draw point')
+        action.setIcon(QIcon('icons/point.png'))
         action.changed.connect(self.pointActionHandler)
         return action
 
@@ -95,6 +97,7 @@ class Application(QMainWindow):
         action.setShortcut('Ctrl+L')
         action.setToolTip('Draw line')
         action.setStatusTip('Draw line')
+        action.setIcon(QIcon('icons/line.png'))
         action.changed.connect(self.lineActionHandler)
         return action
 
@@ -106,6 +109,7 @@ class Application(QMainWindow):
         action = QAction('Horizontal')
         action.setStatusTip('Set up horizontal scope')
         action.setToolTip('Set up horizontal scope')
+        action.setIcon(QIcon('icons/horizontal.png'))
         action.changed.connect(self.horizontalActionHandler)
         return action
 
@@ -117,6 +121,7 @@ class Application(QMainWindow):
         action = QAction('Vertical')
         action.setStatusTip('Set up vertical scope')
         action.setToolTip('Set up vertical scope')
+        action.setIcon(QIcon('icons/vertical.png'))
         action.changed.connect(self.verticalActionHandler)
         return action
 
@@ -128,6 +133,7 @@ class Application(QMainWindow):
         action = QAction('Angle')
         action.setStatusTip('Set up angle scope')
         action.setToolTip('Set up angle scope')
+        action.setIcon(QIcon('icons/angle.png'))
         action.changed.connect(self.angleActionHandler)
         return action
 
@@ -149,6 +155,7 @@ class Application(QMainWindow):
         action = QAction('Length')
         action.setStatusTip('Set up length scope')
         action.setToolTip('Set up length scope')
+        action.setIcon(QIcon('icons/length.png'))
         action.changed.connect(self.lengthActionHandler)
         return action
 
@@ -167,9 +174,10 @@ class Application(QMainWindow):
         return length, ok
 
     def parallelAction(self):
-        action = QAction('Parallels')
-        action.setStatusTip('Set up parallels scope')
-        action.setToolTip('Set up parallels scope')
+        action = QAction('Parallel')
+        action.setStatusTip('Set up parallel scope')
+        action.setToolTip('Set up parallel scope')
+        action.setIcon(QIcon('icons/parallel.png'))
         action.changed.connect(self.parallelsActionHandler)
         return action
 
@@ -181,6 +189,7 @@ class Application(QMainWindow):
         action = QAction('Disable')
         action.setStatusTip('Disable all scopes')
         action.setToolTip('Disable all scopes')
+        action.setIcon(QIcon('icons/cursor.png'))
         action.triggered.connect(self.disableScopes)
         return action
 
