@@ -173,10 +173,9 @@ class Application(QMainWindow):
                 self.disableScopes()
 
     def askLengthValue(self):
-        s1 = 'Set length scope'
-        s2 = 'Input length value:'
-        length, ok = QInputDialog.getDouble(self, s1, s2, min=0)
-        return length, ok
+        label = 'Input length value:'
+        title = 'Set length constraint'
+        return QInputDialog.getDouble(self, title, label, 0, 0)
 
     def parallelAction(self):
         action = QAction('Parallel')
