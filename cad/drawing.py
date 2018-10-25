@@ -6,21 +6,20 @@ def distancePointToPoint(p1, p2):
 
 
 def distancePointToVector(p, l):
-    if l.length() == 0.:
-        return distancePointToPoint(p, l.p1())
-    p1, p2 = l.p1(), l.p2()
-    s = l.dy() * p.x() - l.dx() * p.y() + p2.x() * p1.y() - p2.y() * p1.x()
-    return abs(s) / l.length()
+    if l.length() > 0:
+        s = l.dy() * p.x() - l.dx() * p.y() + l.x2() * l.y1() - l.y2() * l.x1()
+        return abs(s) / l.length()
+    return distancePointToPoint(p, l.p1())
 
 
 def isPointOnVector(p, l):
-    return distancePointToVector(p, l) == 0.
+    return distancePointToVector(p, l) == 0
 
 
 def isPointOnLine(p, l):
-    if not isPointOnVector(p, l):
-        return False
-    return l.p1().x() <= p.x() <= l.p2().x()
+    if isPointOnVector(p, l):
+        return l.x1() <= p.x() <= l.x2()
+    return False
 
 
 class Pen(QtGui.QPen):
@@ -64,10 +63,10 @@ class Segment(QtCore.QLineF):
         return False
 
     def hide(self):
-        self.setLength(0.)
+        self.setLength(0)
 
     def isHidden(self):
-        return self.length() == 0.
+        return self.length() == 0
 
 
 class Point(QtCore.QPointF):
