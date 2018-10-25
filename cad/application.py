@@ -30,10 +30,21 @@ class Application(QMainWindow):
 
     def __initMenuBar(self):
         self.__menu = self.menuBar()
+
         file = self.__menu.addMenu('File')
         file.addAction(self.exitAction())
         file.addAction(self.openAction())
         file.addAction(self.saveAction())
+
+        edit = self.__menu.addMenu('Edit')
+        edit.addAction(self.undoAction())
+
+    def undoAction(self):
+        action = QAction('Undo', self.__menu)
+        action.setShortcut('Ctrl+Z')
+        action.setStatusTip('Undo')
+        action.setToolTip('Undo')
+        return action
 
     def exitAction(self):
         action = QAction('Exit', self.__menu)
