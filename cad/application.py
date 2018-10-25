@@ -11,13 +11,13 @@ class Application(QMainWindow):
 
         self.menu = None
         self.sketch = None
-        self.drawBar = None
-        self.drawBarGroup = None
+        self.instrumentsBar = None
+        self.instrumentsBarGroup = None
 
         self.initSketch()
         self.initMenuBar()
         self.initStatusBar()
-        self.initDrawingBar()
+        self.initInstruments()
         self.initGeometry()
 
         self.setWindowTitle('Sketch')
@@ -57,9 +57,9 @@ class Application(QMainWindow):
         action.triggered.connect(self.showOpenDialog)
         return action
 
-    def initDrawingBar(self):
-        self.drawBar = self.addToolBar('Drawing')
-        self.drawBarGroup = QActionGroup(self.drawBar)
+    def initInstruments(self):
+        self.instrumentsBar = self.addToolBar('Drawing')
+        self.instrumentsBarGroup = QActionGroup(self.instrumentsBar)
 
         actions = [
             self.lineAction(),
@@ -73,10 +73,10 @@ class Application(QMainWindow):
         ]
 
         for action in actions:
-            action.setParent(self.drawBar)
             action.setCheckable(True)
-            self.drawBar.addAction(action)
-            self.drawBarGroup.addAction(action)
+            action.setParent(self.instrumentsBar)
+            self.instrumentsBar.addAction(action)
+            self.instrumentsBarGroup.addAction(action)
 
     def pointAction(self):
         action = QAction('Point')
@@ -185,7 +185,7 @@ class Application(QMainWindow):
         return action
 
     def disableScopes(self):
-        for action in self.drawBarGroup.actions():
+        for action in self.instrumentsBarGroup.actions():
             action.setChecked(False)
         self.sketch.disableScope()
 
