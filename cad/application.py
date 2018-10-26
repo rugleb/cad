@@ -110,6 +110,7 @@ class Application(QMainWindow):
             self.perpendicularAction(),
             self.verticalAction(),
             self.horizontalAction(),
+            self.coincidentAction(),
         ]
 
         for action in actions:
@@ -235,6 +236,18 @@ class Application(QMainWindow):
     def perpendicularActionHandler(self):
         if self.sender().isChecked():
             self.sketch.enablePerpendicularScope()
+
+    def coincidentAction(self):
+        action = QAction('Coincident')
+        action.setToolTip('Coincident constraint')
+        action.setStatusTip('Coincident constraint')
+        action.setIcon(QIcon('icons/coincident.png'))
+        action.changed.connect(self.coincidentActionHandler)
+        return action
+
+    def coincidentActionHandler(self):
+        if self.sender().isChecked():
+            self.sketch.enableCoincidentScope()
 
     def disableScopeAction(self):
         action = QAction('Disable')

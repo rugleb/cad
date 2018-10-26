@@ -10,6 +10,7 @@ ANGLE_SCOPE_MODE = 3
 LENGTH_SCOPE_MODE = 4
 PARALLEL_SCOPE_MODE = 5
 PERPENDICULAR_SCOPE_MODE = 6
+COINCIDENT_SCOPE_MODE = 7
 
 
 class Sketch(QtWidgets.QWidget):
@@ -22,12 +23,15 @@ class Sketch(QtWidgets.QWidget):
         LENGTH_SCOPE_MODE,
         PARALLEL_SCOPE_MODE,
         PERPENDICULAR_SCOPE_MODE,
+        COINCIDENT_SCOPE_MODE,
     ]
 
     DEFAULT_MODE = DISABLE_MODE
 
     def __init__(self, *args):
         super().__init__(*args)
+
+        self.memory = []
 
         self.points = []
         self.segments = []
@@ -102,6 +106,19 @@ class Sketch(QtWidgets.QWidget):
                 self.scope = segment
             else:
                 segment.setAngle(self.scope.angle() + 90)
+                self.scope = None
+
+        if self.mode == COINCIDENT_SCOPE_MODE:
+            if self.scope is None:
+                if Segment(self.currentPos, segment.p1()).length() < 6:
+                    self.scope = segment.p1()
+                elif Segment(self.currentPos, segment.p2()).length() < 6:
+                    self.scope = segment.p2()
+            else:
+                if Segment(self.currentPos, segment.p1()).length() < 6:
+                    segment.setP1(self.scope)
+                elif Segment(self.currentPos, segment.p2()).length() < 6:
+                    segment.setP2(self.scope)
                 self.scope = None
 
     def mouseReleaseEvent(self, event):
@@ -184,6 +201,10 @@ class Sketch(QtWidgets.QWidget):
 
     def enablePerpendicularScope(self):
         self.setMode(PERPENDICULAR_SCOPE_MODE)
+        self.scope = None
+
+    def enableCoincidentScope(self):
+        self.setMode(COINCIDENT_SCOPE_MODE)
         self.scope = None
 
     def disableScope(self, mode=DEFAULT_MODE):
