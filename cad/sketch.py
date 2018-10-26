@@ -9,6 +9,7 @@ DRAWING_POINT_MODE = 2
 ANGLE_SCOPE_MODE = 3
 LENGTH_SCOPE_MODE = 4
 PARALLEL_SCOPE_MODE = 5
+PERPENDICULAR_SCOPE_MODE = 6
 
 
 class Sketch(QtWidgets.QWidget):
@@ -20,6 +21,7 @@ class Sketch(QtWidgets.QWidget):
         ANGLE_SCOPE_MODE,
         LENGTH_SCOPE_MODE,
         PARALLEL_SCOPE_MODE,
+        PERPENDICULAR_SCOPE_MODE,
     ]
 
     DEFAULT_MODE = DISABLE_MODE
@@ -93,6 +95,13 @@ class Sketch(QtWidgets.QWidget):
                 self.scope = segment
             else:
                 segment.setAngle(self.scope.angle())
+                self.scope = None
+
+        if self.mode == PERPENDICULAR_SCOPE_MODE:
+            if self.scope is None:
+                self.scope = segment
+            else:
+                segment.setAngle(self.scope.angle() + 90)
                 self.scope = None
 
     def mouseReleaseEvent(self, event):
@@ -171,6 +180,10 @@ class Sketch(QtWidgets.QWidget):
 
     def enableParallelScope(self):
         self.setMode(PARALLEL_SCOPE_MODE)
+        self.scope = None
+
+    def enablePerpendicularScope(self):
+        self.setMode(PERPENDICULAR_SCOPE_MODE)
         self.scope = None
 
     def disableScope(self, mode=DEFAULT_MODE):

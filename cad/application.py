@@ -107,6 +107,7 @@ class Application(QMainWindow):
             self.angleAction(),
             self.lengthAction(),
             self.parallelAction(),
+            self.perpendicularAction(),
             self.verticalAction(),
             self.horizontalAction(),
         ]
@@ -222,6 +223,18 @@ class Application(QMainWindow):
     def parallelsActionHandler(self):
         if self.sender().isChecked():
             self.sketch.enableParallelScope()
+
+    def perpendicularAction(self):
+        action = QAction('Perpendicular')
+        action.setToolTip('Perpendicular constraint')
+        action.setStatusTip('Perpendicular constraint')
+        action.setIcon(QIcon('icons/perpendicular.png'))
+        action.changed.connect(self.perpendicularActionHandler)
+        return action
+
+    def perpendicularActionHandler(self):
+        if self.sender().isChecked():
+            self.sketch.enablePerpendicularScope()
 
     def disableScopeAction(self):
         action = QAction('Disable')
