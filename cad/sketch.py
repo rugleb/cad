@@ -8,7 +8,7 @@ DRAWING_LINE_MODE = 1
 DRAWING_POINT_MODE = 2
 ANGLE_SCOPE_MODE = 3
 LENGTH_SCOPE_MODE = 4
-PARALLELS_SCOPE_MODE = 5
+PARALLEL_SCOPE_MODE = 5
 
 
 class Sketch(QtWidgets.QWidget):
@@ -19,7 +19,7 @@ class Sketch(QtWidgets.QWidget):
         DRAWING_POINT_MODE,
         ANGLE_SCOPE_MODE,
         LENGTH_SCOPE_MODE,
-        PARALLELS_SCOPE_MODE,
+        PARALLEL_SCOPE_MODE,
     ]
 
     DEFAULT_MODE = DISABLE_MODE
@@ -33,11 +33,22 @@ class Sketch(QtWidgets.QWidget):
         self.currentPos = None
         self.pressedPos = None
 
+        self.constraint = None
+
         self.mode = self.DEFAULT_MODE
         self.scope = None
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
+
+    def setConstraint(self, constraint):
+        self.constraint = constraint
+
+    def getConstraint(self):
+        return self.constraint
+
+    def disableConstraint(self):
+        self.constraint = None
 
     def isMousePressed(self):
         return self.pressedPos is not None
@@ -77,7 +88,7 @@ class Sketch(QtWidgets.QWidget):
         if self.mode == LENGTH_SCOPE_MODE:
             segment.setLength(self.scope)
 
-        if self.mode == PARALLELS_SCOPE_MODE:
+        if self.mode == PARALLEL_SCOPE_MODE:
             if self.scope is None:
                 self.scope = segment
             else:
@@ -158,8 +169,8 @@ class Sketch(QtWidgets.QWidget):
         self.setMode(LENGTH_SCOPE_MODE)
         self.scope = value
 
-    def enableParallelsAction(self):
-        self.setMode(PARALLELS_SCOPE_MODE)
+    def enableParallelScope(self):
+        self.setMode(PARALLEL_SCOPE_MODE)
         self.scope = None
 
     def disableScope(self, mode=DEFAULT_MODE):

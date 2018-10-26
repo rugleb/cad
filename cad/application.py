@@ -221,7 +221,7 @@ class Application(QMainWindow):
 
     def parallelsActionHandler(self):
         if self.sender().isChecked():
-            self.sketch.enableParallelsAction()
+            self.sketch.enableParallelScope()
 
     def disableScopeAction(self):
         action = QAction('Disable')
