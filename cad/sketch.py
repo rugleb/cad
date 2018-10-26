@@ -45,8 +45,8 @@ class Sketch(QtWidgets.QWidget):
     def getCursorPosition(self):
         return self.currentPos
 
-    def releasedMouse(self):
-        self.pressedPos = None
+    def getPressedPosition(self):
+        return self.pressedPos
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Delete:
