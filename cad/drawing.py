@@ -25,7 +25,7 @@ def isPointOnLine(p, l):
 class Pen(QtGui.QPen):
 
     @classmethod
-    def active(cls):
+    def selected(cls):
         return cls(QtCore.Qt.gray, 6, QtCore.Qt.SolidLine)
 
     @classmethod

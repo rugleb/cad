@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 
 from cad.sketch import Sketch
+from cad.geometry.constraints import *
 
 
 class Application(QMainWindow):
@@ -98,7 +99,7 @@ class Application(QMainWindow):
         self.toolBar = self.addToolBar('Drawing')
         self.toolBarGroup = QActionGroup(self.toolBar)
 
-        default = self.disableScopeAction()
+        default = self.disableAction()
 
         actions = [
             default,
@@ -131,7 +132,8 @@ class Application(QMainWindow):
         return action
 
     def pointActionHandler(self):
-        self.sketch.enableDrawPointMode()
+        mode = DrawPoint(self.sketch)
+        self.sketch.setMode(mode)
 
     def lineAction(self):
         action = QAction('Line')
@@ -143,7 +145,8 @@ class Application(QMainWindow):
         return action
 
     def lineActionHandler(self):
-        self.sketch.enableDrawLineMode()
+        mode = DrawSegment(self.sketch)
+        self.sketch.setMode(mode)
 
     def horizontalAction(self):
         action = QAction('Horizontal')
@@ -154,7 +157,8 @@ class Application(QMainWindow):
         return action
 
     def horizontalActionHandler(self):
-        self.sketch.enableAngleScope(0)
+        mode = Horizontal(self.sketch)
+        self.sketch.setMode(mode)
 
     def verticalAction(self):
         action = QAction('Vertical')
@@ -165,7 +169,8 @@ class Application(QMainWindow):
         return action
 
     def verticalActionHandler(self):
-        self.sketch.enableAngleScope(90)
+        mode = Vertical(self.sketch)
+        self.sketch.setMode(mode)
 
     def angleAction(self):
         action = QAction('Angle')
@@ -176,16 +181,8 @@ class Application(QMainWindow):
         return action
 
     def angleActionHandler(self):
-        angle, ok = self.askAngleValue()
-        if ok:
-            self.sketch.enableAngleScope(angle)
-        else:
-            self.disableScopes()
-
-    def askAngleValue(self):
-        label = 'Input angle value:'
-        title = 'Set angle constraint'
-        return QInputDialog.getDouble(self, title, label, 0)
+        mode = Angle(self.sketch)
+        self.sketch.setMode(mode)
 
     def lengthAction(self):
         action = QAction('Length')
@@ -196,16 +193,8 @@ class Application(QMainWindow):
         return action
 
     def lengthActionHandler(self):
-        length, ok = self.askLengthValue()
-        if ok:
-            self.sketch.enableLengthScope(length)
-        else:
-            self.disableScopes()
-
-    def askLengthValue(self):
-        label = 'Input length value:'
-        title = 'Set length constraint'
-        return QInputDialog.getDouble(self, title, label, 0, 0)
+        mode = Length(self.sketch)
+        self.sketch.setMode(mode)
 
     def parallelAction(self):
         action = QAction('Parallel')
@@ -216,7 +205,8 @@ class Application(QMainWindow):
         return action
 
     def parallelsActionHandler(self):
-        self.sketch.enableParallelScope()
+        mode = Parallel(self.sketch)
+        self.sketch.setMode(mode)
 
     def perpendicularAction(self):
         action = QAction('Perpendicular')
@@ -227,7 +217,8 @@ class Application(QMainWindow):
         return action
 
     def perpendicularActionHandler(self):
-        self.sketch.enablePerpendicularScope()
+        mode = Perpendicular(self.sketch)
+        self.sketch.setMode(mode)
 
     def coincidentAction(self):
         action = QAction('Coincident')
@@ -238,20 +229,22 @@ class Application(QMainWindow):
         return action
 
     def coincidentActionHandler(self):
-        self.sketch.enableCoincidentScope()
+        mode = Coincident(self.sketch)
+        self.sketch.setMode(mode)
 
-    def disableScopeAction(self):
+    def disableAction(self):
         action = QAction('Disable')
         action.setToolTip('Choose action')
         action.setStatusTip('Choose action')
         action.setIcon(QIcon('icons/cursor.png'))
-        action.triggered.connect(self.disableScopes)
+        action.triggered.connect(self.disableActionHandler)
         return action
 
-    def disableScopes(self):
+    def disableActionHandler(self):
         for action in self.toolBarGroup.actions():
             action.setChecked(False)
-        self.sketch.disableScope()
+
+        self.sketch.setMode(SketchMode(self.sketch))
         self.toolBarGroup.actions()[0].setChecked(True)
 
     def initStatusBar(self):
@@ -285,7 +278,7 @@ class Application(QMainWindow):
         self.sketch.keyPressEvent(event)
 
         if event.key() == Qt.Key_Escape:
-            return self.disableScopes()
+            return self.disableActionHandler()
 
     def closeEvent(self, event):
         title = 'Close application'
