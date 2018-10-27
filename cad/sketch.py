@@ -67,7 +67,7 @@ class Sketch(QtWidgets.QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Delete:
-            segment = self.getActive()
+            segment = self.getSelected()
             if segment:
                 self.segments.remove(segment)
 
@@ -84,7 +84,7 @@ class Sketch(QtWidgets.QWidget):
             point = Point(self.pressedPos)
             self.points.append(point)
 
-        segment = self.getActive()
+        segment = self.getSelected()
         if segment is None:
             return None
 
@@ -138,9 +138,9 @@ class Sketch(QtWidgets.QWidget):
         for segment in self.segments:
             segment.setPen(Pen.stable())
 
-        active = self.getActive()
-        if active:
-            active.setPen(Pen.active())
+        figure = self.getSelected()
+        if figure:
+            figure.setPen(Pen.selected())
 
         self.update()
 
@@ -175,7 +175,7 @@ class Sketch(QtWidgets.QWidget):
 
         self.mode = mode
 
-    def getActive(self):
+    def getSelected(self):
         for segment in self.segments:
             if segment.hasPoint(self.currentPos):
                 return segment
