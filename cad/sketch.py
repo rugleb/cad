@@ -59,7 +59,7 @@ class Sketch(QtWidgets.QWidget):
     def isMousePressed(self):
         return self.pressedPos is not None
 
-    def getCursorPosition(self):
+    def getCurrentPosition(self):
         return self.currentPos
 
     def getPressedPosition(self):
