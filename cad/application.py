@@ -127,12 +127,11 @@ class Application(QMainWindow):
         action.setToolTip('Draw point')
         action.setStatusTip('Draw point')
         action.setIcon(QIcon('icons/point.png'))
-        action.changed.connect(self.pointActionHandler)
+        action.triggered.connect(self.pointActionHandler)
         return action
 
     def pointActionHandler(self):
-        if self.sender().isChecked():
-            self.sketch.enableDrawPointMode()
+        self.sketch.enableDrawPointMode()
 
     def lineAction(self):
         action = QAction('Line')
@@ -140,52 +139,48 @@ class Application(QMainWindow):
         action.setToolTip('Draw line')
         action.setStatusTip('Draw line')
         action.setIcon(QIcon('icons/line.png'))
-        action.changed.connect(self.lineActionHandler)
+        action.triggered.connect(self.lineActionHandler)
         return action
 
     def lineActionHandler(self):
-        if self.sender().isChecked():
-            self.sketch.enableDrawLineMode()
+        self.sketch.enableDrawLineMode()
 
     def horizontalAction(self):
         action = QAction('Horizontal')
         action.setToolTip('Horizontal constraint')
         action.setStatusTip('Horizontal constraint')
         action.setIcon(QIcon('icons/horizontal.png'))
-        action.changed.connect(self.horizontalActionHandler)
+        action.triggered.connect(self.horizontalActionHandler)
         return action
 
     def horizontalActionHandler(self):
-        if self.sender().isChecked():
-            self.sketch.enableAngleScope(0)
+        self.sketch.enableAngleScope(0)
 
     def verticalAction(self):
         action = QAction('Vertical')
         action.setToolTip('Vertical constraint')
         action.setStatusTip('Vertical constraint')
         action.setIcon(QIcon('icons/vertical.png'))
-        action.changed.connect(self.verticalActionHandler)
+        action.triggered.connect(self.verticalActionHandler)
         return action
 
     def verticalActionHandler(self):
-        if self.sender().isChecked():
-            self.sketch.enableAngleScope(90)
+        self.sketch.enableAngleScope(90)
 
     def angleAction(self):
         action = QAction('Angle')
         action.setToolTip('Angle constraint')
         action.setStatusTip('Angle constraint')
         action.setIcon(QIcon('icons/angle.png'))
-        action.changed.connect(self.angleActionHandler)
+        action.triggered.connect(self.angleActionHandler)
         return action
 
     def angleActionHandler(self):
-        if self.sender().isChecked():
-            angle, ok = self.askAngleValue()
-            if ok:
-                self.sketch.enableAngleScope(angle)
-            else:
-                self.disableScopes()
+        angle, ok = self.askAngleValue()
+        if ok:
+            self.sketch.enableAngleScope(angle)
+        else:
+            self.disableScopes()
 
     def askAngleValue(self):
         label = 'Input angle value:'
@@ -197,16 +192,15 @@ class Application(QMainWindow):
         action.setToolTip('Length constraint')
         action.setStatusTip('Length constraint')
         action.setIcon(QIcon('icons/length.png'))
-        action.changed.connect(self.lengthActionHandler)
+        action.triggered.connect(self.lengthActionHandler)
         return action
 
     def lengthActionHandler(self):
-        if self.sender().isChecked():
-            length, ok = self.askLengthValue()
-            if ok:
-                self.sketch.enableLengthScope(length)
-            else:
-                self.disableScopes()
+        length, ok = self.askLengthValue()
+        if ok:
+            self.sketch.enableLengthScope(length)
+        else:
+            self.disableScopes()
 
     def askLengthValue(self):
         label = 'Input length value:'
@@ -218,36 +212,33 @@ class Application(QMainWindow):
         action.setToolTip('Parallel constraint')
         action.setStatusTip('Parallel constraint')
         action.setIcon(QIcon('icons/parallel.png'))
-        action.changed.connect(self.parallelsActionHandler)
+        action.triggered.connect(self.parallelsActionHandler)
         return action
 
     def parallelsActionHandler(self):
-        if self.sender().isChecked():
-            self.sketch.enableParallelScope()
+        self.sketch.enableParallelScope()
 
     def perpendicularAction(self):
         action = QAction('Perpendicular')
         action.setToolTip('Perpendicular constraint')
         action.setStatusTip('Perpendicular constraint')
         action.setIcon(QIcon('icons/perpendicular.png'))
-        action.changed.connect(self.perpendicularActionHandler)
+        action.triggered.connect(self.perpendicularActionHandler)
         return action
 
     def perpendicularActionHandler(self):
-        if self.sender().isChecked():
-            self.sketch.enablePerpendicularScope()
+        self.sketch.enablePerpendicularScope()
 
     def coincidentAction(self):
         action = QAction('Coincident')
         action.setToolTip('Coincident constraint')
         action.setStatusTip('Coincident constraint')
         action.setIcon(QIcon('icons/coincident.png'))
-        action.changed.connect(self.coincidentActionHandler)
+        action.triggered.connect(self.coincidentActionHandler)
         return action
 
     def coincidentActionHandler(self):
-        if self.sender().isChecked():
-            self.sketch.enableCoincidentScope()
+        self.sketch.enableCoincidentScope()
 
     def disableScopeAction(self):
         action = QAction('Disable')
