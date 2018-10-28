@@ -48,6 +48,9 @@ class Figure(ABC):
     def getConstraints(self):
         return self._constraints
 
+    def hasConstraints(self):
+        return [] == self.getConstraints()
+
 
 class Point(Figure):
 
