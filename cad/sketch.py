@@ -30,7 +30,9 @@ class Sketch(QtWidgets.QWidget):
         return self.pressedPos
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Delete:
+        keys = [QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Delete]
+
+        if event.key() in keys:
             segment = self.getSelected()
             if segment:
                 self.segments.remove(segment)
