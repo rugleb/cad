@@ -27,12 +27,16 @@ class Figure(ABC):
             raise GivenTypeIsInvalidException(message)
 
     def setConstraint(self, constraint):
+        # Let's check the object for normal type
         self._checkConstraint(constraint)
 
+        # After validation, we need to remove all previously
+        # imposed restrictions with the same type
         for c in self._constraints:
             if type(c) is type(constraint):
                 self._constraints.remove(c)
 
+        # Then we just impose this restriction
         self._constraints.append(constraint)
 
     @classmethod
