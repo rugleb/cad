@@ -1,0 +1,2 @@
+class GivenTypeIsInvalidException(Exception):
+    pass
