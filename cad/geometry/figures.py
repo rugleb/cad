@@ -1,5 +1,7 @@
 from abc import ABC
 
+from PyQt5.QtCore import QPointF, QLineF
+
 from .constraints import Constraint
 from .exceptions import GivenTypeIsInvalidException
 
@@ -64,15 +66,25 @@ class Point(Figure):
         self._checkCoordinate(x)
         self._x = x
 
+    def getX(self):
+        return self._x
+
     def setY(self, y):
         self._checkCoordinate(y)
         self._y = y
+
+    def getY(self):
+        return self._y
 
     @classmethod
     def _checkCoordinate(cls, coordinate):
         if type(coordinate) not in (float, int):
             message = 'Point coordinate must be int or float instance.'
             raise GivenTypeIsInvalidException(message)
+
+    def toQtPoint(self):
+        x, y = self.getX(), self.getY()
+        return QPointF(x, y)
 
 
 class Line(Figure):
@@ -108,3 +120,7 @@ class Line(Figure):
         if type(point) is not Point:
             message = 'Line point must be Point instance.'
             raise GivenTypeIsInvalidException(message)
+
+    def toQtLine(self):
+        p1, p2 = self.getP1(), self.getP2()
+        return QLineF(p1, p2)
