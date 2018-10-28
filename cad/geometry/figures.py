@@ -87,9 +87,21 @@ class Line(Figure):
         self._checkPoint(point)
         self._p1 = point
 
+    def getP1(self):
+        return self._p1
+
+    def hasP1(self):
+        return self.getP1() is not None
+
     def setP2(self, point):
         self._checkPoint(point)
         self._p2 = point
+
+    def getP2(self):
+        return self._p2
+
+    def hasP2(self):
+        return self.getP2() is not None
 
     @classmethod
     def _checkPoint(cls, point):
