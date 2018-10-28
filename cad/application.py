@@ -104,14 +104,14 @@ class Application(QMainWindow):
         actions = [
             default,
             self.lineAction(),
-            self.pointAction(),
+            # self.pointAction(),
             self.angleAction(),
             self.lengthAction(),
             self.parallelAction(),
             self.perpendicularAction(),
             self.verticalAction(),
             self.horizontalAction(),
-            self.coincidentAction(),
+            # self.coincidentAction(),
         ]
 
         for action in actions:
