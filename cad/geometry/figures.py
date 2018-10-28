@@ -25,8 +25,8 @@ class Figure(ABC):
     @classmethod
     def _checkName(cls, name):
         if type(name) is not str:
-            message = 'Figure name must be a string instance.'
-            raise GivenTypeIsInvalidException(message)
+            msg = 'The figure name must be an instance of string'
+            raise GivenTypeIsInvalidException(msg)
 
     def setConstraint(self, constraint):
         # Let's check the object for normal type
@@ -44,8 +44,8 @@ class Figure(ABC):
     @classmethod
     def _checkConstraint(cls, constraint):
         if type(constraint) is not Constraint:
-            message = 'Figure constraint must be a Constraint instance.'
-            raise GivenTypeIsInvalidException(message)
+            msg = 'The constraint must be an instance of the Constraint class'
+            raise GivenTypeIsInvalidException(msg)
 
     def getConstraints(self):
         return self._constraints
@@ -79,8 +79,8 @@ class PointFigure(Figure):
     @classmethod
     def _checkCoordinate(cls, coordinate):
         if type(coordinate) not in (float, int):
-            message = 'Point coordinate must be int or float instance.'
-            raise GivenTypeIsInvalidException(message)
+            msg = 'The point coordinate must be an instance of int or float'
+            raise GivenTypeIsInvalidException(msg)
 
     def toQtPoint(self):
         x = self.getX()
@@ -119,8 +119,8 @@ class LineFigure(Figure):
     @classmethod
     def _checkPoint(cls, point):
         if type(point) is not PointFigure:
-            message = 'Line point must be PointFigure instance.'
-            raise GivenTypeIsInvalidException(message)
+            msg = 'The point must be an instance of the PointFigure class'
+            raise GivenTypeIsInvalidException(msg)
 
     def toQtLine(self):
         p1 = self.getP1()
