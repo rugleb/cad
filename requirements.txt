@@ -1,2 +1,4 @@
-PyQt5==5.11.2
-PyQt5-sip==4.19.12
+numpy==1.15.3
+scipy==1.1.0
+PyQt5==5.11.3
+PyQt5-sip==4.19.13
