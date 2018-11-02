@@ -56,11 +56,14 @@ class Figure(ABC):
 
 class PointFigure(Figure):
 
-    def __init__(self):
+    def __init__(self, x: float, y: float):
         super().__init__()
 
         self._x = None
         self._y = None
+
+        self.setX(x)
+        self.setY(y)
 
     def setX(self, x: float) -> None:
         self._checkCoordinate(x)
@@ -87,14 +90,21 @@ class PointFigure(Figure):
         y = self.getY()
         return QPointF(x, y)
 
+    @classmethod
+    def fromQtPoint(cls, point: QPointF):
+        return cls(point.x(), point.y())
+
 
 class LineFigure(Figure):
 
-    def __init__(self):
+    def __init__(self, p1: PointFigure, p2: PointFigure):
         super().__init__()
 
         self._p1 = None
         self._p2 = None
+
+        self.setP1(p1)
+        self.setP2(p2)
 
     def setP1(self, point: PointFigure) -> None:
         self._checkPoint(point)
@@ -138,3 +148,9 @@ class LineFigure(Figure):
         p1 = self.getP1()
         p2 = self.getP2()
         return QLineF(p1, p2)
+
+    @classmethod
+    def fromQtLine(cls, line: QLineF):
+        p1 = PointFigure.fromQtPoint(line.p1())
+        p2 = PointFigure.fromQtPoint(line.p2())
+        return cls(p1, p2)
