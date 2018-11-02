@@ -145,8 +145,8 @@ class LineFigure(Figure):
             raise GivenTypeIsInvalidException(msg)
 
     def toQtLine(self) -> QLineF:
-        p1 = self.getP1()
-        p2 = self.getP2()
+        p1 = self.getP1().toQtPoint()
+        p2 = self.getP2().toQtPoint()
         return QLineF(p1, p2)
 
     @classmethod
