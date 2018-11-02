@@ -116,6 +116,18 @@ class LineFigure(Figure):
     def hasP2(self):
         return self.getP2() is not None
 
+    def getX1(self):
+        return self.getP1().getX()
+
+    def getY1(self):
+        return self.getP1().getY()
+
+    def getX2(self):
+        return self.getP2().getX()
+
+    def getY2(self):
+        return self.getP2().getY()
+
     @classmethod
     def _checkPoint(cls, point):
         if type(point) is not PointFigure:
