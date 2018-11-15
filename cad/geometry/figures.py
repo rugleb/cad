@@ -4,6 +4,10 @@ from PyQt5.QtCore import QPointF, QLineF
 
 from .constraints import Constraint
 from .exceptions import GivenTypeIsInvalidException
+from .math import distancePointToVector
+
+
+OFFSET = 4
 
 
 class Figure(ABC):
@@ -173,4 +177,13 @@ class Line(Figure):
             return self.toQtLine() == line
         if type(line) is Line:
             return self.toQtLine() == line.toQtLine()
+        return False
+
+    def hasPoint(self, p: Point) -> bool:
+        d = distancePointToVector(p.toQtPoint(), self.toQtLine())
+        if d < OFFSET:
+            if self.getX1() < p.getX() < self.getX2():
+                return True
+            if self.getX2() < p.getX() < self.getX1():
+                return True
         return False
