@@ -92,7 +92,9 @@ class Point(Figure):
 
     @classmethod
     def fromQtPoint(cls, point: QPointF):
-        return cls(point.x(), point.y())
+        x = point.x()
+        y = point.y()
+        return cls(x, y)
 
 
 class Line(Figure):
