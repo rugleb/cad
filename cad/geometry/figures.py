@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from PyQt5.QtCore import QPointF, QLineF
 
@@ -53,6 +53,10 @@ class Figure(ABC):
     def hasConstraints(self) -> bool:
         return [] == self.getConstraints()
 
+    @abstractmethod
+    def isEqual(self, figure) -> bool:
+        pass
+
 
 class Point(Figure):
 
@@ -95,6 +99,13 @@ class Point(Figure):
         x = point.x()
         y = point.y()
         return cls(x, y)
+
+    def isEqual(self, point) -> bool:
+        if type(point) is QPointF:
+            return self.toQtPoint() == point
+        if type(point) is Point:
+            return self.toQtPoint() == point.toQtPoint()
+        return False
 
 
 class Line(Figure):
@@ -156,3 +167,10 @@ class Line(Figure):
         p1 = Point.fromQtPoint(line.p1())
         p2 = Point.fromQtPoint(line.p2())
         return cls(p1, p2)
+
+    def isEqual(self, line) -> bool:
+        if type(line) is QLineF:
+            return self.toQtLine() == line
+        if type(line) is Line:
+            return self.toQtLine() == line.toQtLine()
+        return False
