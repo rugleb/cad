@@ -54,7 +54,7 @@ class Figure(ABC):
         return [] == self.getConstraints()
 
 
-class PointFigure(Figure):
+class Point(Figure):
 
     def __init__(self, x: float, y: float):
         super().__init__()
@@ -95,9 +95,9 @@ class PointFigure(Figure):
         return cls(point.x(), point.y())
 
 
-class LineFigure(Figure):
+class Line(Figure):
 
-    def __init__(self, p1: PointFigure, p2: PointFigure):
+    def __init__(self, p1: Point, p2: Point):
         super().__init__()
 
         self._p1 = None
@@ -106,21 +106,21 @@ class LineFigure(Figure):
         self.setP1(p1)
         self.setP2(p2)
 
-    def setP1(self, point: PointFigure) -> None:
+    def setP1(self, point: Point) -> None:
         self._checkPoint(point)
         self._p1 = point
 
-    def getP1(self) -> PointFigure:
+    def getP1(self) -> Point:
         return self._p1
 
     def hasP1(self) -> bool:
         return self.getP1() is not None
 
-    def setP2(self, point: PointFigure) -> None:
+    def setP2(self, point: Point) -> None:
         self._checkPoint(point)
         self._p2 = point
 
-    def getP2(self) -> PointFigure:
+    def getP2(self) -> Point:
         return self._p2
 
     def hasP2(self) -> float:
@@ -140,8 +140,8 @@ class LineFigure(Figure):
 
     @classmethod
     def _checkPoint(cls, point) -> None:
-        if type(point) is not PointFigure:
-            msg = 'The point must be an instance of the PointFigure class'
+        if type(point) is not Point:
+            msg = 'The point must be an instance of the Point class'
             raise GivenTypeIsInvalidException(msg)
 
     def toQtLine(self) -> QLineF:
@@ -151,6 +151,6 @@ class LineFigure(Figure):
 
     @classmethod
     def fromQtLine(cls, line: QLineF):
-        p1 = PointFigure.fromQtPoint(line.p1())
-        p2 = PointFigure.fromQtPoint(line.p2())
+        p1 = Point.fromQtPoint(line.p1())
+        p2 = Point.fromQtPoint(line.p2())
         return cls(p1, p2)
