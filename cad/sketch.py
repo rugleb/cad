@@ -6,8 +6,7 @@ class Sketch(QtWidgets.QWidget):
     def __init__(self, *args):
         super().__init__(*args)
 
-        self.lines = []
-        self.points = []
+        self.figures = []
 
         self.currentPos = None
         self.pressedPos = None
@@ -22,11 +21,20 @@ class Sketch(QtWidgets.QWidget):
         keys = [QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Delete]
 
         if event.key() in keys:
-            segment = self.getSelected()
-            if segment:
-                self.lines.remove(segment)
+            self.removeSelectedFigure()
 
         self.update()
+
+    def removeSelectedFigure(self):
+        selected = self.getSelectedFigure()
+        if selected is not None:
+            self.figures.remove(selected)
+
+    def getSelectedFigure(self):
+        for figure in self.figures:
+            if figure.hasPoint(self.currentPos):
+                return True
+        return False
 
     def mousePressEvent(self, event):
         self.pressedPos = event.localPos()

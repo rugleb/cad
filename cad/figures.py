@@ -4,7 +4,10 @@ from PyQt5.QtCore import QPointF, QLineF
 from contracts import contract
 
 from cad.constraints import Constraint
-from cad.math import distancePointToVector
+from cad.math import distancePointToVector, distancePointToPoint
+
+
+OFFSET = 4
 
 
 class Figure(ABC):
@@ -92,7 +95,8 @@ class Point(Figure):
         return False
 
     def hasPoint(self, point: QPointF) -> bool:
-        return self.toQtPoint() == point
+        d = distancePointToPoint(self.toQtPoint(), point)
+        return d < OFFSET
 
 
 class Line(Figure):
@@ -160,7 +164,7 @@ class Line(Figure):
 
     def hasPoint(self, p: Point) -> bool:
         d = distancePointToVector(p.toQtPoint(), self.toQtLine())
-        if d < 4:
+        if d < OFFSET:
             if self.getX1() < p.getX() < self.getX2():
                 return True
             if self.getX2() < p.getX() < self.getX1():
