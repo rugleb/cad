@@ -44,6 +44,10 @@ class Figure(ABC):
     def isEqual(self, figure) -> bool:
         pass
 
+    @abstractmethod
+    def hasPoint(self, point: QPointF) -> bool:
+        pass
+
 
 class Point(Figure):
 
@@ -86,6 +90,9 @@ class Point(Figure):
         if type(point) is Point:
             return self.toQtPoint() == point.toQtPoint()
         return False
+
+    def hasPoint(self, point: QPointF) -> bool:
+        return self.toQtPoint() == point
 
 
 class Line(Figure):
