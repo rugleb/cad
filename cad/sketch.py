@@ -1,5 +1,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QPointF, pyqtSignal
+from PyQt5.QtCore import QPointF, pyqtSignal, pyqtSlot
+
+from contracts import contract
+
+from cad.constraints import Constraint
 
 
 class Sketch(QtWidgets.QWidget):
@@ -15,8 +19,15 @@ class Sketch(QtWidgets.QWidget):
         self.currentPos = None
         self.pressedPos = None
 
+        self.constraint = None
+
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
+
+    @pyqtSlot(Constraint)
+    @contract(constraint=Constraint)
+    def constraintChanged(self, constraint: Constraint):
+        self.constraint = constraint
 
     def isMousePressed(self):
         return self.pressedPos is not None
