@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
 
 from PyQt5.QtCore import QPointF, QLineF
+from contracts import contract
 
 from cad.constraints import Constraint
-from cad.exceptions import GivenTypeIsInvalidException
 from cad.math import distancePointToVector
-
-
-OFFSET = 4
 
 
 class Figure(ABC):
@@ -16,8 +13,8 @@ class Figure(ABC):
         self._name = None
         self._constraints = []
 
+    @contract(name=str)
     def setName(self, name: str) -> None:
-        self._checkName(name)
         self._name = name
 
     def getName(self) -> str:
@@ -26,17 +23,9 @@ class Figure(ABC):
     def hasName(self) -> bool:
         return type(self._name) is not None
 
-    @classmethod
-    def _checkName(cls, name: str) -> None:
-        if type(name) is not str:
-            msg = 'The figure name must be an instance of string'
-            raise GivenTypeIsInvalidException(msg)
-
+    @contract(constraint=Constraint)
     def setConstraint(self, constraint: Constraint) -> None:
-        # Let's check the object for normal type
-        self._checkConstraint(constraint)
-
-        # After validation, we need to remove all previously
+        # First of all, we need to remove all previously
         # imposed restrictions with the same type
         for c in self._constraints:
             if type(c) is type(constraint):
@@ -44,12 +33,6 @@ class Figure(ABC):
 
         # Then we just impose this restriction
         self._constraints.append(constraint)
-
-    @classmethod
-    def _checkConstraint(cls, constraint: Constraint) -> None:
-        if type(constraint) is not Constraint:
-            msg = 'The constraint must be an instance of the Constraint class'
-            raise GivenTypeIsInvalidException(msg)
 
     def getConstraints(self) -> list:
         return self._constraints
@@ -74,24 +57,16 @@ class Point(Figure):
         self.setY(y)
 
     def setX(self, x: float) -> None:
-        self._checkCoordinate(x)
         self._x = x
 
     def getX(self) -> float:
         return self._x
 
     def setY(self, y: float) -> None:
-        self._checkCoordinate(y)
         self._y = y
 
     def getY(self) -> float:
         return self._y
-
-    @classmethod
-    def _checkCoordinate(cls, coordinate) -> None:
-        if type(coordinate) not in (float, int):
-            msg = 'The point coordinate must be an instance of int or float'
-            raise GivenTypeIsInvalidException(msg)
 
     def toQtPoint(self) -> QPointF:
         x = self.getX()
@@ -99,6 +74,7 @@ class Point(Figure):
         return QPointF(x, y)
 
     @classmethod
+    @contract(point=QPointF)
     def fromQtPoint(cls, point: QPointF):
         x = point.x()
         y = point.y()
@@ -114,6 +90,7 @@ class Point(Figure):
 
 class Line(Figure):
 
+    @contract(p1=Point, p2=Point)
     def __init__(self, p1: Point, p2: Point):
         super().__init__()
 
@@ -123,8 +100,8 @@ class Line(Figure):
         self.setP1(p1)
         self.setP2(p2)
 
+    @contract(point=Point)
     def setP1(self, point: Point) -> None:
-        self._checkPoint(point)
         self._p1 = point
 
     def getP1(self) -> Point:
@@ -133,8 +110,8 @@ class Line(Figure):
     def hasP1(self) -> bool:
         return self.getP1() is not None
 
+    @contract(point=Point)
     def setP2(self, point: Point) -> None:
-        self._checkPoint(point)
         self._p2 = point
 
     def getP2(self) -> Point:
@@ -155,18 +132,13 @@ class Line(Figure):
     def getY2(self) -> float:
         return self.getP2().getY()
 
-    @classmethod
-    def _checkPoint(cls, point) -> None:
-        if type(point) is not Point:
-            msg = 'The point must be an instance of the Point class'
-            raise GivenTypeIsInvalidException(msg)
-
     def toQtLine(self) -> QLineF:
         p1 = self.getP1().toQtPoint()
         p2 = self.getP2().toQtPoint()
         return QLineF(p1, p2)
 
     @classmethod
+    @contract(line=QLineF)
     def fromQtLine(cls, line: QLineF):
         p1 = Point.fromQtPoint(line.p1())
         p2 = Point.fromQtPoint(line.p2())
@@ -181,7 +153,7 @@ class Line(Figure):
 
     def hasPoint(self, p: Point) -> bool:
         d = distancePointToVector(p.toQtPoint(), self.toQtLine())
-        if d < OFFSET:
+        if d < 4:
             if self.getX1() < p.getX() < self.getX2():
                 return True
             if self.getX2() < p.getX() < self.getX1():
