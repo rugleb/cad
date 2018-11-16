@@ -1,7 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QPointF, pyqtSignal
 
 
 class Sketch(QtWidgets.QWidget):
+
+    mousePressedSignal = pyqtSignal(QPointF)
+    mouseReleasedSignal = pyqtSignal(QPointF)
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -39,9 +43,13 @@ class Sketch(QtWidgets.QWidget):
     def mousePressEvent(self, event):
         self.pressedPos = event.localPos()
 
+        self.mousePressedSignal.emit(self.pressedPos)
+
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             self.pressedPos = None
+
+        self.mouseReleasedSignal.emit(self.pressedPos)
 
         self.update()
 
