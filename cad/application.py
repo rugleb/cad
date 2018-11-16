@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 
 from cad.sketch import Sketch
-from cad.geometry.constraints import *
+from cad.constraints import *
 
 
 class Application(QMainWindow):

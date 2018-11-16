@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 
 from PyQt5.QtCore import QPointF, QLineF
 
-from .constraints import Constraint
-from .exceptions import GivenTypeIsInvalidException
-from .math import distancePointToVector
+from cad.constraints import Constraint
+from cad.exceptions import GivenTypeIsInvalidException
+from cad.math import distancePointToVector
 
 
 OFFSET = 4
