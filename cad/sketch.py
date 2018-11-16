@@ -1,7 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from cad.drawing import Pen
-
 
 class Sketch(QtWidgets.QWidget):
 
