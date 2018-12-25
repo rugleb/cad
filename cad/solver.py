@@ -1,22 +1,13 @@
 from time import time
 
+import numpy as np
 from scipy import optimize
-from sympy import Symbol, lambdify
 
 
 class Point:
-    def __init__(self, number: int, x: float, y: float):
-        self.i = number
+    def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
-
-    def getEquations(self):
-        x = Symbol('x{}'.format(self.i))
-        y = Symbol('y{}'.format(self.i))
-        return [
-            x - self.x,
-            y - self.y,
-        ]
 
 
 class Line:
@@ -24,52 +15,42 @@ class Line:
         self.p1 = p1
         self.p2 = p2
 
-    def getEquations(self):
-        equations = []
-        for point in (self.p1, self.p2):
-            equations.extend(point.getEquations())
-        return equations
+
+class Solver:
+    def __init__(self):
+        self.points = []
+
+    def add_point(self, p: Point):
+        self.points.append(p)
+
+    def system(self, x: np.ndarray):
+        y = np.zeros(x.shape, dtype=x.dtype)
+
+        for i, p in enumerate(self.points):
+            j = 2 * i
+            y[j] = x[j] - p.x
+            y[j + 1] = x[j + 1] - p.y
+
+        return y
+
+    @property
+    def x0(self):
+        x0 = np.zeros(len(self.points) * 2, dtype=float)
+        return x0
+
+    def solve(self):
+        result = optimize.fsolve(self.system, self.x0)
+        return result
 
 
-a = time()
+start = time()
 
-p1 = Point(1, 5, 5)
-p2 = Point(2, 10, 10)
-p3 = Point(3, 20, 10)
+solver = Solver()
+solver.add_point(Point(10, 10))
+solver.add_point(Point(10, 20))
 
-l1 = Line(p2, p3)
+res = solver.solve()
 
-system = []
-for obj in (p1, l1):
-    system.extend(obj.getEquations())
+print(time() - start)
+print(res)
 
-b = time()
-
-functions = []
-symbols = [
-    Symbol('x1'),
-    Symbol('y1'),
-    Symbol('x2'),
-    Symbol('y2'),
-    Symbol('x3'),
-    Symbol('y3'),
-]
-
-for equation in system:
-    func = lambdify(symbols, equation)
-    functions.append(func)
-
-c = time()
-
-
-def fun(x):
-    return [f(*x) for f in functions]
-
-
-d = time()
-
-result = optimize.fsolve(fun, [0] * len(functions), xtol=0.01)
-
-z = time()
-
-pass
