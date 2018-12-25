@@ -35,7 +35,8 @@ class Solver:
 
     @property
     def x0(self):
-        x0 = np.zeros(len(self.points) * 2, dtype=float)
+        size = len(self.points) * 2
+        x0 = np.zeros(size, dtype=float)
         return x0
 
     def solve(self):
@@ -53,4 +54,3 @@ res = solver.solve()
 
 print(time() - start)
 print(res)
-
