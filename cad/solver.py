@@ -15,42 +15,55 @@ class Line:
         self.p1 = p1
         self.p2 = p2
 
+    def points(self) -> tuple:
+        return self.p1, self.p2
 
-class Solver:
+
+class System:
     def __init__(self):
         self.points = []
 
-    def add_point(self, p: Point):
-        self.points.append(p)
+    def add(self, point: Point):
+        self.points.append(point)
 
-    def system(self, x: np.ndarray):
-        y = np.zeros(x.shape, dtype=x.dtype)
+    @property
+    def x0(self) -> np.ndarray:
+        size = len(self.points) * 2
+        return np.ndarray(shape=(size, ), dtype=float)
 
-        for i, p in enumerate(self.points):
-            j = 2 * i
-            y[j] = x[j] - p.x
-            y[j + 1] = x[j + 1] - p.y
+    def system(self, x: np.ndarray) -> np.ndarray:
+        y = np.zeros(shape=x.shape, dtype=x.dtype)
+
+        for i, point in enumerate(self.points):
+            for j, prop in enumerate(['x', 'y']):
+                n = i * 2 + j
+                y[n] = x[n] - getattr(point, prop)
 
         return y
 
-    @property
-    def x0(self):
-        size = len(self.points) * 2
-        x0 = np.zeros(size, dtype=float)
-        return x0
-
-    def solve(self):
-        result = optimize.fsolve(self.system, self.x0)
+    def solve(self) -> list:
+        result = []
+        for y in optimize.fsolve(self.system, self.x0, xtol=1e-2):
+            result.append(round(y, 2))
         return result
+
+    def recount(self):
+        y = self.solve()
+
+        for i, point in enumerate(self.points):
+            for j, prop in enumerate(['x', 'y']):
+                n = i * 2 + j
+                setattr(point, prop, y[n])
 
 
 start = time()
 
-solver = Solver()
-solver.add_point(Point(10, 10))
-solver.add_point(Point(10, 20))
+system = System()
+for value in range(5):
+    system.add(Point(value, value))
 
-res = solver.solve()
+solution = system.solve()
+delta = time() - start
 
-print(time() - start)
-print(res)
+print(solution)
+print(delta)
