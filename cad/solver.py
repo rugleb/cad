@@ -14,12 +14,27 @@ class Point:
         return self.x, self.y
 
 
+class Constraint:
+    pass
+
+
+class Length(Constraint):
+    def __init__(self, p1: Point, p2: Point, value: float):
+        self.p1 = p1
+        self.p2 = p2
+        self.value = value
+
+
 class System:
     def __init__(self):
         self.points = []
+        self.constraints = []
 
     def add_point(self, point: Point):
         self.points.append(point)
+
+    def add_constraint(self, constraint: Constraint):
+        self.constraints.append(constraint)
 
     @property
     def x0(self) -> np.ndarray:
@@ -52,18 +67,25 @@ class System:
                 setattr(point, prop, y[n])
 
 
+def main():
+    p1 = Point(10., 10.)
+    p2 = Point(30., 10.)
+    p3 = Point(20., 20.)
+
+    system = System()
+    system.add_point(p1)
+    system.add_point(p2)
+    system.add_point(p3)
+
+    length = Length(p1, p2, 20)
+    system.add_constraint(length)
+
+    return system.solve()
+
+
 start = time()
+solution = main()
 
-p1 = Point(10., 10.)
-p2 = Point(30., 10.)
-p3 = Point(20., 20.)
-
-system = System()
-system.add_point(p1)
-system.add_point(p2)
-system.add_point(p3)
-
-solution = system.solve()
 delta = time() - start
 
 print(solution)
