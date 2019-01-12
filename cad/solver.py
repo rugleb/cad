@@ -9,14 +9,9 @@ class Point:
         self.x = x
         self.y = y
 
-
-class Line:
-    def __init__(self, p1: Point, p2: Point):
-        self.p1 = p1
-        self.p2 = p2
-
-    def points(self) -> tuple:
-        return self.p1, self.p2
+    @property
+    def coordinates(self) -> tuple:
+        return self.x, self.y
 
 
 class System:
@@ -35,9 +30,9 @@ class System:
         y = np.zeros(shape=x.shape, dtype=x.dtype)
 
         for i, point in enumerate(self.points):
-            for j, prop in enumerate(['x', 'y']):
+            for j, coordinate in enumerate(point.coordinates):
                 n = i * 2 + j
-                y[n] = x[n] - getattr(point, prop)
+                y[n] = x[n] - coordinate
 
         return y
 
@@ -50,17 +45,23 @@ class System:
     def recount(self):
         y = self.solve()
 
+        properties = ('x', 'y')
         for i, point in enumerate(self.points):
-            for j, prop in enumerate(['x', 'y']):
+            for j, prop in enumerate(properties):
                 n = i * 2 + j
                 setattr(point, prop, y[n])
 
 
 start = time()
 
+p1 = Point(10., 10.)
+p2 = Point(30., 10.)
+p3 = Point(20., 20.)
+
 system = System()
-for value in range(5):
-    system.add(Point(value, value))
+system.add(p1)
+system.add(p2)
+system.add(p3)
 
 solution = system.solve()
 delta = time() - start
