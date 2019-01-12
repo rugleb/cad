@@ -18,6 +18,36 @@ class Constraint:
     pass
 
 
+class CoincidentX(Constraint):
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+    def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
+        i1 = system.points.index(self.p1) * 2
+        i2 = system.points.index(self.p2) * 2
+
+        y[i1] += x[i]
+        y[i2] -= x[i]
+
+        y[i] = x[i1] - x[i2]
+
+
+class CoincidentY(Constraint):
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+    def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
+        i1 = system.points.index(self.p1) * 2 + 1
+        i2 = system.points.index(self.p2) * 2 + 1
+
+        y[i1] += x[i]
+        y[i2] -= x[i]
+
+        y[i] = x[i1] - x[i2]
+
+
 class Length(Constraint):
     def __init__(self, p1: Point, p2: Point, value: float):
         self.p1 = p1
