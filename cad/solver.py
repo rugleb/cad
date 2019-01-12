@@ -25,8 +25,8 @@ class Length(Constraint):
         self.length = value
 
     def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
-        i1 = system.points.index(self.p1)
-        i2 = system.points.index(self.p2)
+        i1 = system.points.index(self.p1) * 2
+        i2 = system.points.index(self.p2) * 2
 
         y[i1 + 0] += 2 * x[i] * (x[i1 + 0] - x[i2 + 0])
         y[i1 + 1] += 2 * x[i] * (x[i1 + 1] - x[i2 + 1])
@@ -43,7 +43,7 @@ class FixedX(Constraint):
         self.value = value
 
     def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
-        j = system.points.index(self.point)
+        j = system.points.index(self.point) * 2
         y[j] += x[i]
 
         y[i] = x[j] - self.value
@@ -55,10 +55,40 @@ class FixedY(Constraint):
         self.value = value
 
     def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
-        j = system.points.index(self.point) + 1
+        j = system.points.index(self.point) * 2 + 1
         y[j] += x[i]
 
         y[i] = x[j] - self.value
+
+
+class Horizontal(Constraint):
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+    def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
+        i1 = system.points.index(self.p1) * 2 + 1
+        i2 = system.points.index(self.p2) * 2 + 1
+
+        y[i1] += x[i]
+        y[i2] -= x[i]
+
+        y[i] = x[i1] - x[i2]
+
+
+class Vertical(Constraint):
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+    def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
+        i1 = system.points.index(self.p1) * 2
+        i2 = system.points.index(self.p2) * 2
+
+        y[i1] += x[i]
+        y[i2] -= x[i]
+
+        y[i] = x[i1] - x[i2]
 
 
 class System:
@@ -83,7 +113,7 @@ class System:
                 y[n] = coordinate
 
         for i, constraint in enumerate(self.constraints):
-            n = len(self.points) + i
+            n = len(self.points) * 2 + i
             y[n] = i + 1 + 1e-3
 
         return y
@@ -97,7 +127,7 @@ class System:
                 y[n] = 2 * (x[n] - coordinate)
 
         for i, constraint in enumerate(self.constraints):
-            n = len(self.points) + i
+            n = len(self.points) * 2 + i
             constraint.apply(self, x, y, n)
 
         return y
@@ -127,6 +157,8 @@ def main():
     system.add_point(p2)
 
     system.add_constraint(Length(p1, p2, 20.))
+    system.add_constraint(FixedX(p2, p2.x))
+    system.add_constraint(FixedY(p2, p2.y))
 
     return system.solve()
 
