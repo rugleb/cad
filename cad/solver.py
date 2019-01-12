@@ -18,7 +18,7 @@ class System:
     def __init__(self):
         self.points = []
 
-    def add(self, point: Point):
+    def add_point(self, point: Point):
         self.points.append(point)
 
     @property
@@ -59,9 +59,9 @@ p2 = Point(30., 10.)
 p3 = Point(20., 20.)
 
 system = System()
-system.add(p1)
-system.add(p2)
-system.add(p3)
+system.add_point(p1)
+system.add_point(p2)
+system.add_point(p3)
 
 solution = system.solve()
 delta = time() - start
