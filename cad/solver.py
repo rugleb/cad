@@ -104,7 +104,7 @@ class System:
 
     def solve(self) -> list:
         result = []
-        for y in optimize.fsolve(self.system, self.x0, xtol=1e-2):
+        for y in optimize.fsolve(self.system, self.x0, xtol=1e-3):
             result.append(round(y, 2))
         return result
 
