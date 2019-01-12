@@ -22,7 +22,43 @@ class Length(Constraint):
     def __init__(self, p1: Point, p2: Point, value: float):
         self.p1 = p1
         self.p2 = p2
+        self.length = value
+
+    def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
+        i1 = system.points.index(self.p1)
+        i2 = system.points.index(self.p2)
+
+        y[i1 + 0] += 2 * x[i] * (x[i1 + 0] - x[i2 + 0])
+        y[i1 + 1] += 2 * x[i] * (x[i1 + 1] - x[i2 + 1])
+
+        y[i1 + 0] -= 2 * x[i] * (x[i1 + 0] - x[i2 + 0])
+        y[i1 + 1] -= 2 * x[i] * (x[i1 + 1] - x[i2 + 1])
+
+        y[i] = (x[i1] - x[i2]) ** 2 + (x[i1 + 1] - x[i2 + 1]) ** 2 - self.length ** 2
+
+
+class FixedX(Constraint):
+    def __init__(self, point: Point, value: float):
+        self.point = point
         self.value = value
+
+    def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
+        j = system.points.index(self.point)
+        y[j] += x[i]
+
+        y[i] = x[j] - self.value
+
+
+class FixedY(Constraint):
+    def __init__(self, point: Point, value: float):
+        self.point = point
+        self.value = value
+
+    def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
+        j = system.points.index(self.point) + 1
+        y[j] += x[i]
+
+        y[i] = x[j] - self.value
 
 
 class System:
@@ -38,8 +74,19 @@ class System:
 
     @property
     def x0(self) -> np.ndarray:
-        size = len(self.points) * 2
-        return np.ndarray(shape=(size, ), dtype=float)
+        size = len(self.points) * 2 + len(self.constraints)
+        y = np.zeros(shape=(size, ), dtype=float)
+
+        for i, point in enumerate(self.points):
+            for j, coordinate in enumerate(point.coordinates):
+                n = i * 2 + j
+                y[n] = coordinate
+
+        for i, constraint in enumerate(self.constraints):
+            n = len(self.points) + i
+            y[n] = i + 1 + 1e-3
+
+        return y
 
     def system(self, x: np.ndarray) -> np.ndarray:
         y = np.zeros(shape=x.shape, dtype=x.dtype)
@@ -47,7 +94,11 @@ class System:
         for i, point in enumerate(self.points):
             for j, coordinate in enumerate(point.coordinates):
                 n = i * 2 + j
-                y[n] = x[n] - coordinate
+                y[n] = 2 * (x[n] - coordinate)
+
+        for i, constraint in enumerate(self.constraints):
+            n = len(self.points) + i
+            constraint.apply(self, x, y, n)
 
         return y
 
@@ -70,15 +121,12 @@ class System:
 def main():
     p1 = Point(10., 10.)
     p2 = Point(30., 10.)
-    p3 = Point(20., 20.)
 
     system = System()
     system.add_point(p1)
     system.add_point(p2)
-    system.add_point(p3)
 
-    length = Length(p1, p2, 20)
-    system.add_constraint(length)
+    system.add_constraint(Length(p1, p2, 20.))
 
     return system.solve()
 
