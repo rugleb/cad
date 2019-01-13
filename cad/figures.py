@@ -1,7 +1,6 @@
 from abc import ABC
 
 from PyQt5.QtCore import QPointF, QLineF
-from contracts import contract
 
 
 class Figure(ABC):
@@ -23,14 +22,16 @@ class Point(Figure):
         return self.__y
 
     @y.setter
-    @contract(y=float)
     def y(self, y: float):
         self.__y = y
 
     @x.setter
-    @contract(x=float)
     def x(self, x: float):
         self.__x = x
+
+    @property
+    def coordinates(self) -> tuple:
+        return self.x, self.y
 
     @classmethod
     def fromQtPoint(cls, point: QPointF):
@@ -52,17 +53,14 @@ class Line(Figure):
         return self.__p2
 
     @p1.setter
-    @contract(p1=Point)
     def p1(self, p1: Point):
         self.__p1 = p1
 
     @p2.setter
-    @contract()
     def p2(self, p2: Point):
         self.__p2 = p2
 
     @classmethod
-    @contract(line=QLineF)
     def fromQtLine(cls, line: QLineF):
         p1 = Point.fromQtPoint(line.p1())
         p2 = Point.fromQtPoint(line.p2())
