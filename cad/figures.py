@@ -1,14 +1,7 @@
-from abc import ABC
-
 from PyQt5.QtCore import QPointF, QLineF
 
 
-class Figure(ABC):
-    pass
-
-
-class Point(Figure):
-
+class Point:
     def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
@@ -33,20 +26,18 @@ class Point(Figure):
     def coordinates(self) -> tuple:
         return self.x, self.y
 
+    def toQtPoint(self) -> QPointF:
+        return QPointF(self.x, self.y)
+
     @classmethod
     def fromQtPoint(cls, point: QPointF):
         return cls(point.x(), point.y())
 
 
-class Line(Figure):
-
+class Line:
     def __init__(self, p1: Point, p2: Point):
         self.p1 = p1
         self.p2 = p2
-
-    @property
-    def points(self) -> tuple:
-        return self.p1, self.p2
 
     @property
     def p1(self) -> Point:
@@ -63,6 +54,18 @@ class Line(Figure):
     @p2.setter
     def p2(self, p2: Point):
         self.__p2 = p2
+
+    @property
+    def points(self) -> tuple:
+        return self.p1, self.p2
+
+    def coordinates(self) -> tuple:
+        return self.p1.x, self.p1.x, self.p2.x, self.p2.y
+
+    def toQtLine(self) -> QLineF:
+        p1 = self.p1.toQtPoint()
+        p2 = self.p2.toQtPoint()
+        return QLineF(p1, p2)
 
     @classmethod
     def fromQtLine(cls, line: QLineF):
