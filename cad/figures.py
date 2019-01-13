@@ -67,6 +67,34 @@ class Line:
         p2 = self.p2.toQtPoint()
         return QLineF(p1, p2)
 
+    @property
+    def length(self) -> float:
+        return self.toQtLine().length()
+
+    @property
+    def dx(self) -> float:
+        return self.toQtLine().dx()
+
+    @property
+    def dy(self) -> float:
+        return self.toQtLine().dy()
+
+    @property
+    def x1(self) -> float:
+        return self.p1.x
+
+    @property
+    def x2(self) -> float:
+        return self.p2.x
+
+    @property
+    def y1(self) -> float:
+        return self.p1.y
+
+    @property
+    def y2(self) -> float:
+        return self.p2.y
+
     @classmethod
     def fromQtLine(cls, line: QLineF):
         p1 = Point.fromQtPoint(line.p1())

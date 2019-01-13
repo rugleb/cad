@@ -1,22 +1,18 @@
-from PyQt5.QtCore import QLineF, QPointF
+from cad.figures import Line, Point
 
 
-def distancePointToPoint(p1: QPointF, p2: QPointF) -> float:
-    return QLineF(p1, p2).length()
+def distPointToVector(p: Point, l: Line) -> float:
+    if not l.length > 0:
+        return Line(p, l.p1).length
+    s = l.dy * p.x - l.dx * p.y + l.x2 * l.y1 - l.y2 * l.x1
+    return abs(s) / l.length
 
 
-def distancePointToVector(p: QPointF, l: QLineF) -> float:
-    if not l.length() > 0:
-        return distancePointToPoint(p, l.p1())
-    s = l.dy() * p.x() - l.dx() * p.y() + l.x2() * l.y1() - l.y2() * l.x1()
-    return abs(s) / l.length()
+def isPointOnVector(p: Point, l: Line) -> bool:
+    return distPointToVector(p, l) == 0.
 
 
-def isPointOnVector(p: QPointF, l: QLineF) -> bool:
-    return distancePointToVector(p, l) == 0.
-
-
-def isPointOnLine(p: QPointF, l: QLineF) -> bool:
+def isPointOnLine(p: Point, l: Line) -> bool:
     if isPointOnVector(p, l):
-        return l.x1() <= p.x() <= l.x2()
+        return l.x1 <= p.x <= l.x2
     return False
