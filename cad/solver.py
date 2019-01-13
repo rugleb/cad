@@ -67,7 +67,7 @@ class Length(Constraint):
         y[i] = (x[i1] - x[i2]) ** 2 + (x[i1 + 1] - x[i2 + 1]) ** 2 - self.length ** 2
 
 
-class FixedX(Constraint):
+class FixationX(Constraint):
     def __init__(self, point: Point, value: float):
         self.point = point
         self.value = value
@@ -79,7 +79,7 @@ class FixedX(Constraint):
         y[i] = x[j] - self.value
 
 
-class FixedY(Constraint):
+class FixationY(Constraint):
     def __init__(self, point: Point, value: float):
         self.point = point
         self.value = value
@@ -144,7 +144,7 @@ class System:
 
         for i, constraint in enumerate(self.constraints):
             n = len(self.points) * 2 + i
-            y[n] = i + 1 + 1e-3
+            y[n] = i + 0.1
 
         return y
 
@@ -187,8 +187,6 @@ def main():
     system.add_point(p2)
 
     system.add_constraint(Length(p1, p2, 20.))
-    system.add_constraint(FixedX(p2, p2.x))
-    system.add_constraint(FixedY(p2, p2.y))
 
     return system.solve()
 
