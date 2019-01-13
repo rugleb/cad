@@ -55,6 +55,22 @@ class System(object):
         return y
 
 
+class Handler:
+
+    def mouseMoved(self, sketch):
+        pass
+
+    def mousePressed(self, sketch):
+        pass
+
+    def mouseReleased(self, sketch):
+        pass
+
+
+class LineDrawing(Handler):
+    pass
+
+
 class Constraint(object):
 
     @abstractmethod

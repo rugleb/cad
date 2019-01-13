@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
 
 from cad.sketch import Sketch
-from cad.constraints import *
+from cad.solver import *
 
 
 class Application(QMainWindow):
@@ -132,8 +132,7 @@ class Application(QMainWindow):
         return action
 
     def pointActionHandler(self):
-        mode = DrawPoint(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def lineAction(self):
         action = QAction('Line')
@@ -145,8 +144,7 @@ class Application(QMainWindow):
         return action
 
     def lineActionHandler(self):
-        mode = DrawSegment(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def horizontalAction(self):
         action = QAction('Horizontal')
@@ -157,8 +155,7 @@ class Application(QMainWindow):
         return action
 
     def horizontalActionHandler(self):
-        mode = Horizontal(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def verticalAction(self):
         action = QAction('Vertical')
@@ -169,8 +166,7 @@ class Application(QMainWindow):
         return action
 
     def verticalActionHandler(self):
-        mode = Vertical(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def angleAction(self):
         action = QAction('Angle')
@@ -181,8 +177,7 @@ class Application(QMainWindow):
         return action
 
     def angleActionHandler(self):
-        mode = Angle(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def lengthAction(self):
         action = QAction('Length')
@@ -193,8 +188,7 @@ class Application(QMainWindow):
         return action
 
     def lengthActionHandler(self):
-        mode = Length(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def parallelAction(self):
         action = QAction('Parallel')
@@ -205,8 +199,7 @@ class Application(QMainWindow):
         return action
 
     def parallelsActionHandler(self):
-        mode = Parallel(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def perpendicularAction(self):
         action = QAction('Perpendicular')
@@ -217,8 +210,7 @@ class Application(QMainWindow):
         return action
 
     def perpendicularActionHandler(self):
-        mode = Perpendicular(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def coincidentAction(self):
         action = QAction('Coincident')
@@ -229,8 +221,7 @@ class Application(QMainWindow):
         return action
 
     def coincidentActionHandler(self):
-        mode = Coincident(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def disableAction(self):
         action = QAction('Disable')
@@ -244,7 +235,6 @@ class Application(QMainWindow):
         for action in self.toolBarGroup.actions():
             action.setChecked(False)
 
-        self.sketch.setMode(SketchMode(self.sketch))
         self.toolBarGroup.actions()[0].setChecked(True)
 
     def initStatusBar(self):

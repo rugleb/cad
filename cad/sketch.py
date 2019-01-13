@@ -14,7 +14,7 @@ class Sketch(QtWidgets.QWidget):
         self.currentPos = None
         self.pressedPos = None
 
-        self.handler = LineDrawing
+        self.handler = LineDrawing()
         self.system = System()
 
         self.setMouseTracking(True)
@@ -32,23 +32,23 @@ class Sketch(QtWidgets.QWidget):
         self.update()
 
     def removeSelectedFigure(self):
-        selected = self.getSelectedFigure()
-        if selected is not None:
-            self.figures.remove(selected)
+        pass
 
     def mousePressEvent(self, event):
         self.pressedPos = event.localPos()
+
+        self.handler.mousePressed(self)
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             self.pressedPos = None
 
-        self.update()
+        self.handler.mouseReleased(self)
 
     def mouseMoveEvent(self, event):
         self.currentPos = event.localPos()
 
-        self.update()
+        self.handler.mouseMoved(self)
 
     def paintEvent(self, event):
         painter = QtGui.QPainter()
@@ -59,17 +59,12 @@ class Sketch(QtWidgets.QWidget):
 
     def drawLines(self, painter):
         for line in self.lines:
-            pen = line.getPen()
+            pen = QtGui.QPen(QtCore.Qt.gray, 6, QtCore.Qt.SolidLine)
             painter.setPen(pen)
             painter.drawLine(line)
-            width = pen.widthF()
-            pen.setWidthF(width * 2)
-            painter.setPen(pen)
-            painter.drawPoints(line.p1(), line.p2())
-            pen.setWidthF(width)
 
     def drawPoints(self, painter):
         for point in self.points:
-            pen = Pen.stable()
+            pen = QtGui.QPen(QtCore.Qt.gray, 6, QtCore.Qt.SolidLine)
             painter.setPen(pen)
             painter.drawPoint(point)
