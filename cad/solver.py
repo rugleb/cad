@@ -13,6 +13,9 @@ class Point:
     def coordinates(self) -> tuple:
         return self.x, self.y
 
+    def __repr__(self):
+        return 'Point: {}, {}'.format(self.x, self.y)
+
 
 class Constraint:
     pass
