@@ -292,7 +292,7 @@ class CoincidentHandler(Handler):
                 return True
             else:
                 sketch.system.addConstraint(CoincidentX(self.p1, point))
-                sketch.system.addConstraint(CoincidentX(self.p1, point))
+                sketch.system.addConstraint(CoincidentY(self.p1, point))
 
                 self.p1 = None
 
