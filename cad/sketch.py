@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from cad.solver import *
 from cad.math import *
+from cad import pen
 
 
 class Sketch(QtWidgets.QWidget):
@@ -73,6 +74,7 @@ class Sketch(QtWidgets.QWidget):
         self.currentPos = Point.fromQtPoint(position)
 
         self.handler.mouseMoved(self)
+        self.update()
 
     def update(self):
         self.system.recount()
@@ -84,16 +86,33 @@ class Sketch(QtWidgets.QWidget):
         painter.begin(self)
         self.drawLines(painter)
         self.drawPoints(painter)
+        self.drawActive(painter)
         painter.end()
 
     def drawLines(self, painter):
         for line in self.lines:
-            pen = QtGui.QPen(QtCore.Qt.gray, 6, QtCore.Qt.SolidLine)
-            painter.setPen(pen)
+            painter.setPen(pen.line)
             painter.drawLine(line.toQtLine())
+            painter.setPen(pen.point)
+            painter.drawPoint(line.p1.toQtPoint())
+            painter.drawPoint(line.p2.toQtPoint())
 
     def drawPoints(self, painter):
         for point in self.points:
-            pen = QtGui.QPen(QtCore.Qt.gray, 6, QtCore.Qt.SolidLine)
-            painter.setPen(pen)
+            painter.setPen(pen.point)
             painter.drawPoint(point.toQtPoint())
+
+    def drawActive(self, painter):
+        point = self.getActivePoint()
+        if point:
+            painter.setPen(pen.activePoint)
+            painter.drawPoint(point.toQtPoint())
+            return True
+
+        line = self.getActiveLine()
+        if line:
+            painter.setPen(pen.activeLine)
+            painter.drawLine(line.toQtLine())
+            painter.setPen(pen.activePoint)
+            painter.drawPoint(line.p1.toQtPoint())
+            painter.drawPoint(line.p2.toQtPoint())
