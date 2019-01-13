@@ -16,7 +16,7 @@ class Sketch(QtWidgets.QWidget):
         self.currentPos = None
         self.pressedPos = None
 
-        self.handler = LineDrawing()
+        self.handler = DisableHandler()
         self.system = System(self)
 
         self.setMouseTracking(True)
@@ -24,6 +24,9 @@ class Sketch(QtWidgets.QWidget):
 
     def addLine(self, line: Line):
         self.lines.append(line)
+
+    def addPoint(self, point: Point):
+        self.points.append(point)
 
     def isMousePressed(self) -> bool:
         return self.pressedPos is not None

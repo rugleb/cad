@@ -132,7 +132,7 @@ class Application(QMainWindow):
         return action
 
     def pointActionHandler(self):
-        pass
+        self.sketch.handler = PointDrawing()
 
     def lineAction(self):
         action = QAction('Line')
@@ -144,7 +144,7 @@ class Application(QMainWindow):
         return action
 
     def lineActionHandler(self):
-        pass
+        self.sketch.handler = LineDrawing()
 
     def horizontalAction(self):
         action = QAction('Horizontal')
@@ -155,7 +155,7 @@ class Application(QMainWindow):
         return action
 
     def horizontalActionHandler(self):
-        pass
+        self.sketch.handler = HorizontalHandler()
 
     def verticalAction(self):
         action = QAction('Vertical')
@@ -177,7 +177,15 @@ class Application(QMainWindow):
         return action
 
     def angleActionHandler(self):
-        pass
+
+        def askAngleValue():
+            label = 'Input angle value:'
+            title = 'Set angle constraint'
+            return QInputDialog.getDouble(self.sketch.parent(), title, label, 0)
+
+        angle, ok = askAngleValue()
+        if ok:
+            self.sketch.handler = AngleHandler(angle)
 
     def lengthAction(self):
         action = QAction('Length')
@@ -188,7 +196,15 @@ class Application(QMainWindow):
         return action
 
     def lengthActionHandler(self):
-        pass
+
+        def askLengthValue():
+            label = 'Input length value:'
+            title = 'Set length constraint'
+            return QInputDialog.getDouble(self.sketch.parent(), title, label, 0, 0)
+
+        length, ok = askLengthValue()
+        if ok:
+            self.sketch.handler = LengthHandler(length)
 
     def parallelAction(self):
         action = QAction('Parallel')
@@ -221,7 +237,7 @@ class Application(QMainWindow):
         return action
 
     def coincidentActionHandler(self):
-        pass
+        self.sketch.handler = CoincidentHandler()
 
     def disableAction(self):
         action = QAction('Disable')

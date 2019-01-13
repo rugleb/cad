@@ -17,6 +17,8 @@ class System(object):
         points = []
         for line in self.sketch.lines:
             points.extend(line.points)
+        for point in self.sketch.points:
+            points.append(point)
         return points
 
     def addConstraint(self, constraint):
@@ -67,6 +69,10 @@ class Handler:
         pass
 
 
+class DisableHandler(Handler):
+    pass
+
+
 class LineDrawing(Handler):
 
     def mousePressed(self, sketch):
@@ -80,6 +86,14 @@ class LineDrawing(Handler):
         if sketch.isMousePressed():
             sketch.lines[-1].p2 = sketch.getCurrentPosition()
             sketch.update()
+
+
+class PointDrawing(Handler):
+
+    def mousePressed(self, sketch):
+        point = sketch.getPressedPosition()
+        sketch.addPoint(point)
+        sketch.update()
 
 
 class Constraint(object):
@@ -117,6 +131,32 @@ class Length(Constraint):
         y[i1 + 1] -= 2 * x[n] * dy
 
         y[n] = dx ** 2 + dy ** 2 - self.length ** 2
+
+
+class LengthHandler(Handler):
+
+    def __init__(self, length: float):
+        self.length = length
+
+    def mousePressed(self, sketch):
+        line = sketch.getActiveLine()
+        if line:
+            constraint = Length(line, self.length)
+            sketch.system.addConstraint(constraint)
+            sketch.update()
+
+
+class AngleHandler(Handler):
+
+    def __init__(self, angle: float):
+        self.angle = angle
+
+    def mousePressed(self, sketch):
+        line = sketch.getActiveLine()
+        if line:
+            constraint = Angle(line, self.angle)
+            sketch.system.addConstraint(constraint)
+            sketch.update()
 
 
 class FixingX(Constraint):
@@ -183,6 +223,16 @@ class VerticalHandler(Handler):
             sketch.update()
 
 
+class HorizontalHandler(Handler):
+
+    def mousePressed(self, sketch):
+        line = sketch.getActiveLine()
+        if line:
+            constraint = Horizontal(line)
+            sketch.system.addConstraint(constraint)
+            sketch.update()
+
+
 class Vertical(Constraint, Handler):
 
     def __init__(self, line: Line):
@@ -227,6 +277,24 @@ class Horizontal(Constraint):
         y[i1] -= x[n]
 
         y[n] = x[i2] - x[i1]
+
+
+class CoincidentHandler(Handler):
+
+    def __init__(self):
+        self.p1 = None
+
+    def mousePressed(self, sketch):
+        point = sketch.getActivePoint()
+        if point:
+            if not self.p1:
+                self.p1 = point
+                return True
+            else:
+                sketch.system.addConstraint(CoincidentX(self.p1, point))
+                sketch.system.addConstraint(CoincidentX(self.p1, point))
+
+                self.p1 = None
 
 
 class CoincidentX(Constraint):
