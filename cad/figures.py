@@ -33,6 +33,9 @@ class Point:
     def fromQtPoint(cls, point: QPointF):
         return cls(point.x(), point.y())
 
+    def distToPoint(self, point) -> float:
+        return Line(self, point).length
+
 
 class Line:
     def __init__(self, p1: Point, p2: Point):
