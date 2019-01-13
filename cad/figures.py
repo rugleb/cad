@@ -45,6 +45,10 @@ class Line(Figure):
         self.p2 = p2
 
     @property
+    def points(self) -> tuple:
+        return self.p1, self.p2
+
+    @property
     def p1(self) -> Point:
         return self.__p1
 

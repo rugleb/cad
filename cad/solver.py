@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from time import time
 
 import numpy as np
 from scipy.optimize import fsolve
@@ -248,4 +249,7 @@ def main():
             print(point.x, point.y)
 
 
+start = time()
 main()
+
+print(time() - start)
