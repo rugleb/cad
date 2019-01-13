@@ -39,6 +39,12 @@ class Sketch(QtWidgets.QWidget):
                 return line
         return False
 
+    def getActivePoint(self):
+        for point in self.points:
+            if point.distToPoint(self.currentPos) < 4:
+                return point
+        return False
+
     def keyPressEvent(self, event):
         keys = [QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Delete]
 
