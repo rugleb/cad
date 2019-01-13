@@ -105,5 +105,7 @@ class Line:
         return cls(p1, p2)
 
     def distToPoint(self, p: Point) -> float:
+        if self.length == 0.:
+            return p.distToPoint(self.p1)
         s = self.dy * p.x - self.dx * p.y + self.x2 * self.y1 - self.y2 * self.x1
         return abs(s) / self.length
