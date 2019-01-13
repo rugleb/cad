@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from cad.solver import *
+from cad.math import *
 
 
 class Sketch(QtWidgets.QWidget):
@@ -15,13 +16,28 @@ class Sketch(QtWidgets.QWidget):
         self.pressedPos = None
 
         self.handler = LineDrawing()
-        self.system = System()
+        self.system = System(self)
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
 
-    def isMousePressed(self):
+    def addLine(self, line: Line):
+        self.lines.append(line)
+
+    def isMousePressed(self) -> bool:
         return self.pressedPos is not None
+
+    def getCurrentPosition(self) -> QPointF:
+        return self.currentPos
+
+    def getPressedPosition(self) -> QPointF:
+        return self.pressedPos
+
+    def getActiveLine(self):
+        for line in self.lines:
+            if distancePointToVector(self.currentPos, line) < 4:
+                return line
+        return False
 
     def keyPressEvent(self, event):
         keys = [QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Delete]
@@ -50,6 +66,11 @@ class Sketch(QtWidgets.QWidget):
 
         self.handler.mouseMoved(self)
 
+    def update(self):
+        self.system.recount()
+
+        super().update()
+
     def paintEvent(self, event):
         painter = QtGui.QPainter()
         painter.begin(self)
@@ -61,10 +82,10 @@ class Sketch(QtWidgets.QWidget):
         for line in self.lines:
             pen = QtGui.QPen(QtCore.Qt.gray, 6, QtCore.Qt.SolidLine)
             painter.setPen(pen)
-            painter.drawLine(line)
+            painter.drawLine(line.toQtLine())
 
     def drawPoints(self, painter):
         for point in self.points:
             pen = QtGui.QPen(QtCore.Qt.gray, 6, QtCore.Qt.SolidLine)
             painter.setPen(pen)
-            painter.drawPoint(point)
+            painter.drawPoint(point.toQtPoint())
