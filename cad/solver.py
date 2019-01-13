@@ -8,27 +8,27 @@ from cad.figures import Point, Line
 
 class System(object):
 
-    def __init__(self):
-        self.points = []
+    def __init__(self, sketch):
+        self.sketch = sketch
         self.constraints = []
 
-    def addPoint(self, point: Point):
-        self.points.append(point)
-
-    def addLine(self, line: Line):
-        for point in line.points:
-            self.addPoint(point)
+    @property
+    def points(self) -> list:
+        points = []
+        for line in self.sketch.lines:
+            points.extend(line.points)
+        return points
 
     def addConstraint(self, constraint):
         self.constraints.append(constraint)
 
     def recount(self):
-        y = self.solve()
-
-        for i, point in enumerate(self.points):
-            for j, prop in enumerate(['x', 'y']):
-                n = i * 2 + j
-                setattr(point, prop, y[n])
+        if len(self.x0):
+            y = self.solve()
+            for i, point in enumerate(self.points):
+                for j, prop in enumerate(('x', 'y')):
+                    n = i * 2 + j
+                    setattr(point, prop, y[n])
 
     def solve(self):
         result = fsolve(self.system, self.x0, full_output=False, xtol=1e-2)
@@ -68,7 +68,18 @@ class Handler:
 
 
 class LineDrawing(Handler):
-    pass
+
+    def mousePressed(self, sketch):
+        p1 = sketch.getPressedPosition()
+        p2 = sketch.getCurrentPosition()
+
+        sketch.addLine(Line(p1, p2))
+        sketch.update()
+
+    def mouseMoved(self, sketch):
+        if sketch.isMousePressed():
+            sketch.lines[-1].p2 = sketch.getCurrentPosition()
+            sketch.update()
 
 
 class Constraint(object):
@@ -116,6 +127,7 @@ class FixingX(Constraint):
 
     def apply(self, system: System, x: np.ndarray, y: np.ndarray, n: int):
         i = system.points.index(self.point) * 2
+
         y[i] += x[n]
 
         y[n] = x[i] - self.value
@@ -129,6 +141,7 @@ class FixingY(Constraint):
 
     def apply(self, system: System, x: np.ndarray, y: np.ndarray, n: int):
         i = system.points.index(self.point) * 2 + 1
+
         y[i] += x[n]
 
         y[n] = x[i] - self.value
@@ -161,7 +174,16 @@ class Angle(Constraint):
         y[n] = x[i2 + 1] - x[i1 + 1] - (x[i2] - x[i1]) * self.tan
 
 
-class Vertical(Constraint):
+class VerticalHandler(Handler):
+
+    def mousePressed(self, sketch):
+        line = sketch.getActiveLine()
+        if line:
+            sketch.system.addConstraint(Vertical(line))
+            sketch.update()
+
+
+class Vertical(Constraint, Handler):
 
     def __init__(self, line: Line):
         self.line = line

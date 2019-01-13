@@ -27,15 +27,15 @@ class Sketch(QtWidgets.QWidget):
     def isMousePressed(self) -> bool:
         return self.pressedPos is not None
 
-    def getCurrentPosition(self) -> QPointF:
+    def getCurrentPosition(self) -> Point:
         return self.currentPos
 
-    def getPressedPosition(self) -> QPointF:
+    def getPressedPosition(self) -> Point:
         return self.pressedPos
 
     def getActiveLine(self):
         for line in self.lines:
-            if distancePointToVector(self.currentPos, line) < 4:
+            if line.distToPoint(self.currentPos) < 4:
                 return line
         return False
 
@@ -51,7 +51,8 @@ class Sketch(QtWidgets.QWidget):
         pass
 
     def mousePressEvent(self, event):
-        self.pressedPos = event.localPos()
+        position = event.localPos()
+        self.pressedPos = Point.fromQtPoint(position)
 
         self.handler.mousePressed(self)
 
@@ -62,7 +63,8 @@ class Sketch(QtWidgets.QWidget):
         self.handler.mouseReleased(self)
 
     def mouseMoveEvent(self, event):
-        self.currentPos = event.localPos()
+        position = event.localPos()
+        self.currentPos = Point.fromQtPoint(position)
 
         self.handler.mouseMoved(self)
 

@@ -166,7 +166,7 @@ class Application(QMainWindow):
         return action
 
     def verticalActionHandler(self):
-        pass
+        self.sketch.handler = VerticalHandler()
 
     def angleAction(self):
         action = QAction('Angle')
