@@ -36,6 +36,12 @@ class Point:
     def distToPoint(self, point) -> float:
         return Line(self, point).length
 
+    def distToVector(self, l) -> float:
+        if l.length == 0:
+            return Line(self, l.p1).length
+        s = l.dy * self.x - l.dx * self.y + l.x2 * l.y1 - l.y2 * l.x1
+        return abs(s) / l.length
+
 
 class Line:
     def __init__(self, p1: Point, p2: Point):
@@ -109,3 +115,13 @@ class Line:
             return p.distToPoint(self.p1)
         s = self.dy * p.x - self.dx * p.y + self.x2 * self.y1 - self.y2 * self.x1
         return abs(s) / self.length
+
+    def hasPoint(self, point: Point, offset: float = 0.) -> bool:
+        dist = point.distToVector(self)
+        if offset / 2 <= dist:
+            return False
+        if self.x1 <= point.x <= self.x2:
+            return True
+        if self.x2 <= point.x <= self.x1:
+            return True
+        return False

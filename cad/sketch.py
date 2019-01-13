@@ -39,11 +39,15 @@ class Sketch(QtWidgets.QWidget):
 
     def getActiveLine(self):
         for line in self.lines:
-            if line.distToPoint(self.currentPos) < 4:
+            if line.hasPoint(self.currentPos, 4):
                 return line
         return False
 
     def getActivePoint(self):
+        for line in self.lines:
+            for point in line.points:
+                if point.distToPoint(self.currentPos) < 4:
+                    return point
         for point in self.points:
             if point.distToPoint(self.currentPos) < 4:
                 return point

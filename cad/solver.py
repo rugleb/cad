@@ -85,7 +85,6 @@ class LineDrawing(Handler):
     def mouseMoved(self, sketch):
         if sketch.isMousePressed():
             sketch.lines[-1].p2 = sketch.getCurrentPosition()
-            sketch.update()
 
 
 class PointDrawing(Handler):
