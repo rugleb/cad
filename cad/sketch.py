@@ -1,33 +1,24 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QPointF, pyqtSignal, pyqtSlot
 
-from contracts import contract
-
-from cad.constraints import Constraint
+from cad.solver import *
 
 
 class Sketch(QtWidgets.QWidget):
 
-    mousePressedSignal = pyqtSignal(QPointF)
-    mouseReleasedSignal = pyqtSignal(QPointF)
-
     def __init__(self, *args):
         super().__init__(*args)
 
-        self.figures = []
+        self.lines = []
+        self.points = []
 
         self.currentPos = None
         self.pressedPos = None
 
-        self.constraint = None
+        self.handler = LineDrawing
+        self.system = System()
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
-
-    @pyqtSlot(Constraint)
-    @contract(constraint=Constraint)
-    def constraintChanged(self, constraint: Constraint):
-        self.constraint = constraint
 
     def isMousePressed(self):
         return self.pressedPos is not None
@@ -45,22 +36,12 @@ class Sketch(QtWidgets.QWidget):
         if selected is not None:
             self.figures.remove(selected)
 
-    def getSelectedFigure(self):
-        for figure in self.figures:
-            if figure.hasPoint(self.currentPos):
-                return True
-        return False
-
     def mousePressEvent(self, event):
         self.pressedPos = event.localPos()
-
-        self.mousePressedSignal.emit(self.pressedPos)
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             self.pressedPos = None
-
-        self.mouseReleasedSignal.emit(self.pressedPos)
 
         self.update()
 

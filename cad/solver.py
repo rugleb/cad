@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from time import time
 
 import numpy as np
 from scipy.optimize import fsolve
@@ -15,6 +14,10 @@ class System(object):
 
     def addPoint(self, point: Point):
         self.points.append(point)
+
+    def addLine(self, line: Line):
+        for point in line.points:
+            self.addPoint(point)
 
     def addConstraint(self, constraint):
         self.constraints.append(constraint)
@@ -52,7 +55,7 @@ class System(object):
         return y
 
 
-class Constraint:
+class Constraint(object):
 
     @abstractmethod
     def apply(self, system: System, x: np.ndarray, y: np.ndarray, n: int):
@@ -218,38 +221,3 @@ class CoincidentY(Constraint):
         y[i1] -= x[n]
 
         y[n] = x[i2] - x[i1]
-
-
-def main():
-    line1 = Line(Point(0., 0.), Point(10., 20.))
-    line2 = Line(Point(0., 0.), Point(10., 20.))
-
-    lines = [
-        line1,
-        line2,
-    ]
-
-    system = System()
-    for line in lines:
-        for point in line.points:
-            system.addPoint(point)
-
-    system.addConstraint(FixingX(line1.p1, 5.))
-    system.addConstraint(FixingY(line1.p1, 5.))
-    system.addConstraint(Length(line1, 20.))
-    system.addConstraint(Horizontal(line1))
-    system.addConstraint(CoincidentX(line2.p1, line1.p2))
-    system.addConstraint(CoincidentY(line2.p1, line1.p2))
-    system.addConstraint(Vertical(line2))
-
-    system.recount()
-
-    for line in lines:
-        for point in line.points:
-            print(point.x, point.y)
-
-
-start = time()
-main()
-
-print(time() - start)

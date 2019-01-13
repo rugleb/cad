@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import *
 
 from cad.sketch import Sketch
 from cad.constraints import *
@@ -104,14 +104,14 @@ class Application(QMainWindow):
         actions = [
             default,
             self.lineAction(),
-            # self.pointAction(),
+            self.pointAction(),
             self.angleAction(),
             self.lengthAction(),
-            self.parallelAction(),
-            self.perpendicularAction(),
+            # self.parallelAction(),
+            # self.perpendicularAction(),
             self.verticalAction(),
             self.horizontalAction(),
-            # self.coincidentAction(),
+            self.coincidentAction(),
         ]
 
         for action in actions:
