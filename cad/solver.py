@@ -13,8 +13,23 @@ class Point:
     def coordinates(self) -> tuple:
         return self.x, self.y
 
-    def __repr__(self):
-        return 'Point: {}, {}'.format(self.x, self.y)
+    def __repr__(self) -> str:
+        template = 'Point: <{}, {}>'
+        return template.format(self.x, self.y)
+
+
+class Line:
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+    @property
+    def points(self) -> tuple:
+        return self.p1, self.p2
+
+    def __repr__(self) -> str:
+        template = 'Line: <{}, {}>, <{}, {}>'
+        return template.format(self.p1.x, self.p1.y, self.p2.x, self.p2.y)
 
 
 class Constraint:
@@ -52,14 +67,13 @@ class CoincidentY(Constraint):
 
 
 class Length(Constraint):
-    def __init__(self, p1: Point, p2: Point, value: float):
-        self.p1 = p1
-        self.p2 = p2
+    def __init__(self, line: Line, value: float):
+        self.line = line
         self.length = value
 
     def apply(self, system, x: np.ndarray, y: np.ndarray, i: int):
-        i1 = system.points.index(self.p1) * 2
-        i2 = system.points.index(self.p2) * 2
+        i1 = system.points.index(self.line.p1) * 2
+        i2 = system.points.index(self.line.p2) * 2
 
         y[i1 + 0] += 2 * x[i] * (x[i1 + 0] - x[i2 + 0])
         y[i1 + 1] += 2 * x[i] * (x[i1 + 1] - x[i2 + 1])
@@ -182,14 +196,15 @@ class System:
 
 
 def main():
-    p1 = Point(10., 10.)
-    p2 = Point(30., 10.)
+    line1 = Line(Point(10., 10.), Point(10., 20.))
+    line2 = Line(Point(35., 35.), Point(40., 40.))
 
     system = System()
-    system.add_point(p1)
-    system.add_point(p2)
+    for line in (line1, line2):
+        for point in line.points:
+            system.add_point(point)
 
-    system.add_constraint(Length(p1, p2, 20.))
+    system.add_constraint()
 
     return system.solve()
 
