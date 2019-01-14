@@ -104,6 +104,67 @@ class Constraint(object):
         pass
 
 
+class Parallel(Constraint):
+
+    def __init__(self, l1: Line, l2: Line):
+        self.l1 = l1
+        self.l2 = l2
+
+    @property
+    def p1(self) -> Point:
+        return self.l1.p1
+
+    @property
+    def p2(self) -> Point:
+        return self.l1.p2
+
+    @property
+    def p3(self) -> Point:
+        return self.l2.p1
+
+    @property
+    def p4(self) -> Point:
+        return self.l2.p2
+
+    def apply(self, system: System, x: np.ndarray, y: np.ndarray, n: int):
+        i1 = system.points.index(self.p1) * 2
+        i2 = system.points.index(self.p2) * 2
+        i3 = system.points.index(self.p3) * 2
+        i4 = system.points.index(self.p4) * 2
+
+        y[i1] -= (x[i4 + 1] - x[i3 + 1]) * x[n]
+        y[i2] += (x[i4 + 1] - x[i3 + 1]) * x[n]
+        y[i3] += (x[i2 + 1] - x[i1 + 1]) * x[n]
+        y[i4] -= (x[i2 + 1] - x[i1 + 1]) * x[n]
+
+        y[i1 + 1] += (x[i4] - x[i3]) * x[n]
+        y[i2 + 1] -= (x[i4] - x[i3]) * x[n]
+        y[i3 + 1] -= (x[i2] - x[i1]) * x[n]
+        y[i4 + 1] += (x[i2] - x[i1]) * x[n]
+
+        y[n] = (x[i2] - x[i1]) * (x[i4 + 1] - x[i3 + 1]) - (x[i2 + 1] - x[i1 + 1]) * (x[i4] - x[i3])
+
+
+class ParallelHandler(Handler):
+
+    def __init__(self):
+        self.l1 = None
+
+    def mousePressed(self, sketch):
+        if not self.l1:
+            line = sketch.getActiveLine()
+            if line:
+                self.l1 = line
+        else:
+            l2 = sketch.getActiveLine()
+            if l2:
+                constraint = Parallel(self.l1, l2)
+                self.l1 = None
+
+                sketch.system.addConstraint(constraint)
+                sketch.update()
+
+
 class Length(Constraint):
 
     def __init__(self, line: Line, length: float):

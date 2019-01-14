@@ -62,7 +62,14 @@ class Sketch(QtWidgets.QWidget):
         self.update()
 
     def removeSelectedFigure(self):
-        pass
+        line = self.getActiveLine()
+        if line:
+            self.lines.remove(line)
+            return True
+
+        point = self.getActivePoint()
+        if point:
+            self.points.remove(point)
 
     def mousePressEvent(self, event):
         position = event.localPos()
@@ -83,8 +90,9 @@ class Sketch(QtWidgets.QWidget):
         self.handler.mouseMoved(self)
         self.update()
 
-    def update(self):
-        self.system.recount()
+    def update(self, recount=True):
+        if recount:
+            self.system.recount()
 
         super().update()
 

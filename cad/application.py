@@ -105,14 +105,14 @@ class Application(QMainWindow):
             default,
             self.lineAction(),
             self.pointAction(),
-            self.angleAction(),
-            self.lengthAction(),
-            # self.parallelAction(),
+            self.parallelAction(),
             # self.perpendicularAction(),
             self.verticalAction(),
             self.horizontalAction(),
             self.coincidentAction(),
             self.fixedAction(),
+            self.angleAction(),
+            self.lengthAction(),
         ]
 
         for action in actions:
@@ -216,7 +216,7 @@ class Application(QMainWindow):
         return action
 
     def parallelsActionHandler(self):
-        pass
+        self.sketch.handler = ParallelHandler()
 
     def perpendicularAction(self):
         action = QAction('Perpendicular')
