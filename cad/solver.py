@@ -26,15 +26,17 @@ class System(object):
 
     def recount(self):
         if len(self.x0):
-            y = self.solve()
-            for i, point in enumerate(self.points):
-                for j, prop in enumerate(('x', 'y')):
-                    n = i * 2 + j
-                    setattr(point, prop, y[n])
+            result = self.solve()
+            if result[2] == 1:
+                y = [round(y, 1) for y in result[0]]
+                for i, point in enumerate(self.points):
+                    for j, prop in enumerate(('x', 'y')):
+                        n = i * 2 + j
+                        setattr(point, prop, y[n])
 
     def solve(self):
-        result = fsolve(self.system, self.x0, full_output=False, xtol=1e-2)
-        return [round(y, 1) for y in result]
+        result = fsolve(self.system, self.x0, full_output=True, xtol=1e-2)
+        return result
 
     def system(self, x: np.ndarray) -> np.ndarray:
         y = np.zeros(shape=x.shape, dtype=x.dtype)
