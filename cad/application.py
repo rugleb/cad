@@ -112,6 +112,7 @@ class Application(QMainWindow):
             self.verticalAction(),
             self.horizontalAction(),
             self.coincidentAction(),
+            self.fixedAction(),
         ]
 
         for action in actions:
@@ -238,6 +239,27 @@ class Application(QMainWindow):
 
     def coincidentActionHandler(self):
         self.sketch.handler = CoincidentHandler()
+
+    def fixedAction(self):
+        action = QAction('Fixed')
+        action.setToolTip('Fixed constraint')
+        action.setStatusTip('Fixed constraint')
+        action.setIcon(QIcon('icons/point.png'))
+        action.triggered.connect(self.fixedActionHandler)
+        return action
+
+    def fixedActionHandler(self):
+
+        def askCoordinateValue():
+            label = 'Enter coordinate:'
+            title = 'Set fixing constraint'
+            return QInputDialog.getDouble(self.sketch.parent(), title, label, 0)
+
+        x, ok = askCoordinateValue()
+        if ok:
+            y, ok = askCoordinateValue()
+            if ok:
+                self.sketch.handler = FixingHandler(x, y)
 
     def disableAction(self):
         action = QAction('Disable')

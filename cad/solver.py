@@ -186,6 +186,19 @@ class FixingY(Constraint):
         y[n] = x[i] - self.value
 
 
+class FixingHandler(Handler):
+
+    def __init__(self, x: float, y: float):
+        self.x = x
+        self.y = y
+
+    def mousePressed(self, sketch):
+        point = sketch.getActivePoint()
+        if point:
+            sketch.system.addConstraint(FixingX(point, self.x))
+            sketch.system.addConstraint(FixingY(point, self.y))
+
+
 class Angle(Constraint):
 
     def __init__(self, line: Line, angle: float):
