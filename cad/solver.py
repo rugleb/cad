@@ -309,6 +309,7 @@ class CoincidentHandler(Handler):
                 sketch.system.addConstraint(CoincidentY(self.p1, point))
 
                 self.p1 = None
+                sketch.update()
 
 
 class CoincidentX(Constraint):
