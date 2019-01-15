@@ -1,9 +1,9 @@
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import *
 
 from cad.sketch import Sketch
-from cad.geometry.constraints import *
+from cad.solver import *
 
 
 class Application(QMainWindow):
@@ -104,14 +104,15 @@ class Application(QMainWindow):
         actions = [
             default,
             self.lineAction(),
-            # self.pointAction(),
-            self.angleAction(),
-            self.lengthAction(),
+            self.pointAction(),
             self.parallelAction(),
-            self.perpendicularAction(),
+            # self.perpendicularAction(),
             self.verticalAction(),
             self.horizontalAction(),
-            # self.coincidentAction(),
+            self.coincidentAction(),
+            self.fixedAction(),
+            self.angleAction(),
+            self.lengthAction(),
         ]
 
         for action in actions:
@@ -132,8 +133,7 @@ class Application(QMainWindow):
         return action
 
     def pointActionHandler(self):
-        mode = DrawPoint(self.sketch)
-        self.sketch.setMode(mode)
+        self.sketch.handler = PointDrawing()
 
     def lineAction(self):
         action = QAction('Line')
@@ -145,8 +145,7 @@ class Application(QMainWindow):
         return action
 
     def lineActionHandler(self):
-        mode = DrawSegment(self.sketch)
-        self.sketch.setMode(mode)
+        self.sketch.handler = LineDrawing()
 
     def horizontalAction(self):
         action = QAction('Horizontal')
@@ -157,8 +156,7 @@ class Application(QMainWindow):
         return action
 
     def horizontalActionHandler(self):
-        mode = Horizontal(self.sketch)
-        self.sketch.setMode(mode)
+        self.sketch.handler = HorizontalHandler()
 
     def verticalAction(self):
         action = QAction('Vertical')
@@ -169,8 +167,7 @@ class Application(QMainWindow):
         return action
 
     def verticalActionHandler(self):
-        mode = Vertical(self.sketch)
-        self.sketch.setMode(mode)
+        self.sketch.handler = VerticalHandler()
 
     def angleAction(self):
         action = QAction('Angle')
@@ -181,8 +178,15 @@ class Application(QMainWindow):
         return action
 
     def angleActionHandler(self):
-        mode = Angle(self.sketch)
-        self.sketch.setMode(mode)
+
+        def askAngleValue():
+            label = 'Input angle value:'
+            title = 'Set angle constraint'
+            return QInputDialog.getDouble(self.sketch.parent(), title, label, 0)
+
+        angle, ok = askAngleValue()
+        if ok:
+            self.sketch.handler = AngleHandler(angle)
 
     def lengthAction(self):
         action = QAction('Length')
@@ -193,8 +197,15 @@ class Application(QMainWindow):
         return action
 
     def lengthActionHandler(self):
-        mode = Length(self.sketch)
-        self.sketch.setMode(mode)
+
+        def askLengthValue():
+            label = 'Input length value:'
+            title = 'Set length constraint'
+            return QInputDialog.getDouble(self.sketch.parent(), title, label, 0, 0)
+
+        length, ok = askLengthValue()
+        if ok:
+            self.sketch.handler = LengthHandler(length)
 
     def parallelAction(self):
         action = QAction('Parallel')
@@ -205,8 +216,7 @@ class Application(QMainWindow):
         return action
 
     def parallelsActionHandler(self):
-        mode = Parallel(self.sketch)
-        self.sketch.setMode(mode)
+        self.sketch.handler = ParallelHandler()
 
     def perpendicularAction(self):
         action = QAction('Perpendicular')
@@ -217,8 +227,7 @@ class Application(QMainWindow):
         return action
 
     def perpendicularActionHandler(self):
-        mode = Perpendicular(self.sketch)
-        self.sketch.setMode(mode)
+        pass
 
     def coincidentAction(self):
         action = QAction('Coincident')
@@ -229,8 +238,28 @@ class Application(QMainWindow):
         return action
 
     def coincidentActionHandler(self):
-        mode = Coincident(self.sketch)
-        self.sketch.setMode(mode)
+        self.sketch.handler = CoincidentHandler()
+
+    def fixedAction(self):
+        action = QAction('Fixed')
+        action.setToolTip('Fixed constraint')
+        action.setStatusTip('Fixed constraint')
+        action.setIcon(QIcon('icons/point.png'))
+        action.triggered.connect(self.fixedActionHandler)
+        return action
+
+    def fixedActionHandler(self):
+
+        def askCoordinateValue():
+            label = 'Enter coordinate:'
+            title = 'Set fixing constraint'
+            return QInputDialog.getDouble(self.sketch.parent(), title, label, 0)
+
+        x, ok = askCoordinateValue()
+        if ok:
+            y, ok = askCoordinateValue()
+            if ok:
+                self.sketch.handler = FixingHandler(x, y)
 
     def disableAction(self):
         action = QAction('Disable')
@@ -244,7 +273,6 @@ class Application(QMainWindow):
         for action in self.toolBarGroup.actions():
             action.setChecked(False)
 
-        self.sketch.setMode(SketchMode(self.sketch))
         self.toolBarGroup.actions()[0].setChecked(True)
 
     def initStatusBar(self):

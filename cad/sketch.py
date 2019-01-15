@@ -1,7 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from cad.drawing import Pen
-from cad.geometry.constraints import SketchMode
+from cad.solver import *
+from cad.math import *
+from cad import pen
 
 
 class Sketch(QtWidgets.QWidget):
@@ -9,93 +10,124 @@ class Sketch(QtWidgets.QWidget):
     def __init__(self, *args):
         super().__init__(*args)
 
+        self.lines = []
         self.points = []
-        self.segments = []
 
         self.currentPos = None
         self.pressedPos = None
 
-        self.mode = SketchMode(self)
+        self.handler = DisableHandler()
+        self.system = System(self)
 
         self.setMouseTracking(True)
         self.setWindowTitle('Sketch')
 
-    def isMousePressed(self):
+    def addLine(self, line: Line):
+        self.lines.append(line)
+
+    def addPoint(self, point: Point):
+        self.points.append(point)
+
+    def isMousePressed(self) -> bool:
         return self.pressedPos is not None
 
-    def getCurrentPosition(self):
+    def getCurrentPosition(self) -> Point:
         return self.currentPos
 
-    def getPressedPosition(self):
+    def getPressedPosition(self) -> Point:
         return self.pressedPos
+
+    def getActiveLine(self):
+        for line in self.lines:
+            if line.hasPoint(self.currentPos, 4):
+                return line
+        return False
+
+    def getActivePoint(self):
+        for line in self.lines:
+            for point in line.points:
+                if point.distToPoint(self.currentPos) < 4:
+                    return point
+        for point in self.points:
+            if point.distToPoint(self.currentPos) < 4:
+                return point
+        return False
 
     def keyPressEvent(self, event):
         keys = [QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Delete]
 
         if event.key() in keys:
-            segment = self.getSelected()
-            if segment:
-                self.segments.remove(segment)
+            self.removeSelectedFigure()
 
         self.update()
 
-    def mousePressEvent(self, event):
-        self.pressedPos = event.localPos()
+    def removeSelectedFigure(self):
+        line = self.getActiveLine()
+        if line:
+            self.lines.remove(line)
+            return True
 
-        self.mode.mousePressedHandler()
+        point = self.getActivePoint()
+        if point:
+            self.points.remove(point)
+
+    def mousePressEvent(self, event):
+        position = event.localPos()
+        self.pressedPos = Point.fromQtPoint(position)
+
+        self.handler.mousePressed(self)
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             self.pressedPos = None
 
-        self.update()
+        self.handler.mouseReleased(self)
 
     def mouseMoveEvent(self, event):
-        self.currentPos = event.localPos()
+        position = event.localPos()
+        self.currentPos = Point.fromQtPoint(position)
 
-        self.mode.mouseMovedHandler()
-
-        for segment in self.segments:
-            segment.setPen(Pen.stable())
-
-        figure = self.getSelected()
-        if figure:
-            figure.setPen(Pen.selected())
-
+        self.handler.mouseMoved(self)
         self.update()
+
+    def update(self, recount=True):
+        if recount:
+            self.system.recount()
+
+        super().update()
 
     def paintEvent(self, event):
         painter = QtGui.QPainter()
         painter.begin(self)
         self.drawLines(painter)
         self.drawPoints(painter)
+        self.drawActive(painter)
         painter.end()
 
     def drawLines(self, painter):
-        for line in self.segments:
-            pen = line.getPen()
-            painter.setPen(pen)
-            painter.drawLine(line)
-            width = pen.widthF()
-            pen.setWidthF(width * 2)
-            painter.setPen(pen)
-            painter.drawPoints(line.p1(), line.p2())
-            pen.setWidthF(width)
+        for line in self.lines:
+            painter.setPen(pen.line)
+            painter.drawLine(line.toQtLine())
+            painter.setPen(pen.point)
+            painter.drawPoint(line.p1.toQtPoint())
+            painter.drawPoint(line.p2.toQtPoint())
 
     def drawPoints(self, painter):
         for point in self.points:
-            pen = Pen.stable()
-            painter.setPen(pen)
-            painter.drawPoint(point)
+            painter.setPen(pen.point)
+            painter.drawPoint(point.toQtPoint())
 
-    def getSelected(self):
-        for segment in self.segments:
-            if segment.hasPoint(self.currentPos):
-                return segment
-        return None
+    def drawActive(self, painter):
+        point = self.getActivePoint()
+        if point:
+            painter.setPen(pen.activePoint)
+            painter.drawPoint(point.toQtPoint())
+            return True
 
-    def setMode(self, mode):
-        if not isinstance(mode, SketchMode):
-            message = 'Given type is invalid. Expected SketchMode instance'
-            raise Exception(message)
-        self.mode = mode
+        line = self.getActiveLine()
+        if line:
+            painter.setPen(pen.activeLine)
+            painter.drawLine(line.toQtLine())
+            painter.setPen(pen.activePoint)
+            painter.drawPoint(line.p1.toQtPoint())
+            painter.drawPoint(line.p2.toQtPoint())
