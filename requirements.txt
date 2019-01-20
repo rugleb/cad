@@ -1,11 +1,4 @@
-decorator==4.3.0
-future==0.17.1
-mpmath==1.0.0
-numpy==1.15.4
-PyContracts==1.8.7
-pyparsing==2.3.0
 PyQt5==5.11.3
 PyQt5-sip==4.19.13
+PyContracts==1.8.7
 scipy==1.1.0
-six==1.11.0
-sympy==1.3
