@@ -244,7 +244,7 @@ class Application(QMainWindow):
         action = QAction('Fixed')
         action.setToolTip('Fixed constraint')
         action.setStatusTip('Fixed constraint')
-        action.setIcon(QIcon('icons/point.png'))
+        action.setIcon(QIcon('icons/fixed.png'))
         action.triggered.connect(self.fixedActionHandler)
         return action
 
