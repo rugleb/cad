@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
@@ -128,7 +130,7 @@ class Application(QMainWindow):
         action.setShortcut('Ctrl+P')
         action.setToolTip('Draw point')
         action.setStatusTip('Draw point')
-        action.setIcon(QIcon('icons/point.png'))
+        action.setIcon(QIcon(icon('point.png')))
         action.triggered.connect(self.pointActionHandler)
         return action
 
@@ -140,7 +142,7 @@ class Application(QMainWindow):
         action.setShortcut('Ctrl+L')
         action.setToolTip('Draw line')
         action.setStatusTip('Draw line')
-        action.setIcon(QIcon('icons/line.png'))
+        action.setIcon(QIcon(icon('line.png')))
         action.triggered.connect(self.lineActionHandler)
         return action
 
@@ -151,7 +153,7 @@ class Application(QMainWindow):
         action = QAction('Horizontal')
         action.setToolTip('Horizontal constraint')
         action.setStatusTip('Horizontal constraint')
-        action.setIcon(QIcon('icons/horizontal.png'))
+        action.setIcon(QIcon(icon('horizontal.png')))
         action.triggered.connect(self.horizontalActionHandler)
         return action
 
@@ -162,7 +164,7 @@ class Application(QMainWindow):
         action = QAction('Vertical')
         action.setToolTip('Vertical constraint')
         action.setStatusTip('Vertical constraint')
-        action.setIcon(QIcon('icons/vertical.png'))
+        action.setIcon(QIcon(icon('vertical.png')))
         action.triggered.connect(self.verticalActionHandler)
         return action
 
@@ -173,7 +175,7 @@ class Application(QMainWindow):
         action = QAction('Angle')
         action.setToolTip('Angle constraint')
         action.setStatusTip('Angle constraint')
-        action.setIcon(QIcon('icons/angle.png'))
+        action.setIcon(QIcon(icon('angle.png')))
         action.triggered.connect(self.angleActionHandler)
         return action
 
@@ -192,7 +194,7 @@ class Application(QMainWindow):
         action = QAction('Length')
         action.setToolTip('Length constraint')
         action.setStatusTip('Length constraint')
-        action.setIcon(QIcon('icons/length.png'))
+        action.setIcon(QIcon(icon('length.png')))
         action.triggered.connect(self.lengthActionHandler)
         return action
 
@@ -211,7 +213,7 @@ class Application(QMainWindow):
         action = QAction('Parallel')
         action.setToolTip('Parallel constraint')
         action.setStatusTip('Parallel constraint')
-        action.setIcon(QIcon('icons/parallel.png'))
+        action.setIcon(QIcon(icon('parallel.png')))
         action.triggered.connect(self.parallelsActionHandler)
         return action
 
@@ -222,7 +224,7 @@ class Application(QMainWindow):
         action = QAction('Perpendicular')
         action.setToolTip('Perpendicular constraint')
         action.setStatusTip('Perpendicular constraint')
-        action.setIcon(QIcon('icons/perpendicular.png'))
+        action.setIcon(QIcon(icon('perpendicular.png')))
         action.triggered.connect(self.perpendicularActionHandler)
         return action
 
@@ -233,7 +235,7 @@ class Application(QMainWindow):
         action = QAction('Coincident')
         action.setToolTip('Coincident constraint')
         action.setStatusTip('Coincident constraint')
-        action.setIcon(QIcon('icons/coincident.png'))
+        action.setIcon(QIcon(icon('coincident.png')))
         action.triggered.connect(self.coincidentActionHandler)
         return action
 
@@ -244,7 +246,7 @@ class Application(QMainWindow):
         action = QAction('Fixed')
         action.setToolTip('Fixed constraint')
         action.setStatusTip('Fixed constraint')
-        action.setIcon(QIcon('icons/fixed.png'))
+        action.setIcon(QIcon(icon('point.png')))
         action.triggered.connect(self.fixedActionHandler)
         return action
 
@@ -265,7 +267,7 @@ class Application(QMainWindow):
         action = QAction('Disable')
         action.setToolTip('Choose action')
         action.setStatusTip('Choose action')
-        action.setIcon(QIcon('icons/cursor.png'))
+        action.setIcon(QIcon(icon('cursor.png')))
         action.triggered.connect(self.disableActionHandler)
         return action
 
@@ -320,3 +322,9 @@ class Application(QMainWindow):
             event.accept()
         else:
             event.ignore()
+
+
+def icon(name: str):
+    directory = os.path.dirname(__file__)
+    path = os.path.join(directory, 'icons', name)
+    return path
