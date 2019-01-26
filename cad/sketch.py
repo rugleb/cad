@@ -1,7 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from cad.solver import *
-from cad.math import *
 from cad import pen
 
 
