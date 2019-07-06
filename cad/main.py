@@ -25,16 +25,23 @@ class MenuBar(QtWidgets.QMenuBar):
     pass
 
 
-class ToolBar(QtWidgets.QToolBar):
-    pass
-
-
 class Icon(QtGui.QIcon):
     pass
 
 
 class ActionGroup(QtWidgets.QActionGroup):
-    pass
+
+    def addActions(self, actions: iter) -> None:
+        for action in actions:
+            self.addAction(action)
+
+
+class ToolBar(QtWidgets.QToolBar):
+
+    def toActionGroup(self) -> ActionGroup:
+        group = ActionGroup(self)
+        group.addActions(self.actions())
+        return group
 
 
 class KeySequence(QtGui.QKeySequence):
@@ -50,8 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.logger = logger
 
-        self.drawBar, self.drawBarGroup = self.makeDrawBar()
-        self.addToolBar(self.drawBar)
+        self.addToolBar(self.makeDrawBar())
 
         self.setMenuBar(self.makeMenuBar())
         self.setGeometry(self.getGeometry())
@@ -60,33 +66,39 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage('Ready')
 
     def getGeometry(self) -> QtCore.QRect:
-        available = QtWidgets.QDesktopWidget().availableGeometry()
-        x = (available.width() - self.width) / 2
-        y = (available.height() - self.height) / 2
+        screen = QtWidgets.QDesktopWidget().availableGeometry()
+        x = (screen.width() - self.width) / 2
+        y = (screen.height() - self.height) / 2
         rect = QtCore.QRectF(x, y, self.width, self.height)
         return rect.toRect()
 
-    def makeDrawBar(self) -> (ToolBar, ActionGroup):
+    def makeDrawBar(self) -> ToolBar:
         bar = ToolBar('Draw toolbar', self)
-        group = self.makeDrawBarGroup(bar)
-        actions = group.actions()
-        bar.addActions(actions)
-        before = actions[2]
-        bar.insertSeparator(before)
-        return bar, group
+        bar.setIconSize(QtCore.QSize(40, 40))
+        bar.addAction(self.makeDisableAction(bar))
+        bar.addSeparator()
+        bar.addAction(self.makePointAction(bar))
+        bar.addAction(self.makeLineAction(bar))
+        bar.addSeparator()
+        bar.addAction(self.makeParallelAction(bar))
+        bar.addAction(self.makePerpendicularAction(bar))
+        bar.addAction(self.makeCoincidentAction(bar))
+        bar.addAction(self.makeFixedAction(bar))
+        bar.addAction(self.makeAngleAction(bar))
+        bar.addAction(self.makeVerticalAction(bar))
+        bar.addAction(self.makeHorizontalAction(bar))
+        bar.toActionGroup()
+        return bar
 
-    def makeDrawBarGroup(self, bar: ToolBar) -> ActionGroup:
-        group = ActionGroup(self)
-        group.addAction(self.makePointAction(bar))
-        group.addAction(self.makeLineAction(bar))
-        group.addAction(self.makeParallelAction(bar))
-        group.addAction(self.makePerpendicularAction(bar))
-        group.addAction(self.makeCoincidentAction(bar))
-        group.addAction(self.makeFixedAction(bar))
-        group.addAction(self.makeAngleAction(bar))
-        group.addAction(self.makeVerticalAction(bar))
-        group.addAction(self.makeHorizontalAction(bar))
-        return group
+    def makeDisableAction(self, bar: ToolBar) -> Action:
+        action = Action('Disable', bar)
+        action.setShortcut(KeySequence('Escape'))
+        action.setStatusTip('Disable draw')
+        action.setIcon(Icon(iconPath('cursor.png')))
+        action.setCheckable(True)
+        action.setChecked(True)
+        action.triggered.connect(self.disable)
+        return action
 
     def makePointAction(self, bar: ToolBar) -> Action:
         action = Action('Point drawing', bar)
@@ -295,6 +307,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def delete(self) -> None:
         self.logger.debug('Delete action triggered')
 
+    def disable(self) -> None:
+        self.logger.debug('Disable action triggered')
+
     def point(self) -> None:
         self.logger.debug('Point action triggered')
 
@@ -324,7 +339,3 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         pass
-
-    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
-        if event.key() == QtCore.Qt.Key_Escape:
-            self.drawBarGroup.checkedAction().setChecked(False)
