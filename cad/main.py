@@ -1,5 +1,5 @@
 import os
-from PySide2 import QtWidgets, QtGui
+from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.logging import logger
 
@@ -42,6 +42,8 @@ class KeySequence(QtGui.QKeySequence):
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    width = 800
+    height = 500
 
     def __init__(self):
         super().__init__()
@@ -54,11 +56,18 @@ class MainWindow(QtWidgets.QMainWindow):
         menuBar = self.makeMenuBar()
         self.setMenuBar(menuBar)
 
-        geometry = QtGui.QScreen().geometry()
+        geometry = self.getGeometry()
         self.setGeometry(geometry)
 
         self.setWindowTitle('2D CAD')
         self.statusBar().showMessage('Ready')
+
+    def getGeometry(self) -> QtCore.QRect:
+        available = QtWidgets.QDesktopWidget().availableGeometry()
+        x = (available.width() - self.width) / 2
+        y = (available.height() - self.height) / 2
+        rect = QtCore.QRectF(x, y, self.width, self.height)
+        return rect.toRect()
 
     def makeDrawBar(self) -> (ToolBar, ActionGroup):
         bar = ToolBar('Draw toolbar', self)
@@ -160,6 +169,7 @@ class MainWindow(QtWidgets.QMainWindow):
         bar = MenuBar(self)
         bar.addMenu(self.makeFileMenu(bar))
         bar.addMenu(self.makeEditMenu(bar))
+        bar.addMenu(self.makeViewMenu(bar))
         return bar
 
     def makeFileMenu(self, bar: MenuBar) -> Menu:
@@ -179,6 +189,12 @@ class MainWindow(QtWidgets.QMainWindow):
         menu.addAction(self.makeCopyAction(menu))
         menu.addAction(self.makePasteAction(menu))
         menu.addAction(self.makeDeleteAction(menu))
+        return menu
+
+    def makeViewMenu(self, bar: MenuBar) -> Menu:
+        menu = Menu('&View', bar)
+        menu.addAction(self.makeMaxScreenAction(menu))
+        menu.addAction(self.makeNormalScreenAction(menu))
         return menu
 
     def makeOpenAction(self, menu: Menu) -> Action:
@@ -242,6 +258,20 @@ class MainWindow(QtWidgets.QMainWindow):
         action.setShortcut(KeySequence('Delete'))
         action.setToolTip('Delete selected object')
         action.triggered.connect(self.delete)
+        return action
+
+    def makeMaxScreenAction(self, menu: Menu) -> Action:
+        action = Action('Max Screen', menu)
+        action.setShortcut(KeySequence('F10'))
+        action.setToolTip('Shows the window as maximized')
+        action.triggered.connect(self.showMaximized)
+        return action
+
+    def makeNormalScreenAction(self, menu: Menu) -> Action:
+        action = Action('Normal Screen', menu)
+        action.setShortcut(KeySequence('F9'))
+        action.setToolTip('Shows the window as normal')
+        action.triggered.connect(self.showNormal)
         return action
 
     def open(self) -> None:
