@@ -50,14 +50,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.logger = logger
 
-        drawBar, drawBarGroup = self.makeDrawBar()
-        self.addToolBar(drawBar)
+        self.drawBar, self.drawBarGroup = self.makeDrawBar()
+        self.addToolBar(self.drawBar)
 
-        menuBar = self.makeMenuBar()
-        self.setMenuBar(menuBar)
-
-        geometry = self.getGeometry()
-        self.setGeometry(geometry)
+        self.setMenuBar(self.makeMenuBar())
+        self.setGeometry(self.getGeometry())
 
         self.setWindowTitle('2D CAD')
         self.statusBar().showMessage('Ready')
