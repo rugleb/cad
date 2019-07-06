@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtGui
 
 
 class Application(QtWidgets.QApplication):
@@ -6,4 +6,12 @@ class Application(QtWidgets.QApplication):
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    pass
+
+    def __init__(self):
+        super().__init__()
+
+        geometry = QtGui.QScreen().geometry()
+        self.setGeometry(geometry)
+
+        self.setWindowTitle('2D CAD')
+        self.statusBar().showMessage('Ready')
