@@ -1,7 +1,7 @@
 import sys
 import logging
 
-level = logging.INFO
+level = logging.DEBUG
 date_format = '%Y-%m-%d %H:%M:%S'
 
 fmt = '[%(asctime)s] - CAD %(levelname)s - "%(message)s"'
