@@ -52,6 +52,10 @@ class MessageBox(QtWidgets.QMessageBox):
     pass
 
 
+class FileDialog(QtWidgets.QFileDialog):
+    pass
+
+
 class MainWindow(QtWidgets.QMainWindow):
     width = 800
     height = 500
@@ -288,7 +292,12 @@ class MainWindow(QtWidgets.QMainWindow):
         return action
 
     def open(self) -> None:
-        self.logger.debug('Open action triggered')
+        title = 'Open file or project'
+        options = FileDialog.DontUseNativeDialog
+
+        file, _ = FileDialog.getOpenFileName(self, title, '.', options=options)
+        if file:
+            pass
 
     def save(self) -> None:
         self.logger.debug('Save action triggered')
