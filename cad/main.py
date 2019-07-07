@@ -48,6 +48,10 @@ class KeySequence(QtGui.QKeySequence):
     pass
 
 
+class MessageBox(QtWidgets.QMessageBox):
+    pass
+
+
 class MainWindow(QtWidgets.QMainWindow):
     width = 800
     height = 500
@@ -338,4 +342,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logger.debug('Horizontal action triggered')
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
-        pass
+        ask = 'Are you sure you want to quit?'
+        title = 'Close application'
+        yes, no = MessageBox.Yes, MessageBox.No
+
+        if MessageBox.question(self, title, ask, yes | no) == yes:
+            event.accept()
+        else:
+            event.ignore()
