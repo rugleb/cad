@@ -379,6 +379,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 class DrawingBoard(QtWidgets.QWidget):
     mouseMoved = QtCore.Signal(QtGui.QMouseEvent)
+    mousePressed = QtCore.Signal(QtGui.QMouseEvent)
 
     def __init__(self, parent: MainWindow):
         super().__init__(parent)
@@ -390,3 +391,6 @@ class DrawingBoard(QtWidgets.QWidget):
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         self.mouseMoved.emit(event)
+
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        self.mousePressed.emit(event)
