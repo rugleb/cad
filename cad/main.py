@@ -65,6 +65,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.logger = logger
 
+        board = DrawingBoard(self)
+        self.setCentralWidget(board)
+
+        board.mouseMoved.connect(self.mouseMovedHandler)
+
         self.addToolBar(self.makeDrawBar())
 
         self.setMenuBar(self.makeMenuBar())
@@ -364,3 +369,24 @@ class MainWindow(QtWidgets.QMainWindow):
             event.accept()
         else:
             event.ignore()
+
+    @QtCore.Slot(QtGui.QMouseEvent)
+    def mouseMovedHandler(self, event: QtGui.QMouseEvent) -> None:
+        x, y = event.x(), event.y()
+        message = f'x: {x}, y: {y}'
+        self.statusBar().showMessage(message)
+
+
+class DrawingBoard(QtWidgets.QWidget):
+    mouseMoved = QtCore.Signal(QtGui.QMouseEvent)
+
+    def __init__(self, parent: MainWindow):
+        super().__init__(parent)
+
+        self.setMouseTracking(True)
+
+    def parent(self) -> MainWindow:
+        return super().parent()
+
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
+        self.mouseMoved.emit(event)
