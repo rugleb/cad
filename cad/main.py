@@ -65,10 +65,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.logger = logger
 
-        board = DrawingBoard(self)
-        self.setCentralWidget(board)
-
-        board.mouseMoved.connect(self.mouseMovedHandler)
+        self.board: DrawingBoard = self.makeDrawingBoard()
+        self.setCentralWidget(self.board)
 
         self.addToolBar(self.makeDrawBar())
 
@@ -77,6 +75,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setWindowTitle('2D CAD')
         self.statusBar().showMessage('Ready')
+
+    def makeDrawingBoard(self) -> QtWidgets.QWidget:
+        board = DrawingBoard(self)
+        board.mouseMoved.connect(self.mouseMovedHandler)
+        return board
 
     def getGeometry(self) -> QtCore.QRect:
         screen = QtWidgets.QDesktopWidget().availableGeometry()
@@ -331,10 +334,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logger.debug('Delete action triggered')
 
     def disable(self) -> None:
-        self.logger.debug('Disable action triggered')
+        handler = NullHandler(self.board)
+        self.board.setHandler(handler)
 
     def point(self) -> None:
-        self.logger.debug('Point action triggered')
+        handler = PointHandler(self.board)
+        self.board.setHandler(handler)
 
     def line(self) -> None:
         self.logger.debug('Line action triggered')
@@ -377,6 +382,30 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(message)
 
 
+class NullHandler(QtCore.QObject):
+
+    def __init__(self, board: QtWidgets.QWidget):
+        super().__init__()
+
+        self.board: DrawingBoard = board
+
+    @QtCore.Slot(QtGui.QMouseEvent)
+    def onMouseMoved(self, event: QtGui.QMouseEvent):
+        pass
+
+    @QtCore.Slot(QtGui.QMouseEvent)
+    def onMousePressed(self, event: QtGui.QMouseEvent):
+        pass
+
+
+class PointHandler(NullHandler):
+
+    @QtCore.Slot(QtGui.QMouseEvent)
+    def onMousePressed(self, event: QtGui.QMouseEvent):
+        point = event.localPos()
+        self.board.addPoint(point).repaint()
+
+
 class DrawingBoard(QtWidgets.QWidget):
     mouseMoved = QtCore.Signal(QtGui.QMouseEvent)
     mousePressed = QtCore.Signal(QtGui.QMouseEvent)
@@ -384,7 +413,35 @@ class DrawingBoard(QtWidgets.QWidget):
     def __init__(self, parent: MainWindow):
         super().__init__(parent)
 
+        self.handler = NullHandler(self)
+
+        self.lines = []
+        self.points = []
+
         self.setMouseTracking(True)
+
+    def addPoint(self, point):
+        self.points.append(point)
+
+        return self
+
+    def setHandler(self, handler: NullHandler):
+        self.handler = handler
+
+        self.mouseMoved.connect(self.handler.onMouseMoved)
+        self.mousePressed.connect(self.handler.onMousePressed)
+
+    def paintEvent(self, event: QtGui.QPaintEvent) -> None:
+        painter = QtGui.QPainter()
+        painter.begin(self)
+        self.drawPoints(painter)
+        painter.end()
+
+    def drawPoints(self, painter) -> None:
+        radius = 10.
+        painter.setBrush(QtCore.Qt.blue)
+        for point in self.points:
+            painter.drawEllipse(point.x(), point.y(), radius, radius)
 
     def parent(self) -> MainWindow:
         return super().parent()
