@@ -300,7 +300,12 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
 
     def save(self) -> None:
-        self.logger.debug('Save action triggered')
+        title = 'Save file'
+        options = FileDialog.DontUseNativeDialog
+
+        file, _ = FileDialog.getSaveFileName(self, title, '.', options=options)
+        if file:
+            pass
 
     def undo(self) -> None:
         self.logger.debug('Undo action triggered')
