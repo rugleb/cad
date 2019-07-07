@@ -217,82 +217,82 @@ class MainWindow(QtWidgets.QMainWindow):
     def makeOpenAction(self, menu: Menu) -> Action:
         action = Action('Save', menu)
         action.setShortcut(KeySequence('Ctrl+O'))
-        action.setToolTip('Open new file')
+        action.setStatusTip('Open new file')
         action.triggered.connect(self.open)
         return action
 
     def makeSaveAction(self, menu: Menu) -> Action:
         action = Action('Save', menu)
         action.setShortcut(KeySequence('Ctrl+S'))
-        action.setToolTip('Save file')
+        action.setStatusTip('Save file')
         action.triggered.connect(self.save)
         return action
 
     def makeQuitAction(self, menu: Menu) -> Action:
         action = Action('Quit', menu)
         action.setShortcut(KeySequence('Ctrl+Q'))
-        action.setToolTip('Close application')
+        action.setStatusTip('Close application')
         action.triggered.connect(self.close)
         return action
 
     def makeUndoAction(self, menu: Menu) -> Action:
         action = Action('Undo', menu)
         action.setShortcut(KeySequence('Ctrl+Z'))
-        action.setToolTip('Undo previous action')
+        action.setStatusTip('Undo previous action')
         action.triggered.connect(self.undo)
         return action
 
     def makeRedoAction(self, menu: Menu) -> Action:
         action = Action('Redo', menu)
         action.setShortcut(KeySequence('Ctrl+Shift+Z'))
-        action.setToolTip('Redo previous action')
+        action.setStatusTip('Redo previous action')
         action.triggered.connect(self.redo)
         return action
 
     def makeCutAction(self, menu: Menu) -> Action:
         action = Action('Cut', menu)
         action.setShortcut(KeySequence('Ctrl+X'))
-        action.setToolTip('Cut selected object')
+        action.setStatusTip('Cut selected object')
         action.triggered.connect(self.cut)
         return action
 
     def makeCopyAction(self, menu: Menu) -> Action:
         action = Action('Copy', menu)
         action.setShortcut(KeySequence('Ctrl+C'))
-        action.setToolTip('Copy selected object')
+        action.setStatusTip('Copy selected object')
         action.triggered.connect(self.redo)
         return action
 
     def makePasteAction(self, menu: Menu) -> Action:
         action = Action('Paste', menu)
         action.setShortcut(KeySequence('Ctrl+V'))
-        action.setToolTip('Paste object from buffer')
+        action.setStatusTip('Paste object from buffer')
         action.triggered.connect(self.paste)
         return action
 
     def makeDeleteAction(self, menu: Menu) -> Action:
         action = Action('Delete', menu)
         action.setShortcut(KeySequence('Delete'))
-        action.setToolTip('Delete selected object')
+        action.setStatusTip('Delete selected object')
         action.triggered.connect(self.delete)
         return action
 
     def makeMaxScreenAction(self, menu: Menu) -> Action:
         action = Action('Max Screen', menu)
         action.setShortcut(KeySequence('F10'))
-        action.setToolTip('Shows the window as maximized')
+        action.setStatusTip('Shows the window as maximized')
         action.triggered.connect(self.showMaximized)
         return action
 
     def makeNormalScreenAction(self, menu: Menu) -> Action:
         action = Action('Normal Screen', menu)
         action.setShortcut(KeySequence('F9'))
-        action.setToolTip('Shows the window as normal')
+        action.setStatusTip('Shows the window as normal')
         action.triggered.connect(self.showNormal)
         return action
 
     def open(self) -> None:
-        title = 'Open file or project'
+        title = 'Open file'
         options = FileDialog.DontUseNativeDialog
 
         file, _ = FileDialog.getOpenFileName(self, title, '.', options=options)
