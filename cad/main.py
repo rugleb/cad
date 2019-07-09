@@ -492,6 +492,8 @@ class DrawingBoard(QtWidgets.QWidget):
         painter.setPen(QtGui.QPen(color, 3, QtCore.Qt.SolidLine))
         painter.drawLines(self.lines)
 
+        # color = QtGui.QColor(254,  137, 144)    # active color
+
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         self.mouseMoved.emit(event)
 
