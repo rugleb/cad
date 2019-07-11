@@ -1,11 +1,6 @@
-import math
 import unittest
 
-from cad.algebra.distance import Point, Line, p2p, p2l
-
-
-def sqrt(x: float, rounded: int = 2) -> float:
-    return round(math.sqrt(x), rounded)
+from cad.algebra.distance import Point, Line, p2p, p2l, sqrt
 
 
 class DistanceTestCase(unittest.TestCase):
