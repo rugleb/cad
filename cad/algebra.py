@@ -8,6 +8,7 @@ Point = QPointF
 
 
 ROUNDED = 2
+INACCURACY = 2
 
 
 def sqrt(x: float, rounded: int = ROUNDED) -> float:

@@ -1,6 +1,6 @@
 import unittest
 
-from cad.algebra.distance import Point, Line, p2p, p2l, sqrt
+from cad.algebra import Point, Line, p2p, p2l, sqrt
 
 
 class DistanceTestCase(unittest.TestCase):
