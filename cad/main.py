@@ -2,6 +2,7 @@ import os
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.logging import logger
+from cad.algebra import p2s, p2p
 
 
 def iconPath(name: str) -> str:
@@ -471,7 +472,7 @@ class DrawingBoard(QtWidgets.QWidget):
         painter.begin(self)
         color, radius = QtGui.QColor(54, 93, 171), 6
         self.drawPoints(painter, radius, color)
-        self.drawLines(painter, radius, color)
+        self.drawLines(painter, color)
         painter.end()
 
     def drawPoints(self, painter: Painter, radius: int, color: QtGui.QColor):
@@ -479,16 +480,14 @@ class DrawingBoard(QtWidgets.QWidget):
         painter.setBrush(color)
         painter.setRenderHint(painter.Antialiasing, True)
         painter.drawCircles(self.points, radius)
-
-    def drawLines(self, painter: Painter, radius: int, color: QtGui.QColor):
-        painter.setPen(QtCore.Qt.NoPen)
-        painter.setBrush(color)
-        painter.setRenderHint(painter.Antialiasing, True)
-
         for line in self.lines:
             painter.drawCircle(line.p1(), radius)
             painter.drawCircle(line.p2(), radius)
 
+    def drawLines(self, painter: Painter, color: QtGui.QColor):
+        painter.setPen(QtCore.Qt.NoPen)
+        painter.setBrush(color)
+        painter.setRenderHint(painter.Antialiasing, True)
         painter.setPen(QtGui.QPen(color, 3, QtCore.Qt.SolidLine))
         painter.drawLines(self.lines)
 
