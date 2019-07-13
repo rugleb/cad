@@ -2,7 +2,6 @@ import os
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.logging import logger
-from cad.algebra import p2s, p2p
 
 
 def iconPath(name: str) -> str:
@@ -90,9 +89,9 @@ class MainWindow(QtWidgets.QMainWindow):
         return rect.toRect()
 
     def makeDrawBar(self) -> ToolBar:
-        bar = ToolBar('Draw toolbar', self)
+        bar = ToolBar(self)
         bar.setIconSize(QtCore.QSize(40, 40))
-        bar.addAction(self.makeDisableAction(bar))
+        bar.addAction(self.makeCancelAction(bar))
         bar.addSeparator()
         bar.addAction(self.makePointAction(bar))
         bar.addAction(self.makeLineAction(bar))
@@ -107,19 +106,19 @@ class MainWindow(QtWidgets.QMainWindow):
         bar.toActionGroup()
         return bar
 
-    def makeDisableAction(self, bar: ToolBar) -> Action:
-        action = Action('Disable', bar)
-        action.setShortcut(KeySequence('Escape'))
-        action.setStatusTip('Disable draw')
+    def makeCancelAction(self, bar: ToolBar) -> Action:
+        action = Action('Cancel', bar)
+        action.setShortcut(KeySequence.Cancel)
+        action.setStatusTip('Cancel drawing')
         action.setIcon(Icon(iconPath('cursor.png')))
         action.setCheckable(True)
         action.setChecked(True)
-        action.triggered.connect(self.disable)
+        action.triggered.connect(self.cancel)
         return action
 
     def makePointAction(self, bar: ToolBar) -> Action:
         action = Action('Point drawing', bar)
-        action.setShortcut(KeySequence('Ctrl+P'))
+        action.setShortcut(QtCore.Qt.CTRL + QtCore.Qt.Key_P)
         action.setStatusTip('Enable point drawing mode')
         action.setIcon(Icon(iconPath('point.png')))
         action.setCheckable(True)
@@ -128,7 +127,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def makeLineAction(self, bar) -> Action:
         action = Action('Line drawing', bar)
-        action.setShortcut(KeySequence('Ctrl+L'))
+        action.setShortcut(QtCore.Qt.CTRL + QtCore.Qt.Key_L)
         action.setStatusTip('Enable line drawing mode')
         action.setIcon(Icon(iconPath('line.png')))
         action.setCheckable(True)
@@ -224,71 +223,71 @@ class MainWindow(QtWidgets.QMainWindow):
         return menu
 
     def makeOpenAction(self, menu: Menu) -> Action:
-        action = Action('Save', menu)
-        action.setShortcut(KeySequence('Ctrl+O'))
-        action.setStatusTip('Open new file')
+        action = Action('Open', menu)
+        action.setShortcut(KeySequence.Open)
+        action.setStatusTip('Open file')
         action.triggered.connect(self.open)
         return action
 
     def makeSaveAction(self, menu: Menu) -> Action:
         action = Action('Save', menu)
-        action.setShortcut(KeySequence('Ctrl+S'))
-        action.setStatusTip('Save file')
+        action.setShortcut(KeySequence.Save)
+        action.setStatusTip('Save')
         action.triggered.connect(self.save)
         return action
 
     def makeQuitAction(self, menu: Menu) -> Action:
         action = Action('Quit', menu)
-        action.setShortcut(KeySequence('Ctrl+Q'))
+        action.setShortcut(KeySequence.Quit)
         action.setStatusTip('Close application')
         action.triggered.connect(self.close)
         return action
 
     def makeUndoAction(self, menu: Menu) -> Action:
         action = Action('Undo', menu)
-        action.setShortcut(KeySequence('Ctrl+Z'))
+        action.setShortcut(KeySequence.Undo)
         action.setStatusTip('Undo previous action')
         action.triggered.connect(self.undo)
         return action
 
     def makeRedoAction(self, menu: Menu) -> Action:
         action = Action('Redo', menu)
-        action.setShortcut(KeySequence('Ctrl+Shift+Z'))
+        action.setShortcut(KeySequence.Redo)
         action.setStatusTip('Redo previous action')
         action.triggered.connect(self.redo)
         return action
 
     def makeCutAction(self, menu: Menu) -> Action:
         action = Action('Cut', menu)
-        action.setShortcut(KeySequence('Ctrl+X'))
+        action.setShortcut(KeySequence.Cut)
         action.setStatusTip('Cut selected object')
         action.triggered.connect(self.cut)
         return action
 
     def makeCopyAction(self, menu: Menu) -> Action:
         action = Action('Copy', menu)
-        action.setShortcut(KeySequence('Ctrl+C'))
+        action.setShortcut(KeySequence.Copy)
         action.setStatusTip('Copy selected object')
         action.triggered.connect(self.redo)
         return action
 
     def makePasteAction(self, menu: Menu) -> Action:
         action = Action('Paste', menu)
-        action.setShortcut(KeySequence('Ctrl+V'))
+        action.setShortcut(KeySequence.Paste)
         action.setStatusTip('Paste object from buffer')
         action.triggered.connect(self.paste)
         return action
 
     def makeDeleteAction(self, menu: Menu) -> Action:
         action = Action('Delete', menu)
-        action.setShortcut(KeySequence('Delete'))
+        action.setShortcut(KeySequence.Delete)
         action.setStatusTip('Delete selected object')
         action.triggered.connect(self.delete)
         return action
 
     def makeMaxScreenAction(self, menu: Menu) -> Action:
         action = Action('Max Screen', menu)
-        action.setShortcut(KeySequence('F10'))
+        action.setShortcut(KeySequence.Save)
         action.setStatusTip('Shows the window as maximized')
         action.triggered.connect(self.showMaximized)
         return action
@@ -334,7 +333,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def delete(self) -> None:
         self.logger.debug('Delete action triggered')
 
-    def disable(self) -> None:
+    def cancel(self) -> None:
         handler = NullHandler(self.board)
         self.board.setHandler(handler)
 
