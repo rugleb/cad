@@ -74,7 +74,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMenuBar(self.createMenuBar())
         self.setGeometry(self.getGeometry())
 
-        self.setWindowTitle('2D CAD')
+        self.updateWindowTitle()
         self.statusBar().showMessage('Ready')
 
     def createDrawingBoard(self) -> QtWidgets.QWidget:
@@ -334,6 +334,7 @@ class MainWindow(QtWidgets.QMainWindow):
         file, _ = FileDialog.getSaveFileName(self, title, '.', options=options)
         if file:
             self.setFileName(file)
+            self.updateWindowTitle()
             self.dump()
 
     def dump(self) -> None:
@@ -403,6 +404,11 @@ class MainWindow(QtWidgets.QMainWindow):
         x, y = event.x(), event.y()
         message = f'x: {x}, y: {y}'
         self.statusBar().showMessage(message)
+
+    def updateWindowTitle(self) -> None:
+        fileName = self.fileName or 'Untitled'
+        title = f'CAD 2D - {fileName}'
+        self.setWindowTitle(title)
 
 
 class NullHandler(QtCore.QObject):
