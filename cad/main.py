@@ -296,14 +296,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def createMaxScreenAction(self, menu: Menu) -> Action:
         action = Action('Max Screen', menu)
-        action.setShortcut(KeySequence('F10'))
+        action.setShortcut(QtCore.Qt.ShiftModifier + QtCore.Qt.Key_F10)
         action.setStatusTip('Shows the window as maximized')
         action.triggered.connect(self.showMaximized)
         return action
 
     def createNormalScreenAction(self, menu: Menu) -> Action:
         action = Action('Normal Screen', menu)
-        action.setShortcut(KeySequence('F9'))
+        action.setShortcut(QtCore.Qt.ShiftModifier + QtCore.Qt.Key_F9)
         action.setStatusTip('Shows the window as normal')
         action.triggered.connect(self.showNormal)
         return action
