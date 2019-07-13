@@ -65,18 +65,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.logger = logger
 
-        self.board: DrawingBoard = self.makeDrawingBoard()
+        self.board: DrawingBoard = self.createDrawingBoard()
         self.setCentralWidget(self.board)
 
-        self.addToolBar(self.makeDrawBar())
+        self.addToolBar(self.createDrawBar())
 
-        self.setMenuBar(self.makeMenuBar())
+        self.setMenuBar(self.createMenuBar())
         self.setGeometry(self.getGeometry())
 
         self.setWindowTitle('2D CAD')
         self.statusBar().showMessage('Ready')
 
-    def makeDrawingBoard(self) -> QtWidgets.QWidget:
+    def createDrawingBoard(self) -> QtWidgets.QWidget:
         board = DrawingBoard(self)
         board.mouseMoved.connect(self.mouseMovedHandler)
         return board
@@ -88,25 +88,25 @@ class MainWindow(QtWidgets.QMainWindow):
         rect = QtCore.QRectF(x, y, self.width, self.height)
         return rect.toRect()
 
-    def makeDrawBar(self) -> ToolBar:
+    def createDrawBar(self) -> ToolBar:
         bar = ToolBar(self)
         bar.setIconSize(QtCore.QSize(40, 40))
-        bar.addAction(self.makeCancelAction(bar))
+        bar.addAction(self.createCancelAction(bar))
         bar.addSeparator()
-        bar.addAction(self.makePointAction(bar))
-        bar.addAction(self.makeLineAction(bar))
+        bar.addAction(self.createPointAction(bar))
+        bar.addAction(self.createLineAction(bar))
         bar.addSeparator()
-        bar.addAction(self.makeParallelAction(bar))
-        bar.addAction(self.makePerpendicularAction(bar))
-        bar.addAction(self.makeCoincidentAction(bar))
-        bar.addAction(self.makeFixedAction(bar))
-        bar.addAction(self.makeAngleAction(bar))
-        bar.addAction(self.makeVerticalAction(bar))
-        bar.addAction(self.makeHorizontalAction(bar))
+        bar.addAction(self.createParallelAction(bar))
+        bar.addAction(self.createPerpendicularAction(bar))
+        bar.addAction(self.createCoincidentAction(bar))
+        bar.addAction(self.createFixedAction(bar))
+        bar.addAction(self.createAngleAction(bar))
+        bar.addAction(self.createVerticalAction(bar))
+        bar.addAction(self.createHorizontalAction(bar))
         bar.toActionGroup()
         return bar
 
-    def makeCancelAction(self, bar: ToolBar) -> Action:
+    def createCancelAction(self, bar: ToolBar) -> Action:
         action = Action('Cancel', bar)
         action.setShortcut(KeySequence.Cancel)
         action.setStatusTip('Cancel drawing')
@@ -116,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.cancel)
         return action
 
-    def makePointAction(self, bar: ToolBar) -> Action:
+    def createPointAction(self, bar: ToolBar) -> Action:
         action = Action('Point drawing', bar)
         action.setShortcut(QtCore.Qt.CTRL + QtCore.Qt.Key_P)
         action.setStatusTip('Enable point drawing mode')
@@ -125,7 +125,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.point)
         return action
 
-    def makeLineAction(self, bar) -> Action:
+    def createLineAction(self, bar) -> Action:
         action = Action('Line drawing', bar)
         action.setShortcut(QtCore.Qt.CTRL + QtCore.Qt.Key_L)
         action.setStatusTip('Enable line drawing mode')
@@ -134,7 +134,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.line)
         return action
 
-    def makeParallelAction(self, bar: ToolBar) -> Action:
+    def createParallelAction(self, bar: ToolBar) -> Action:
         action = Action('Parallel constraint', bar)
         action.setStatusTip('Enable parallel constraint')
         action.setIcon(Icon(iconPath('parallel.png')))
@@ -142,7 +142,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.parallel)
         return action
 
-    def makePerpendicularAction(self, bar: ToolBar) -> Action:
+    def createPerpendicularAction(self, bar: ToolBar) -> Action:
         action = Action('Perpendicular constraint', bar)
         action.setStatusTip('Enable perpendicular constraint')
         action.setIcon(Icon(iconPath('perpendicular.png')))
@@ -150,7 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.perpendicular)
         return action
 
-    def makeCoincidentAction(self, bar: ToolBar) -> Action:
+    def createCoincidentAction(self, bar: ToolBar) -> Action:
         action = Action('Coincident constraint', bar)
         action.setStatusTip('Enable coincident constraint')
         action.setIcon(Icon(iconPath('coincident.png')))
@@ -158,7 +158,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.coincident)
         return action
 
-    def makeFixedAction(self, bar: ToolBar) -> Action:
+    def createFixedAction(self, bar: ToolBar) -> Action:
         action = Action('Fixed constraint', bar)
         action.setStatusTip('Enable fixed constraint')
         action.setIcon(Icon(iconPath('fixed.png')))
@@ -166,7 +166,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.fixed)
         return action
 
-    def makeAngleAction(self, bar: ToolBar) -> Action:
+    def createAngleAction(self, bar: ToolBar) -> Action:
         action = Action('Angle constraint', bar)
         action.setStatusTip('Enable angle constraint')
         action.setIcon(Icon(iconPath('angle.png')))
@@ -174,7 +174,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.angle)
         return action
 
-    def makeVerticalAction(self, bar: ToolBar) -> Action:
+    def createVerticalAction(self, bar: ToolBar) -> Action:
         action = Action('Vertical constraint', bar)
         action.setStatusTip('Enable vertical constraint')
         action.setIcon(Icon(iconPath('vertical.png')))
@@ -182,7 +182,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.vertical)
         return action
 
-    def makeHorizontalAction(self, bar: ToolBar) -> Action:
+    def createHorizontalAction(self, bar: ToolBar) -> Action:
         action = Action('Horizontal constraint', bar)
         action.setStatusTip('Enable horizontal constraint')
         action.setIcon(Icon(iconPath('horizontal.png')))
@@ -190,109 +190,109 @@ class MainWindow(QtWidgets.QMainWindow):
         action.triggered.connect(self.horizontal)
         return action
 
-    def makeMenuBar(self) -> MenuBar:
+    def createMenuBar(self) -> MenuBar:
         bar = MenuBar(self)
-        bar.addMenu(self.makeFileMenu(bar))
-        bar.addMenu(self.makeEditMenu(bar))
-        bar.addMenu(self.makeViewMenu(bar))
+        bar.addMenu(self.createFileMenu(bar))
+        bar.addMenu(self.createEditMenu(bar))
+        bar.addMenu(self.createViewMenu(bar))
         return bar
 
-    def makeFileMenu(self, bar: MenuBar) -> Menu:
+    def createFileMenu(self, bar: MenuBar) -> Menu:
         menu = Menu('&File', bar)
-        menu.addAction(self.makeOpenAction(menu))
-        menu.addAction(self.makeSaveAction(menu))
+        menu.addAction(self.createOpenAction(menu))
+        menu.addAction(self.createSaveAction(menu))
         menu.addSeparator()
-        menu.addAction(self.makeQuitAction(menu))
+        menu.addAction(self.createQuitAction(menu))
         return menu
 
-    def makeEditMenu(self, bar: MenuBar) -> Menu:
+    def createEditMenu(self, bar: MenuBar) -> Menu:
         menu = Menu('&Edit', bar)
-        menu.addAction(self.makeUndoAction(menu))
-        menu.addAction(self.makeRedoAction(menu))
+        menu.addAction(self.createUndoAction(menu))
+        menu.addAction(self.createRedoAction(menu))
         menu.addSeparator()
-        menu.addAction(self.makeCutAction(menu))
-        menu.addAction(self.makeCopyAction(menu))
-        menu.addAction(self.makePasteAction(menu))
-        menu.addAction(self.makeDeleteAction(menu))
+        menu.addAction(self.createCutAction(menu))
+        menu.addAction(self.createCopyAction(menu))
+        menu.addAction(self.createPasteAction(menu))
+        menu.addAction(self.createDeleteAction(menu))
         return menu
 
-    def makeViewMenu(self, bar: MenuBar) -> Menu:
+    def createViewMenu(self, bar: MenuBar) -> Menu:
         menu = Menu('&View', bar)
-        menu.addAction(self.makeMaxScreenAction(menu))
-        menu.addAction(self.makeNormalScreenAction(menu))
+        menu.addAction(self.createMaxScreenAction(menu))
+        menu.addAction(self.createNormalScreenAction(menu))
         return menu
 
-    def makeOpenAction(self, menu: Menu) -> Action:
+    def createOpenAction(self, menu: Menu) -> Action:
         action = Action('Open', menu)
         action.setShortcut(KeySequence.Open)
         action.setStatusTip('Open file')
         action.triggered.connect(self.open)
         return action
 
-    def makeSaveAction(self, menu: Menu) -> Action:
+    def createSaveAction(self, menu: Menu) -> Action:
         action = Action('Save', menu)
         action.setShortcut(KeySequence.Save)
         action.setStatusTip('Save')
         action.triggered.connect(self.save)
         return action
 
-    def makeQuitAction(self, menu: Menu) -> Action:
+    def createQuitAction(self, menu: Menu) -> Action:
         action = Action('Quit', menu)
         action.setShortcut(KeySequence.Quit)
         action.setStatusTip('Close application')
         action.triggered.connect(self.close)
         return action
 
-    def makeUndoAction(self, menu: Menu) -> Action:
+    def createUndoAction(self, menu: Menu) -> Action:
         action = Action('Undo', menu)
         action.setShortcut(KeySequence.Undo)
         action.setStatusTip('Undo previous action')
         action.triggered.connect(self.undo)
         return action
 
-    def makeRedoAction(self, menu: Menu) -> Action:
+    def createRedoAction(self, menu: Menu) -> Action:
         action = Action('Redo', menu)
         action.setShortcut(KeySequence.Redo)
         action.setStatusTip('Redo previous action')
         action.triggered.connect(self.redo)
         return action
 
-    def makeCutAction(self, menu: Menu) -> Action:
+    def createCutAction(self, menu: Menu) -> Action:
         action = Action('Cut', menu)
         action.setShortcut(KeySequence.Cut)
         action.setStatusTip('Cut selected object')
         action.triggered.connect(self.cut)
         return action
 
-    def makeCopyAction(self, menu: Menu) -> Action:
+    def createCopyAction(self, menu: Menu) -> Action:
         action = Action('Copy', menu)
         action.setShortcut(KeySequence.Copy)
         action.setStatusTip('Copy selected object')
         action.triggered.connect(self.redo)
         return action
 
-    def makePasteAction(self, menu: Menu) -> Action:
+    def createPasteAction(self, menu: Menu) -> Action:
         action = Action('Paste', menu)
         action.setShortcut(KeySequence.Paste)
         action.setStatusTip('Paste object from buffer')
         action.triggered.connect(self.paste)
         return action
 
-    def makeDeleteAction(self, menu: Menu) -> Action:
+    def createDeleteAction(self, menu: Menu) -> Action:
         action = Action('Delete', menu)
         action.setShortcut(KeySequence.Delete)
         action.setStatusTip('Delete selected object')
         action.triggered.connect(self.delete)
         return action
 
-    def makeMaxScreenAction(self, menu: Menu) -> Action:
+    def createMaxScreenAction(self, menu: Menu) -> Action:
         action = Action('Max Screen', menu)
         action.setShortcut(KeySequence.Save)
         action.setStatusTip('Shows the window as maximized')
         action.triggered.connect(self.showMaximized)
         return action
 
-    def makeNormalScreenAction(self, menu: Menu) -> Action:
+    def createNormalScreenAction(self, menu: Menu) -> Action:
         action = Action('Normal Screen', menu)
         action.setShortcut(KeySequence('F9'))
         action.setStatusTip('Shows the window as normal')
