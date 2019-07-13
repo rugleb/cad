@@ -64,6 +64,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
 
         self.logger = logger
+        self.fileName = None
 
         self.board: DrawingBoard = self.createDrawingBoard()
         self.setCentralWidget(self.board)
@@ -201,6 +202,7 @@ class MainWindow(QtWidgets.QMainWindow):
         menu = Menu('&File', bar)
         menu.addAction(self.createOpenAction(menu))
         menu.addAction(self.createSaveAction(menu))
+        menu.addAction(self.createSaveAsAction(menu))
         menu.addSeparator()
         menu.addAction(self.createQuitAction(menu))
         return menu
@@ -234,6 +236,13 @@ class MainWindow(QtWidgets.QMainWindow):
         action.setShortcut(KeySequence.Save)
         action.setStatusTip('Save')
         action.triggered.connect(self.save)
+        return action
+
+    def createSaveAsAction(self, menu: Menu) -> Action:
+        action = Action('Save', menu)
+        action.setShortcut(KeySequence.SaveAs)
+        action.setStatusTip('Save as')
+        action.triggered.connect(self.saveAs)
         return action
 
     def createQuitAction(self, menu: Menu) -> Action:
@@ -287,7 +296,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def createMaxScreenAction(self, menu: Menu) -> Action:
         action = Action('Max Screen', menu)
-        action.setShortcut(KeySequence.Save)
+        action.setShortcut(KeySequence('F10'))
         action.setStatusTip('Shows the window as maximized')
         action.triggered.connect(self.showMaximized)
         return action
@@ -307,12 +316,28 @@ class MainWindow(QtWidgets.QMainWindow):
         if file:
             pass
 
+    def hasFile(self) -> bool:
+        return self.fileName is not None
+
+    def setFileName(self, name: str) -> None:
+        self.fileName = name
+
     def save(self) -> None:
-        title = 'Save file'
+        if not self.hasFile():
+            return self.saveAs()
+        return self.dump()
+
+    def saveAs(self) -> None:
+        title = 'Save file as'
         options = FileDialog.DontUseNativeDialog
 
         file, _ = FileDialog.getSaveFileName(self, title, '.', options=options)
         if file:
+            self.setFileName(file)
+            self.dump()
+
+    def dump(self) -> None:
+        with open(self.fileName, 'w') as f:
             pass
 
     def undo(self) -> None:
