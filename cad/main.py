@@ -371,10 +371,8 @@ class MainWindow(QtWidgets.QMainWindow):
         title = 'Close application'
         yes, no = MessageBox.Yes, MessageBox.No
 
-        if MessageBox.question(self, title, ask, yes | no) == yes:
-            event.accept()
-        else:
-            event.ignore()
+        accepted = MessageBox.question(self, title, ask, yes | no) == yes
+        event.setAccepted(accepted)
 
     def mouseMovedHandler(self, event: QtGui.QMouseEvent) -> None:
         x, y = event.x(), event.y()
