@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from PySide2 import QtWidgets, QtGui, QtCore
 
@@ -64,10 +66,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
 
         self.logger = logger
-        self.fileName = None
-
-        self.board: DrawingBoard = self.createDrawingBoard()
-        self.setCentralWidget(self.board)
+        self.fileName: str = ''
 
         self.addToolBar(self.createDrawBar())
 
@@ -76,11 +75,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.updateWindowTitle()
         self.statusBar().showMessage('Ready')
-
-    def createDrawingBoard(self) -> QtWidgets.QWidget:
-        board = DrawingBoard(self)
-        board.mouseMoved.connect(self.mouseMovedHandler)
-        return board
 
     def getGeometry(self) -> QtCore.QRect:
         screen = QtWidgets.QDesktopWidget().availableGeometry()
@@ -338,7 +332,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.dump()
 
     def dump(self) -> None:
-        with open(self.fileName, 'w') as f:
+        with open(self.fileName, 'w'):
             pass
 
     def undo(self) -> None:
@@ -360,16 +354,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logger.debug('Delete action triggered')
 
     def cancel(self) -> None:
-        handler = NullHandler(self.board)
-        self.board.setHandler(handler)
+        self.logger.debug('Cancel action triggered')
 
     def point(self) -> None:
-        handler = PointHandler(self.board)
-        self.board.setHandler(handler)
+        self.logger.debug('Point action triggered')
 
     def line(self) -> None:
-        handler = LineHandler(self.board)
-        self.board.setHandler(handler)
+        self.logger.debug('Line action triggered')
 
     def parallel(self) -> None:
         self.logger.debug('Parallel action triggered')
@@ -400,129 +391,7 @@ class MainWindow(QtWidgets.QMainWindow):
         accepted = MessageBox.question(self, title, ask, yes | no) == yes
         event.setAccepted(accepted)
 
-    def mouseMovedHandler(self, event: QtGui.QMouseEvent) -> None:
-        x, y = event.x(), event.y()
-        message = f'x: {x}, y: {y}'
-        self.statusBar().showMessage(message)
-
     def updateWindowTitle(self) -> None:
         fileName = self.fileName or 'Untitled'
         title = f'CAD 2D - {fileName}'
         self.setWindowTitle(title)
-
-
-class NullHandler(QtCore.QObject):
-
-    def __init__(self, board: QtWidgets.QWidget):
-        super().__init__()
-
-        self.board: DrawingBoard = board
-
-    def onMouseMoved(self, event: QtGui.QMouseEvent):
-        pass
-
-    def onMousePressed(self, event: QtGui.QMouseEvent):
-        pass
-
-
-class PointHandler(NullHandler):
-
-    def onMousePressed(self, event: QtGui.QMouseEvent):
-        self.board.addPoint(event.localPos())
-        self.board.repaint()
-
-
-class LineHandler(NullHandler):
-
-    def __init__(self, board: QtWidgets.QWidget):
-        super().__init__(board)
-
-        self.p1 = None
-
-    def onMouseMoved(self, event: QtGui.QMouseEvent):
-        if self.p1:
-            p2 = event.localPos()
-            self.board.lines[-1].setP2(p2)
-            self.board.repaint()
-
-    def onMousePressed(self, event: QtGui.QMouseEvent):
-        if self.p1 is None:
-            self.p1 = event.localPos()
-
-            line = QtCore.QLineF(self.p1, self.p1)
-            self.board.addLine(line)
-
-        else:
-            self.p1 = None
-
-
-class Painter(QtGui.QPainter):
-
-    def drawCircle(self, center: QtCore.QPointF, radius: int) -> None:
-        self.drawEllipse(center, radius, radius)
-
-    def drawCircles(self, centers: list, radius: int) -> None:
-        self.drawEllipses(centers, radius, radius)
-
-    def drawEllipses(self, centers: list, rx: int, ry: int) -> None:
-        for center in centers:
-            self.drawEllipse(center, rx, ry)
-
-
-class DrawingBoard(QtWidgets.QWidget):
-    mouseMoved = QtCore.Signal(QtGui.QMouseEvent)
-    mousePressed = QtCore.Signal(QtGui.QMouseEvent)
-
-    def __init__(self, parent: MainWindow):
-        super().__init__(parent)
-
-        self.handler = NullHandler(self)
-
-        self.lines = []
-        self.points = []
-
-        self.setMouseTracking(True)
-
-    def addPoint(self, point: QtCore.QPointF):
-        self.points.append(point)
-
-    def addLine(self, line: QtCore.QLineF):
-        self.lines.append(line)
-
-    def setHandler(self, handler: NullHandler):
-        self.handler = handler
-
-        self.mouseMoved.connect(self.handler.onMouseMoved)
-        self.mousePressed.connect(self.handler.onMousePressed)
-
-    def paintEvent(self, event: QtGui.QPaintEvent) -> None:
-        painter = Painter()
-        painter.begin(self)
-        color, radius = QtGui.QColor(54, 93, 171), 6
-        self.drawPoints(painter, radius, color)
-        self.drawLines(painter, color)
-        painter.end()
-
-    def drawPoints(self, painter: Painter, radius: int, color: QtGui.QColor):
-        painter.setPen(QtCore.Qt.NoPen)
-        painter.setBrush(color)
-        painter.setRenderHint(painter.Antialiasing, True)
-        painter.drawCircles(self.points, radius)
-        for line in self.lines:
-            painter.drawCircle(line.p1(), radius)
-            painter.drawCircle(line.p2(), radius)
-
-    def drawLines(self, painter: Painter, color: QtGui.QColor):
-        painter.setPen(QtCore.Qt.NoPen)
-        painter.setBrush(color)
-        painter.setRenderHint(painter.Antialiasing, True)
-        painter.setPen(QtGui.QPen(color, 3, QtCore.Qt.SolidLine))
-        painter.drawLines(self.lines)
-
-        # color = QtGui.QColor(254,  137, 144)    # active color
-
-    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
-        self.mouseMoved.emit(event)
-
-    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-        self.mousePressed.emit(event)
