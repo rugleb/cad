@@ -71,6 +71,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.fileName: str = ''
 
+        sketch = self.createSketch()
+        self.setCentralWidget(sketch)
+
         self.addToolBar(self.createDrawBar())
 
         self.setMenuBar(self.createMenuBar())
@@ -80,6 +83,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage('Ready')
 
         self.fileNameChanged.connect(self.updateWindowTitle)
+
+    def createSketch(self) -> Sketch:
+        sketch = Sketch(self)
+        sketch.mouseMoved.connect(self.updateStatusBar)
+        return sketch
 
     def getGeometry(self) -> QtCore.QRect:
         screen = QtWidgets.QDesktopWidget().availableGeometry()
@@ -406,3 +414,26 @@ class MainWindow(QtWidgets.QMainWindow):
         file = self.fileName or 'Untitled'
         title = f'CAD 2D - {file}'
         self.setWindowTitle(title)
+
+    def updateStatusBar(self, p: QtCore.QPointF) -> None:
+        x, y = p.x(), p.y()
+        message = f'x: {x}, y: {y}'
+        self.statusBar().showMessage(message)
+
+
+class Sketch(QtWidgets.QWidget):
+    mouseMoved = QtCore.Signal(QtCore.QPointF)
+    mousePressed = QtCore.Signal(QtCore.QPointF)
+
+    def __init__(self, parent: MainWindow):
+        super().__init__(parent)
+
+        self.setMouseTracking(True)
+
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
+        point = event.localPos()
+        self.mouseMoved.emit(point)
+
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        point = event.localPos()
+        self.mousePressed.emit(point)
