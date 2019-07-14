@@ -430,14 +430,20 @@ class Sketch(QtWidgets.QWidget):
     mouseMoved = QtCore.Signal(Point)
     mousePressed = QtCore.Signal(Point)
 
+    pointAdded = QtCore.Signal(Point)
     segmentAdded = QtCore.Signal(Segment)
 
     def __init__(self, parent: MainWindow):
         super().__init__(parent)
 
+        self.points: List[Point] = []
         self.segments: List[Segment] = []
 
         self.setMouseTracking(True)
+
+    def addPoint(self, point: Point) -> None:
+        self.points.append(point)
+        self.pointAdded.emit(point)
 
     def addSegment(self, segment: Segment) -> None:
         self.segments.append(segment)
