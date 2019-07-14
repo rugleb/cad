@@ -62,10 +62,13 @@ class MainWindow(QtWidgets.QMainWindow):
     width = 800
     height = 500
 
+    fileNameChanged = QtCore.Signal(str)
+
     def __init__(self):
         super().__init__()
 
         self.logger = logger
+
         self.fileName: str = ''
 
         self.addToolBar(self.createDrawBar())
@@ -75,6 +78,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.updateWindowTitle()
         self.statusBar().showMessage('Ready')
+
+        self.fileNameChanged.connect(self.updateWindowTitle)
 
     def getGeometry(self) -> QtCore.QRect:
         screen = QtWidgets.QDesktopWidget().availableGeometry()
@@ -311,10 +316,12 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
 
     def hasFile(self) -> bool:
-        return self.fileName is not None
+        return bool(self.fileName)
 
     def setFileName(self, name: str) -> None:
-        self.fileName = name
+        if name != self.fileName:
+            self.fileName = name
+            self.fileNameChanged.emit(name)
 
     def save(self) -> None:
         if not self.hasFile():
@@ -328,7 +335,6 @@ class MainWindow(QtWidgets.QMainWindow):
         file, _ = FileDialog.getSaveFileName(self, title, '.', options=options)
         if file:
             self.setFileName(file)
-            self.updateWindowTitle()
             self.dump()
 
     def dump(self) -> None:
@@ -392,6 +398,6 @@ class MainWindow(QtWidgets.QMainWindow):
         event.setAccepted(accepted)
 
     def updateWindowTitle(self) -> None:
-        fileName = self.fileName or 'Untitled'
-        title = f'CAD 2D - {fileName}'
+        file = self.fileName or 'Untitled'
+        title = f'CAD 2D - {file}'
         self.setWindowTitle(title)
