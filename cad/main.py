@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import os
+from typing import List
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.logging import logger
+
+
+Point = QtCore.QPointF
+Segment = QtCore.QLineF
 
 
 def iconPath(name: str) -> str:
@@ -422,13 +427,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 class Sketch(QtWidgets.QWidget):
-    mouseMoved = QtCore.Signal(QtCore.QPointF)
-    mousePressed = QtCore.Signal(QtCore.QPointF)
+    mouseMoved = QtCore.Signal(Point)
+    mousePressed = QtCore.Signal(Point)
+
+    segmentAdded = QtCore.Signal(Segment)
 
     def __init__(self, parent: MainWindow):
         super().__init__(parent)
 
+        self.segments: List[Segment] = []
+
         self.setMouseTracking(True)
+
+    def addSegment(self, segment: Segment) -> None:
+        self.segments.append(segment)
+        self.segmentAdded.emit(segment)
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         point = event.localPos()
