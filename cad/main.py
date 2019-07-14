@@ -313,7 +313,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         file, _ = FileDialog.getOpenFileName(self, title, '.', options=options)
         if file:
-            pass
+            self.setFileName(file)
+            self.load()
 
     def hasFile(self) -> bool:
         return bool(self.fileName)
@@ -339,6 +340,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def dump(self) -> None:
         with open(self.fileName, 'w'):
+            pass
+
+    def load(self) -> None:
+        with open(self.fileName, 'r'):
             pass
 
     def undo(self) -> None:
