@@ -1,5 +1,8 @@
+from abc import abstractmethod
+
 import numpy as np
 
+from time import time
 from typing import List
 from scipy.optimize import fsolve
 from PySide2.QtCore import QLineF, QPointF
@@ -49,7 +52,10 @@ def p2s(point: Point, line: Line, rounded: int = ROUNDED) -> float:
 
 
 class Constraint(object):
-    pass
+
+    @abstractmethod
+    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+        pass
 
 
 class LengthConstraint(Constraint):
@@ -71,11 +77,28 @@ class VerticalConstraint(Constraint):
         self.line = line
 
 
-class FixConstraint(Constraint):
+class FixingX(Constraint):
 
-    def __init__(self, point: Point, lock: Point):
+    def __init__(self, point: Point, lock: float):
         self.point = point
         self.lock = lock
+
+    def apply(self, solver, x: list, y: list, n: int):
+        i = solver.points.index(self.point) * 2
+        y[i] += x[n]
+        y[n] = x[i] - self.lock
+
+
+class FixingY(Constraint):
+
+    def __init__(self, point: Point, lock: float):
+        self.point = point
+        self.lock = lock
+
+    def apply(self, solver, x: list, y: list, n: int):
+        i = solver.points.index(self.point) * 2 + 1
+        y[i] += x[n]
+        y[n] = x[i] - self.lock
 
 
 class CoincidentConstraint(Constraint):
@@ -110,21 +133,39 @@ Points = List[Point]
 Constraints = List[Constraint]
 
 
-class System(object):
+class Solver(object):
 
     def __init__(self):
         self.points: Points = []
         self.constraints: Constraints = []
 
     def system(self, x: np.ndarray) -> np.ndarray:
-        return x
+        y = np.zeros(x.shape, x.dtype)
+
+        for i, point in enumerate(self.points):
+            y[i * 2 + 0] = 2 * (x[i * 2 + 0] - point.x())
+            y[i * 2 + 1] = 2 * (x[i * 2 + 1] - point.y())
+
+        n = len(self.points) * 2
+        for i, constraint in enumerate(self.constraints):
+            constraint.apply(self, x, y, n + i)
+
+        return y
+
+    def size(self) -> int:
+        return len(self.points) * 2 + len(self.constraints)
 
     @property
     def x0(self) -> np.ndarray:
-        pass
+        size = self.size()
+        x = np.zeros(size, np.float)
+        for i, point in enumerate(self.points):
+            x[i * 2 + 0] = point.x()
+            x[i * 2 + 1] = point.y()
+        return x
 
     def solve(self) -> np.ndarray:
-        opt = {'maxfev': 1000, 'xtol': 1e-4, 'full_output': True}
+        opt = {'maxfev': 10000, 'xtol': 1e-20, 'full_output': True}
         output = fsolve(self.system, self.x0, **opt)
         solution, info, status, message = output
         if status != 1:
@@ -140,3 +181,35 @@ class SolutionNotFound(Exception):
 
     def __str__(self) -> str:
         return self.message
+
+
+def main():
+    solver = Solver()
+
+    points = [
+        Point(10, 10),
+        Point(10, 20),
+        Point(20, 10),
+        Point(20, 20),
+    ]
+
+    constraints = [
+        # Fixing first point
+        FixingX(points[0], 15),
+        FixingY(points[0], 15),
+
+    ]
+
+    solver.points.extend(points)
+    solver.constraints.extend(constraints)
+
+    return solver.solve()
+
+
+if __name__ == '__main__':
+    start = time()
+    sol = main()
+    stop = time()
+
+    print(sol)
+    print(f'Time: {stop - start}')
