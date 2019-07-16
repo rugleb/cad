@@ -1,4 +1,4 @@
-import math
+import numpy as np
 
 from PySide2.QtCore import QLineF, QPointF
 
@@ -12,7 +12,7 @@ INACCURACY = 2
 
 
 def sqrt(x: float, rounded: int = ROUNDED) -> float:
-    return round(math.sqrt(x), rounded)
+    return np.round(np.sqrt(x), rounded)
 
 
 def p2p(p1: Point, p2: Point, rounded: int = ROUNDED) -> float:
