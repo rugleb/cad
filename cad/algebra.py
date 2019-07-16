@@ -1,5 +1,7 @@
 import numpy as np
 
+from typing import List
+from scipy.optimize import fsolve
 from PySide2.QtCore import QLineF, QPointF
 
 
@@ -44,3 +46,97 @@ def p2s(point: Point, line: Line, rounded: int = ROUNDED) -> float:
             return p2p(point, line.p1())
         return p2p(point, line.p2())
     return dist
+
+
+class Constraint(object):
+    pass
+
+
+class LengthConstraint(Constraint):
+
+    def __init__(self, line: Line, length: float):
+        self.line = line
+        self.length = length
+
+
+class HorizontalConstraint(Constraint):
+
+    def __init__(self, line: Line):
+        self.line = line
+
+
+class VerticalConstraint(Constraint):
+
+    def __init__(self, line: Line):
+        self.line = line
+
+
+class FixConstraint(Constraint):
+
+    def __init__(self, point: Point, lock: Point):
+        self.point = point
+        self.lock = lock
+
+
+class CoincidentConstraint(Constraint):
+
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+
+class ParallelConstraint(Constraint):
+
+    def __init__(self, first: Line, second: Line):
+        self.first = first
+        self.second = second
+
+
+class PerpendicularConstraint(Constraint):
+
+    def __init__(self, first: Line, second: Line):
+        self.first = first
+        self.second = second
+
+
+class AngleConstraint(Constraint):
+
+    def __init__(self, line: Line, angle: float):
+        self.line = line
+        self.angle = angle
+
+
+Points = List[Point]
+Constraints = List[Constraint]
+
+
+class System(object):
+
+    def __init__(self):
+        self.points: Points = []
+        self.constraints: Constraints = []
+
+    def system(self, x: np.ndarray) -> np.ndarray:
+        return x
+
+    @property
+    def x0(self) -> np.ndarray:
+        pass
+
+    def solve(self) -> np.ndarray:
+        opt = {'maxfev': 1000, 'xtol': 1e-4, 'full_output': True}
+        output = fsolve(self.system, self.x0, **opt)
+        solution, info, status, message = output
+        if status != 1:
+            raise SolutionNotFound(info, message)
+        return solution.round(ROUNDED)
+
+
+class SolutionNotFound(Exception):
+
+    def __init__(self, info: dict, message: str):
+        self.info = info
+        self.message = message
+
+    def __str__(self) -> str:
+        return self.message
