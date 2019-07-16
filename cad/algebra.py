@@ -169,18 +169,48 @@ class CoincidentY(Constraint):
         y[n] = x[i2] - x[i1]
 
 
-class ParallelConstraint(Constraint):
-
-    def __init__(self, first: Line, second: Line):
-        self.first = first
-        self.second = second
-
-
 class PerpendicularConstraint(Constraint):
 
-    def __init__(self, first: Line, second: Line):
-        self.first = first
-        self.second = second
+    def __init__(self, p1: Point, p2: Point, p3: Point, p4: Point):
+        self.p1 = p1
+        self.p2 = p2
+        self.p3 = p3
+        self.p4 = p4
+
+    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+        pass
+
+
+class Parallel(Constraint):
+
+    def __init__(self, p1: Point, p2: Point, p3: Point, p4: Point):
+        self.p1 = p1
+        self.p2 = p2
+        self.p3 = p3
+        self.p4 = p4
+
+    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+        i1 = solver.points.index(self.p1) * 2
+        i2 = solver.points.index(self.p2) * 2
+        i3 = solver.points.index(self.p3) * 2
+        i4 = solver.points.index(self.p4) * 2
+
+        ax = x[i2] - x[i1]
+        bx = x[i4] - x[i3]
+        ay = x[i2 + 1] - x[i1 + 1]
+        by = x[i4 + 1] - x[i3 + 1]
+
+        y[i1] -= by * x[n]
+        y[i2] += by * x[n]
+        y[i3] += ay * x[n]
+        y[i4] -= ay * x[n]
+
+        y[i1 + 1] += bx * x[n]
+        y[i2 + 1] -= bx * x[n]
+        y[i3 + 1] -= ax * x[n]
+        y[i4 + 1] += ax * x[n]
+
+        y[n] = ax * by - ay * bx
 
 
 class AngleConstraint(Constraint):
@@ -226,7 +256,7 @@ class Solver(object):
         return x
 
     def solve(self) -> np.ndarray:
-        opt = {'maxfev': 1000, 'xtol': 1e-8, 'full_output': True}
+        opt = {'maxfev': 1000, 'xtol': 1e-4, 'full_output': True}
         output = fsolve(self.system, self.x0, **opt)
         solution, info, status, message = output
         if status != 1:
@@ -248,18 +278,30 @@ def main():
     solver = Solver()
 
     points = [
-        Point(10, 10),
-        Point(15, 15),
-        Point(20, 20),
+        Point(1, 1),  # 0
+        Point(2, 2),  # 1
+        Point(3, 3),  # 2
+        Point(4, 4),  # 3
+        Point(5, 5),  # 4
     ]
 
     constraints = [
-        FixingX(points[0], 15),
-        FixingY(points[0], 15),
-        Horizontal(points[0], points[1]),
-        Length(points[0], points[1], 15),
-        CoincidentX(points[1], points[2]),
-        CoincidentY(points[1], points[2]),
+        FixingY(points[0], 0),
+        FixingX(points[0], 0),
+
+        FixingX(points[1], 0),
+
+        Vertical(points[0], points[1]),
+        Length(points[0], points[1], 10),
+
+        Horizontal(points[1], points[2]),
+        Length(points[1], points[2], 10),
+
+        Length(points[2], points[3], 10),
+        Parallel(points[0], points[1], points[3], points[2]),
+
+        Parallel(points[1], points[2], points[3], points[4]),
+        Length(points[3], points[4], 10),
     ]
 
     solver.points.extend(points)
