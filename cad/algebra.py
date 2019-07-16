@@ -4,7 +4,7 @@ import numpy as np
 
 from time import time
 from typing import List
-from scipy.optimize import fsolve
+from scipy.optimize import fsolve, root
 from PySide2.QtCore import QLineF, QPointF
 
 
@@ -58,23 +58,59 @@ class Constraint(object):
         pass
 
 
-class LengthConstraint(Constraint):
+class Length(Constraint):
 
-    def __init__(self, line: Line, length: float):
-        self.line = line
+    def __init__(self, p1: Point, p2: Point, length: float):
+        self.p1 = p1
+        self.p2 = p2
         self.length = length
 
+    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+        i1 = solver.points.index(self.p1) * 2
+        i2 = solver.points.index(self.p2) * 2
 
-class HorizontalConstraint(Constraint):
+        dx = x[i2 + 0] - x[i1 + 0]
+        dy = x[i2 + 1] - x[i1 + 1]
 
-    def __init__(self, line: Line):
-        self.line = line
+        y[i2] += 2 * x[n] * dx
+        y[i1] -= 2 * x[n] * dx
+
+        y[i2 + 1] += 2 * x[n] * dy
+        y[i1 + 1] -= 2 * x[n] * dy
+
+        y[n] = dx ** 2 + dy ** 2 - self.length ** 2
 
 
-class VerticalConstraint(Constraint):
+class Horizontal(Constraint):
 
-    def __init__(self, line: Line):
-        self.line = line
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+        i1 = solver.points.index(self.p1) * 2 + 1
+        i2 = solver.points.index(self.p2) * 2 + 1
+
+        y[i2] += x[n]
+        y[i1] -= x[n]
+
+        y[n] = x[i2] - x[i1]
+
+
+class Vertical(Constraint):
+
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+        i1 = solver.points.index(self.p1) * 2
+        i2 = solver.points.index(self.p2) * 2
+
+        y[i2] += x[n]
+        y[i1] -= x[n]
+
+        y[n] = x[i2] - x[i1]
 
 
 class FixingX(Constraint):
@@ -101,11 +137,36 @@ class FixingY(Constraint):
         y[n] = x[i] - self.lock
 
 
-class CoincidentConstraint(Constraint):
+class CoincidentX(Constraint):
 
     def __init__(self, p1: Point, p2: Point):
         self.p1 = p1
         self.p2 = p2
+
+    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+        i1 = solver.points.index(self.p1) * 2
+        i2 = solver.points.index(self.p2) * 2
+
+        y[i2] += x[n]
+        y[i1] -= x[n]
+
+        y[n] = x[i2] - x[i1]
+
+
+class CoincidentY(Constraint):
+
+    def __init__(self, p1: Point, p2: Point):
+        self.p1 = p1
+        self.p2 = p2
+
+    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+        i1 = solver.points.index(self.p1) * 2 + 1
+        i2 = solver.points.index(self.p2) * 2 + 1
+
+        y[i2] += x[n]
+        y[i1] -= x[n]
+
+        y[n] = x[i2] - x[i1]
 
 
 class ParallelConstraint(Constraint):
@@ -165,12 +226,12 @@ class Solver(object):
         return x
 
     def solve(self) -> np.ndarray:
-        opt = {'maxfev': 10000, 'xtol': 1e-20, 'full_output': True}
+        opt = {'maxfev': 1000, 'xtol': 1e-8, 'full_output': True}
         output = fsolve(self.system, self.x0, **opt)
         solution, info, status, message = output
         if status != 1:
             raise SolutionNotFound(info, message)
-        return solution.round(ROUNDED)
+        return solution.round()
 
 
 class SolutionNotFound(Exception):
@@ -188,16 +249,17 @@ def main():
 
     points = [
         Point(10, 10),
-        Point(10, 20),
-        Point(20, 10),
+        Point(15, 15),
         Point(20, 20),
     ]
 
     constraints = [
-        # Fixing first point
         FixingX(points[0], 15),
         FixingY(points[0], 15),
-
+        Horizontal(points[0], points[1]),
+        Length(points[0], points[1], 15),
+        CoincidentX(points[1], points[2]),
+        CoincidentY(points[1], points[2]),
     ]
 
     solver.points.extend(points)
