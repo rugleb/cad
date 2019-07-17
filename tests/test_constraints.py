@@ -1,8 +1,8 @@
 import unittest
 
 from cad.algebra import Point, Line, Solver, p2p, angle, angleTo
-from cad.algebra import CoincidentY, CoincidentX, Length, Perpendicular
-from cad.algebra import FixingX, FixingY, Vertical, Horizontal, Parallel
+from cad.algebra import CoincidentY, CoincidentX, Length, Parallel, Angle
+from cad.algebra import FixingX, FixingY, Vertical, Horizontal, Perpendicular
 
 
 class ConstraintTestCase(unittest.TestCase):
@@ -44,6 +44,10 @@ class ConstraintTestCase(unittest.TestCase):
         angle1 = angle(p1, p2, 0)
         angle2 = angle(p3, p4, 0)
         self.assertEqual(angle1, angle2)
+
+    def assertAngle(self, l1: Line, l2: Line, value: float):
+        actual = angleTo(l1, l2, 0)
+        self.assertEqual(actual, value)
 
     def assertPerpendicular(self, p1: Point, p2: Point, p3: Point, p4: Point):
         l1 = Line(p1, p2)
@@ -174,6 +178,28 @@ class PerpendicularConstraintTestCase(ConstraintTestCase):
 
         p1, p2, p3, p4 = self.solver.recount()
         self.assertPerpendicular(p1, p2, p3, p4)
+
+
+class AngleConstraintTestCase(ConstraintTestCase):
+
+    def test_perpendicular(self):
+        p1 = Point(10, 10)
+        p2 = Point(10, 30)
+        p3 = Point(15, 15)
+        p4 = Point(30, 30)
+
+        self.solver.addPoint(p1)
+        self.solver.addPoint(p2)
+        self.solver.addPoint(p3)
+        self.solver.addPoint(p4)
+
+        constraint = Angle(p1, p2, p3, p4, 60)
+        self.solver.addConstraint(constraint)
+
+        p1, p2, p3, p4 = self.solver.recount()
+        l1 = Line(p1, p2)
+        l2 = Line(p3, p4)
+        self.assertAngle(l1, l2, constraint.degrees)
 
 
 if __name__ == '__main__':
