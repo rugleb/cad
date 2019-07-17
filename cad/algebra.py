@@ -56,6 +56,11 @@ def angle(p1: Point, p2: Point, rounded: int = ROUNDED) -> float:
     return np.round(value, rounded)
 
 
+def angleTo(l1: Line, l2: Line, rounded: int = ROUNDED):
+    value = l1.angleTo(l2)
+    return np.round(value, rounded)
+
+
 class Constraint(object):
 
     @abstractmethod
@@ -174,7 +179,7 @@ class CoincidentY(Constraint):
         y[n] = x[i2] - x[i1]
 
 
-class PerpendicularConstraint(Constraint):
+class Perpendicular(Constraint):
 
     def __init__(self, p1: Point, p2: Point, p3: Point, p4: Point):
         self.p1 = p1
@@ -183,7 +188,30 @@ class PerpendicularConstraint(Constraint):
         self.p4 = p4
 
     def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
-        pass
+        i1 = solver.points.index(self.p1) * 2
+        i2 = solver.points.index(self.p2) * 2
+        i3 = solver.points.index(self.p3) * 2
+        i4 = solver.points.index(self.p4) * 2
+
+        ax = x[i1] - x[i2]
+        bx = x[i3] - x[i4]
+        ay = x[i1 + 1] - x[i2 + 1]
+        by = x[i3 + 1] - x[i4 + 1]
+
+        l1 = np.sqrt(ax ** 2 + ay ** 2)
+        l2 = np.sqrt(bx ** 2 + by ** 2)
+
+        y[i1] += x[n] * (ay * (bx * ay - ax * by) / (l1 ** 3 * l2))
+        y[i2] += x[n] * (ay * (ax * by - bx * ay) / (l1 ** 3 * l2))
+        y[i3] += x[n] * (by * (ax * by - bx * ay) / (l1 * l2 ** 3))
+        y[i4] += x[n] * (by * (bx * ay - ax * by) / (l1 * l2 ** 3))
+
+        y[i1 + 1] += x[n] * (ax * (ax * by - bx * ay) / (l1 ** 3 * l2))
+        y[i2 + 1] += x[n] * (ax * (bx * ay - ax * by) / (l1 ** 3 * l2))
+        y[i3 + 1] += x[n] * (bx * (bx * ay - ax * by) / (l1 * l2 ** 3 ))
+        y[i4 + 1] += x[n] * (bx * (ax * by - bx * ay) / (l1 * l2 ** 3 ))
+
+        y[n] = (ax * bx + ay * by) / (l1 * l2)
 
 
 class Parallel(Constraint):
