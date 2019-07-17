@@ -4,7 +4,7 @@ import numpy as np
 
 from time import time
 from typing import List
-from scipy.optimize import fsolve, root
+from scipy.optimize import fsolve
 from PySide2.QtCore import QLineF, QPointF
 
 
@@ -32,8 +32,8 @@ def p2l(point: Point, line: Point, rounded: int = ROUNDED) -> float:
         x1, y1 = line.x1(), line.y1()
         x2, y2 = line.x2(), line.y2()
         square = (y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1
-        dist = abs(square) / line.length()
-        return round(dist, rounded)
+        dist = np.abs(square) / line.length()
+        return np.round(dist, rounded)
     else:
         return p2p(line.p1(), point)
 
@@ -229,6 +229,12 @@ class Solver(object):
     def __init__(self):
         self.points: Points = []
         self.constraints: Constraints = []
+
+    def addPoint(self, point: Point) -> None:
+        self.points.append(point)
+
+    def addConstraint(self, constraint: Constraint) -> None:
+        self.constraints.append(constraint)
 
     def system(self, x: np.ndarray) -> np.ndarray:
         y = np.zeros(x.shape, x.dtype)
