@@ -255,13 +255,20 @@ class Solver(object):
             x[i * 2 + 1] = point.y()
         return x
 
-    def solve(self) -> np.ndarray:
+    def solve(self, rounded: int = ROUNDED) -> np.ndarray:
         opt = {'maxfev': 1000, 'xtol': 1e-4, 'full_output': True}
         output = fsolve(self.system, self.x0, **opt)
         solution, info, status, message = output
         if status != 1:
             raise SolutionNotFound(info, message)
-        return solution.round()
+        return solution.round(rounded)
+
+    def recount(self, rounded: int = ROUNDED) -> Points:
+        solution = self.solve(rounded)
+        for i, point in enumerate(self.points):
+            point.setX(solution[i * 2 + 0])
+            point.setY(solution[i * 2 + 1])
+        return self.points
 
 
 class SolutionNotFound(Exception):
