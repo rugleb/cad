@@ -1,8 +1,8 @@
 import unittest
 
-from cad.algebra import Point, Solver, p2p
+from cad.algebra import Point, Line, Solver, p2p, angle
 from cad.algebra import CoincidentY, CoincidentX, Length
-from cad.algebra import FixingX, FixingY, Vertical, Horizontal
+from cad.algebra import FixingX, FixingY, Vertical, Horizontal, Parallel
 
 
 class ConstraintTestCase(unittest.TestCase):
@@ -39,6 +39,11 @@ class ConstraintTestCase(unittest.TestCase):
 
     def assertHorizontal(self, p1: Point, p2: Point):
         self.assertEqual(p1.y(), p2.y())
+
+    def assertParallel(self, p1: Point, p2: Point, p3: Point, p4: Point):
+        angle1 = angle(p1, p2, 0)
+        angle2 = angle(p3, p4, 0)
+        self.assertEqual(angle1, angle2)
 
 
 class LengthConstraintTestCase(ConstraintTestCase):
@@ -123,6 +128,26 @@ class HorizontalConstraintTestCase(ConstraintTestCase):
 
         p1, p2 = self.solver.recount()
         self.assertHorizontal(p1, p2)
+
+
+class ParallelConstraintTestCase(ConstraintTestCase):
+
+    def test_parallel(self):
+        p1 = Point(10, 10)
+        p2 = Point(30, 30)
+        p3 = Point(13, 28)
+        p4 = Point(25, 27)
+
+        self.solver.addPoint(p1)
+        self.solver.addPoint(p2)
+        self.solver.addPoint(p3)
+        self.solver.addPoint(p4)
+
+        constraint = Parallel(p1, p2, p3, p4)
+        self.solver.addConstraint(constraint)
+
+        p1, p2, p3, p4 = self.solver.recount()
+        self.assertParallel(p1, p2, p3, p4)
 
 
 if __name__ == '__main__':

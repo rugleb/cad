@@ -51,6 +51,11 @@ def p2s(point: Point, line: Line, rounded: int = ROUNDED) -> float:
     return dist
 
 
+def angle(p1: Point, p2: Point, rounded: int = ROUNDED) -> float:
+    value = Line(p1, p2).angle()
+    return np.round(value, rounded)
+
+
 class Constraint(object):
 
     @abstractmethod
@@ -195,20 +200,20 @@ class Parallel(Constraint):
         i3 = solver.points.index(self.p3) * 2
         i4 = solver.points.index(self.p4) * 2
 
-        ax = x[i2] - x[i1]
-        bx = x[i4] - x[i3]
-        ay = x[i2 + 1] - x[i1 + 1]
-        by = x[i4 + 1] - x[i3 + 1]
+        ax = x[i1] - x[i2]
+        bx = x[i3] - x[i4]
+        ay = x[i1 + 1] - x[i2 + 1]
+        by = x[i3 + 1] - x[i4 + 1]
 
-        y[i1] -= by * x[n]
-        y[i2] += by * x[n]
-        y[i3] += ay * x[n]
-        y[i4] -= ay * x[n]
+        y[i1] += x[n] * by
+        y[i2] -= x[n] * by
+        y[i3] -= x[n] * ay
+        y[i4] += x[n] * ay
 
-        y[i1 + 1] += bx * x[n]
-        y[i2 + 1] -= bx * x[n]
-        y[i3 + 1] -= ax * x[n]
-        y[i4 + 1] += ax * x[n]
+        y[i1 + 1] -= x[n] * bx
+        y[i2 + 1] += x[n] * bx
+        y[i3 + 1] += x[n] * ax
+        y[i4 + 1] -= x[n] * ax
 
         y[n] = ax * by - ay * bx
 
