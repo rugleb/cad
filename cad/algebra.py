@@ -51,11 +51,6 @@ def p2s(point: Point, line: Line, rounded: int = ROUNDED) -> float:
     return dist
 
 
-def angle(p1: Point, p2: Point, rounded: int = ROUNDED) -> float:
-    value = Line(p1, p2).angle()
-    return np.round(value, rounded)
-
-
 def angleTo(l1: Line, l2: Line, rounded: int = ROUNDED):
     value = l1.angleTo(l2)
     return np.round(value, rounded)

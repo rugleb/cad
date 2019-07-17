@@ -1,6 +1,8 @@
 import unittest
 
-from cad.algebra import Point, Line, Solver, p2p, angle, angleTo
+from time import time
+
+from cad.algebra import Point, Line, Solver, p2p, angleTo, SolutionNotFound
 from cad.algebra import CoincidentY, CoincidentX, Length, Parallel, Angle
 from cad.algebra import FixingX, FixingY, Vertical, Horizontal, Perpendicular
 
@@ -41,9 +43,10 @@ class ConstraintTestCase(unittest.TestCase):
         self.assertEqual(p1.y(), p2.y())
 
     def assertParallel(self, p1: Point, p2: Point, p3: Point, p4: Point):
-        angle1 = angle(p1, p2, 0)
-        angle2 = angle(p3, p4, 0)
-        self.assertEqual(angle1, angle2)
+        l1 = Line(p1, p2)
+        l2 = Line(p3, p4)
+        value = angleTo(l1, l2, 0)
+        self.assertIn(value, [0, 180, 360])
 
     def assertAngle(self, l1: Line, l2: Line, value: float):
         actual = angleTo(l1, l2, 0)
@@ -53,7 +56,7 @@ class ConstraintTestCase(unittest.TestCase):
         l1 = Line(p1, p2)
         l2 = Line(p3, p4)
         value = angleTo(l1, l2, 0)
-        self.assertEqual(value, 90)
+        self.assertIn(value, [90, 270])
 
 
 class LengthConstraintTestCase(ConstraintTestCase):
@@ -200,6 +203,81 @@ class AngleConstraintTestCase(ConstraintTestCase):
         l1 = Line(p1, p2)
         l2 = Line(p3, p4)
         self.assertAngle(l1, l2, constraint.degrees)
+
+
+class ComplexConstraintsTestCase(ConstraintTestCase):
+
+    def test_constraints(self):
+        points = [
+            Point(i, i) for i in range(9)
+        ]
+
+        constraints = [
+            FixingY(points[0], 0),
+            FixingX(points[0], 0),
+            Vertical(points[0], points[1]),
+            Length(points[0], points[1], 10),
+            CoincidentX(points[1], points[1]),
+            CoincidentY(points[2], points[2]),
+            Horizontal(points[2], points[3]),
+            Length(points[2], points[3], 10),
+            FixingY(points[3], 10),
+            FixingX(points[3], 10),
+            CoincidentY(points[3], points[4]),
+            CoincidentX(points[3], points[4]),
+            Perpendicular(points[2], points[3], points[4], points[5]),
+            CoincidentX(points[5], points[6]),
+            CoincidentY(points[5], points[6]),
+            Horizontal(points[6], points[7]),
+            Length(points[6], points[7], 10),
+            Parallel(points[7], points[8], points[5], points[4]),
+            Horizontal(points[8], points[0]),
+        ]
+
+        self.solver.points.extend(points)
+        self.solver.constraints.extend(constraints)
+
+        start = time()
+        points = self.solver.recount()
+        calc_time = time() - start
+
+        self.assertFixing(points[0], Point(0, 0))
+        self.assertLength(points[0], points[1], 10)
+        self.assertVertical(points[0], points[1])
+        self.assertCoincident(points[1], points[2])
+        self.assertHorizontal(points[2], points[3])
+        self.assertLength(points[2], points[3], 10)
+        self.assertFixing(points[3], Point(10, 10))
+        self.assertPerpendicular(points[2], points[3], points[4], points[5])
+        self.assertCoincident(points[5], points[6])
+        self.assertHorizontal(points[6], points[7])
+        self.assertLength(points[6], points[7], 10)
+        self.assertHorizontal(points[8], points[0])
+        self.assertLength(points[8], points[0], 20)
+
+        self.assertLess(calc_time, 0.05)
+
+
+class SolutionNotFoundTestCase(ConstraintTestCase):
+
+    def test_not_solution(self):
+        p1 = Point(10, 10)
+        p2 = Point(20, 20)
+
+        self.solver.addPoint(p1)
+        self.solver.addPoint(p2)
+
+        self.solver.addConstraint(Length(p1, p2, 20))
+        self.solver.addConstraint(Length(p1, p2, 10))
+
+        with self.assertRaises(SolutionNotFound):
+            self.solver.recount()
+
+        try:
+            self.solver.recount()
+        except SolutionNotFound as e:
+            msg = str(e)
+            self.assertIsInstance(msg, str)
 
 
 if __name__ == '__main__':
