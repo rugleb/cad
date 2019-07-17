@@ -2,7 +2,7 @@ import unittest
 
 from cad.algebra import Point, Solver, p2p
 from cad.algebra import CoincidentY, CoincidentX, Length
-from cad.algebra import FixingX, FixingY
+from cad.algebra import FixingX, FixingY, Vertical
 
 
 class ConstraintTestCase(unittest.TestCase):
@@ -33,6 +33,9 @@ class ConstraintTestCase(unittest.TestCase):
     def assertFixing(self, point: Point, lock: Point):
         self.assertFixingX(point, lock)
         self.assertFixingY(point, lock)
+
+    def assertVertical(self, p1: Point, p2: Point):
+        self.assertEqual(p1.x(), p2.x())
 
 
 class LengthConstraintTestCase(ConstraintTestCase):
@@ -85,6 +88,22 @@ class FixingConstraintTestCase(ConstraintTestCase):
 
         point,  = self.solver.recount()
         self.assertFixing(point, Point(x, y))
+
+
+class VerticalConstraintTestCase(ConstraintTestCase):
+
+    def test_vertical(self):
+        p1 = Point(10, 15)
+        p2 = Point(20, 25)
+
+        self.solver.addPoint(p1)
+        self.solver.addPoint(p2)
+
+        constraint = Vertical(p1, p2)
+        self.solver.addConstraint(constraint)
+
+        p1, p2 = self.solver.recount()
+        self.assertVertical(p1, p2)
 
 
 if __name__ == '__main__':
