@@ -2,7 +2,6 @@ from abc import abstractmethod
 
 import numpy as np
 
-from time import time
 from typing import List
 from scipy.optimize import fsolve
 from PySide2.QtCore import QLineF, QPointF
@@ -11,6 +10,7 @@ from PySide2.QtCore import QLineF, QPointF
 Line = QLineF
 Point = QPointF
 
+Array = np.ndarray
 
 ROUNDED = 2
 INACCURACY = 2
@@ -64,7 +64,7 @@ def angleTo(l1: Line, l2: Line, rounded: int = ROUNDED):
 class Constraint(object):
 
     @abstractmethod
-    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+    def apply(self, solver, x: Array, y: Array, n: int):   # pragma: no cover
         pass
 
 
@@ -75,7 +75,7 @@ class Length(Constraint):
         self.p2 = p2
         self.length = length
 
-    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+    def apply(self, solver, x: Array, y: Array, n: int):
         i1 = solver.points.index(self.p1) * 2
         i2 = solver.points.index(self.p2) * 2
 
@@ -97,7 +97,7 @@ class Horizontal(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+    def apply(self, solver, x: Array, y: Array, n: int):
         i1 = solver.points.index(self.p1) * 2 + 1
         i2 = solver.points.index(self.p2) * 2 + 1
 
@@ -113,7 +113,7 @@ class Vertical(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+    def apply(self, solver, x: Array, y: Array, n: int):
         i1 = solver.points.index(self.p1) * 2
         i2 = solver.points.index(self.p2) * 2
 
@@ -153,7 +153,7 @@ class CoincidentX(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+    def apply(self, solver, x: Array, y: Array, n: int):
         i1 = solver.points.index(self.p1) * 2
         i2 = solver.points.index(self.p2) * 2
 
@@ -169,7 +169,7 @@ class CoincidentY(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+    def apply(self, solver, x: Array, y: Array, n: int):
         i1 = solver.points.index(self.p1) * 2 + 1
         i2 = solver.points.index(self.p2) * 2 + 1
 
@@ -187,7 +187,7 @@ class Parallel(Constraint):
         self.p3 = p3
         self.p4 = p4
 
-    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+    def apply(self, solver, x: Array, y: Array, n: int):
         i1 = solver.points.index(self.p1) * 2
         i2 = solver.points.index(self.p2) * 2
         i3 = solver.points.index(self.p3) * 2
@@ -224,7 +224,7 @@ class Angle(Constraint):
     def radians(self) -> float:
         return np.pi / 180 * self.degrees
 
-    def apply(self, solver, x: np.ndarray, y: np.ndarray, n: int):
+    def apply(self, solver, x: Array, y: Array, n: int):
         i1 = solver.points.index(self.p1) * 2
         i2 = solver.points.index(self.p2) * 2
         i3 = solver.points.index(self.p3) * 2
@@ -273,7 +273,7 @@ class Solver(object):
     def addConstraint(self, constraint: Constraint) -> None:
         self.constraints.append(constraint)
 
-    def system(self, x: np.ndarray) -> np.ndarray:
+    def system(self, x: Array) -> Array:
         y = np.zeros(x.shape, x.dtype)
 
         for i, point in enumerate(self.points):
@@ -290,7 +290,7 @@ class Solver(object):
         return len(self.points) * 2 + len(self.constraints)
 
     @property
-    def x0(self) -> np.ndarray:
+    def x0(self) -> Array:
         size = self.size()
         x = np.zeros(size, np.float)
         for i, point in enumerate(self.points):
@@ -298,7 +298,7 @@ class Solver(object):
             x[i * 2 + 1] = point.y()
         return x
 
-    def solve(self, rounded: int = ROUNDED) -> np.ndarray:
+    def solve(self, rounded: int = ROUNDED) -> Array:
         opt = {'maxfev': 1000, 'xtol': 1e-4, 'full_output': True}
         output = fsolve(self.system, self.x0, **opt)
         solution, info, status, message = output
@@ -322,48 +322,3 @@ class SolutionNotFound(Exception):
 
     def __str__(self) -> str:
         return self.message
-
-
-def main():
-    solver = Solver()
-
-    points = [
-        Point(1, 1),  # 0
-        Point(2, 2),  # 1
-        Point(3, 3),  # 2
-        Point(4, 4),  # 3
-        Point(5, 5),  # 4
-    ]
-
-    constraints = [
-        FixingY(points[0], 0),
-        FixingX(points[0], 0),
-
-        FixingX(points[1], 0),
-
-        Vertical(points[0], points[1]),
-        Length(points[0], points[1], 10),
-
-        Horizontal(points[1], points[2]),
-        Length(points[1], points[2], 10),
-
-        Length(points[2], points[3], 10),
-        Parallel(points[0], points[1], points[3], points[2]),
-
-        Parallel(points[1], points[2], points[3], points[4]),
-        Length(points[3], points[4], 10),
-    ]
-
-    solver.points.extend(points)
-    solver.constraints.extend(constraints)
-
-    return solver.solve()
-
-
-if __name__ == '__main__':
-    start = time()
-    sol = main()
-    stop = time()
-
-    print(sol)
-    print(f'Time: {stop - start}')
