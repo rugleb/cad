@@ -324,9 +324,9 @@ class MainWindow(QtWidgets.QMainWindow):
         title = 'Open file'
         options = FileDialog.DontUseNativeDialog
 
-        file, _ = FileDialog.getOpenFileName(self, title, '.', options=options)
-        if file:
-            self.setFileName(file)
+        name, _ = FileDialog.getOpenFileName(self, title, '.', options=options)
+        if name:
+            self.setFileName(name)
             self.load()
 
     def hasFile(self) -> bool:
@@ -346,9 +346,9 @@ class MainWindow(QtWidgets.QMainWindow):
         title = 'Save file as'
         options = FileDialog.DontUseNativeDialog
 
-        file, _ = FileDialog.getSaveFileName(self, title, '.', options=options)
-        if file:
-            self.setFileName(file)
+        name, _ = FileDialog.getSaveFileName(self, title, '.', options=options)
+        if name:
+            self.setFileName(name)
             self.dump()
 
     def dump(self) -> None:
@@ -446,8 +446,8 @@ class MainWindow(QtWidgets.QMainWindow):
         event.setAccepted(accepted)
 
     def updateWindowTitle(self) -> None:
-        file = self.fileName or 'Untitled'
-        title = f'CAD 2D - {file}'
+        fileName = self.fileName or 'Untitled'
+        title = f'CAD 2D - {fileName}'
         self.setWindowTitle(title)
 
     def updateStatusBar(self, p: QtCore.QPointF) -> None:
