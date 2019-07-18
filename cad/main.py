@@ -428,6 +428,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def vertical(self) -> None:
         self.logger.debug('Vertical action triggered')
 
+        controller = VerticalController(self.sketch)
+        self.sketch.setController(controller)
+
     def horizontal(self) -> None:
         self.logger.debug('Horizontal action triggered')
 
@@ -568,6 +571,17 @@ class FixedController(Controller):
 
 
 class AngleController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class VerticalController(Controller):
 
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
