@@ -398,6 +398,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def parallel(self) -> None:
         self.logger.debug('Parallel action triggered')
 
+        controller = ParallelController(self.sketch)
+        self.sketch.setController(controller)
+
     def perpendicular(self) -> None:
         self.logger.debug('Perpendicular action triggered')
 
@@ -505,4 +508,15 @@ class LineController(Controller):
         pass
 
     def onMouseMoved(self, point: Point) -> None:
+        pass
+
+
+class ParallelController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
         pass
