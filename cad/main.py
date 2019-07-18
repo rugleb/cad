@@ -76,8 +76,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.fileName: str = ''
 
-        sketch = self.createSketch()
-        self.setCentralWidget(sketch)
+        self.sketch = self.createSketch()
+        self.setCentralWidget(self.sketch)
 
         self.addToolBar(self.createDrawBar())
 
@@ -380,8 +380,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def cancel(self) -> None:
         self.logger.debug('Cancel action triggered')
 
+        controller = CancelController(self.sketch)
+        self.sketch.setController(controller)
+
     def point(self) -> None:
         self.logger.debug('Point action triggered')
+
+        controller = PointController(self.sketch)
+        self.sketch.setController(controller)
 
     def line(self) -> None:
         self.logger.debug('Line action triggered')
@@ -439,7 +445,12 @@ class Sketch(QtWidgets.QWidget):
         self.points: List[Point] = []
         self.segments: List[Segment] = []
 
+        self.controller: Controller = Controller(self)
+
         self.setMouseTracking(True)
+
+    def setController(self, controller: Controller) -> None:
+        self.controller = controller
 
     def addPoint(self, point: Point) -> None:
         self.points.append(point)
@@ -456,3 +467,24 @@ class Sketch(QtWidgets.QWidget):
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         point = event.localPos()
         self.mousePressed.emit(point)
+
+
+class Controller(object):
+
+    def __init__(self, sketch: Sketch):
+        self.sketch = sketch
+
+
+class CancelController(Controller):
+    pass
+
+
+class PointController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        self.sketch.addPoint(point)
