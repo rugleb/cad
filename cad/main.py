@@ -404,6 +404,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def perpendicular(self) -> None:
         self.logger.debug('Perpendicular action triggered')
 
+        controller = PerpendicularController(self.sketch)
+        self.sketch.setController(controller)
+
     def coincident(self) -> None:
         self.logger.debug('Coincident action triggered')
 
@@ -512,6 +515,17 @@ class LineController(Controller):
 
 
 class ParallelController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class PerpendicularController(Controller):
 
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
