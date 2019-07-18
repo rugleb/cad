@@ -434,6 +434,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def horizontal(self) -> None:
         self.logger.debug('Horizontal action triggered')
 
+        controller = HorizontalController(self.sketch)
+        self.sketch.setController(controller)
+
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         ask = 'Are you sure you want to quit?'
         title = 'Close application'
@@ -582,6 +585,17 @@ class AngleController(Controller):
 
 
 class VerticalController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class HorizontalController(Controller):
 
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
