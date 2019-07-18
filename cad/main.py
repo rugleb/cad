@@ -392,6 +392,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def line(self) -> None:
         self.logger.debug('Line action triggered')
 
+        controller = LineController(self.sketch)
+        self.sketch.setController(controller)
+
     def parallel(self) -> None:
         self.logger.debug('Parallel action triggered')
 
@@ -488,3 +491,18 @@ class PointController(Controller):
 
     def onMousePressed(self, point: Point) -> None:
         self.sketch.addPoint(point)
+
+
+class LineController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+        self.sketch.mouseMoved.connect(self.onMouseMoved)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+    def onMouseMoved(self, point: Point) -> None:
+        pass
