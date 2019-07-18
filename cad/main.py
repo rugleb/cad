@@ -410,6 +410,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def coincident(self) -> None:
         self.logger.debug('Coincident action triggered')
 
+        controller = CoincidentController(self.sketch)
+        self.sketch.setController(controller)
+
     def fixed(self) -> None:
         self.logger.debug('Fixed action triggered')
 
@@ -526,6 +529,17 @@ class ParallelController(Controller):
 
 
 class PerpendicularController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class CoincidentController(Controller):
 
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
