@@ -1,14 +1,16 @@
 from abc import abstractmethod
+from typing import List
 
 import numpy as np
 
-from typing import List
 from scipy.optimize import fsolve
 from PySide2.QtCore import QLineF, QPointF
 
 
 Line = QLineF
 Point = QPointF
+
+Points = List[Point]
 
 Array = np.ndarray
 
@@ -56,11 +58,14 @@ def angleTo(l1: Line, l2: Line, rounded: int = ROUNDED):
     return np.round(value, rounded)
 
 
-class Constraint(object):
+class Constraint(object):    # pragma: no cover
 
     @abstractmethod
-    def apply(self, solver, x: Array, y: Array, n: int):   # pragma: no cover
+    def apply(self, points: Points, x: Array, y: Array, n: int):
         pass
+
+
+Constraints = List[Constraint]
 
 
 class Length(Constraint):
@@ -70,9 +75,9 @@ class Length(Constraint):
         self.p2 = p2
         self.length = length
 
-    def apply(self, solver, x: Array, y: Array, n: int):
-        i1 = solver.points.index(self.p1) * 2
-        i2 = solver.points.index(self.p2) * 2
+    def apply(self, points: Points, x: Array, y: Array, n: int):
+        i1 = points.index(self.p1) * 2
+        i2 = points.index(self.p2) * 2
 
         dx = x[i2 + 0] - x[i1 + 0]
         dy = x[i2 + 1] - x[i1 + 1]
@@ -92,9 +97,9 @@ class Horizontal(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, solver, x: Array, y: Array, n: int):
-        i1 = solver.points.index(self.p1) * 2 + 1
-        i2 = solver.points.index(self.p2) * 2 + 1
+    def apply(self, points: Points, x: Array, y: Array, n: int):
+        i1 = points.index(self.p1) * 2 + 1
+        i2 = points.index(self.p2) * 2 + 1
 
         y[i2] += x[n]
         y[i1] -= x[n]
@@ -108,9 +113,9 @@ class Vertical(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, solver, x: Array, y: Array, n: int):
-        i1 = solver.points.index(self.p1) * 2
-        i2 = solver.points.index(self.p2) * 2
+    def apply(self, points: Points, x: Array, y: Array, n: int):
+        i1 = points.index(self.p1) * 2
+        i2 = points.index(self.p2) * 2
 
         y[i2] += x[n]
         y[i1] -= x[n]
@@ -124,9 +129,11 @@ class FixingX(Constraint):
         self.point = point
         self.lock = lock
 
-    def apply(self, solver, x: list, y: list, n: int):
-        i = solver.points.index(self.point) * 2
+    def apply(self, points: Points, x: list, y: list, n: int):
+        i = points.index(self.point) * 2
+
         y[i] += x[n]
+
         y[n] = x[i] - self.lock
 
 
@@ -136,9 +143,11 @@ class FixingY(Constraint):
         self.point = point
         self.lock = lock
 
-    def apply(self, solver, x: list, y: list, n: int):
-        i = solver.points.index(self.point) * 2 + 1
+    def apply(self, points: Points, x: list, y: list, n: int):
+        i = points.index(self.point) * 2 + 1
+
         y[i] += x[n]
+
         y[n] = x[i] - self.lock
 
 
@@ -148,9 +157,9 @@ class CoincidentX(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, solver, x: Array, y: Array, n: int):
-        i1 = solver.points.index(self.p1) * 2
-        i2 = solver.points.index(self.p2) * 2
+    def apply(self, points: Points, x: Array, y: Array, n: int):
+        i1 = points.index(self.p1) * 2
+        i2 = points.index(self.p2) * 2
 
         y[i2] += x[n]
         y[i1] -= x[n]
@@ -164,9 +173,9 @@ class CoincidentY(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, solver, x: Array, y: Array, n: int):
-        i1 = solver.points.index(self.p1) * 2 + 1
-        i2 = solver.points.index(self.p2) * 2 + 1
+    def apply(self, points: Points, x: Array, y: Array, n: int):
+        i1 = points.index(self.p1) * 2 + 1
+        i2 = points.index(self.p2) * 2 + 1
 
         y[i2] += x[n]
         y[i1] -= x[n]
@@ -182,11 +191,11 @@ class Parallel(Constraint):
         self.p3 = p3
         self.p4 = p4
 
-    def apply(self, solver, x: Array, y: Array, n: int):
-        i1 = solver.points.index(self.p1) * 2
-        i2 = solver.points.index(self.p2) * 2
-        i3 = solver.points.index(self.p3) * 2
-        i4 = solver.points.index(self.p4) * 2
+    def apply(self, points: Points, x: Array, y: Array, n: int):
+        i1 = points.index(self.p1) * 2
+        i2 = points.index(self.p2) * 2
+        i3 = points.index(self.p3) * 2
+        i4 = points.index(self.p4) * 2
 
         ax = x[i1] - x[i2]
         bx = x[i3] - x[i4]
@@ -219,11 +228,11 @@ class Angle(Constraint):
     def radians(self) -> float:
         return np.pi / 180 * self.degrees
 
-    def apply(self, solver, x: Array, y: Array, n: int):
-        i1 = solver.points.index(self.p1) * 2
-        i2 = solver.points.index(self.p2) * 2
-        i3 = solver.points.index(self.p3) * 2
-        i4 = solver.points.index(self.p4) * 2
+    def apply(self, points: Points, x: Array, y: Array, n: int):
+        i1 = points.index(self.p1) * 2
+        i2 = points.index(self.p2) * 2
+        i3 = points.index(self.p3) * 2
+        i4 = points.index(self.p4) * 2
 
         ax = x[i1] - x[i2]
         bx = x[i3] - x[i4]
@@ -252,10 +261,6 @@ class Perpendicular(Angle):
         super().__init__(p1, p2, p3, p4, 90)
 
 
-Points = List[Point]
-Constraints = List[Constraint]
-
-
 class Solver(object):
 
     def __init__(self):
@@ -277,7 +282,7 @@ class Solver(object):
 
         n = len(self.points) * 2
         for i, constraint in enumerate(self.constraints):
-            constraint.apply(self, x, y, n + i)
+            constraint.apply(self.points, x, y, n + i)
 
         return y
 
