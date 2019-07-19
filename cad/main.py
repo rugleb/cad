@@ -471,6 +471,8 @@ class Sketch(QtWidgets.QWidget):
 
         self.controller: Controller = Controller(self)
 
+        self.pointAdded.connect(self.repaint)
+
         self.setMouseTracking(True)
 
     def setController(self, controller: Controller) -> None:
@@ -491,6 +493,17 @@ class Sketch(QtWidgets.QWidget):
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         point = event.localPos()
         self.mousePressed.emit(point)
+
+    def paintEvent(self, event: QtGui.QPaintEvent) -> None:
+        self.drawPoints()
+
+    def drawPoints(self) -> None:
+        painter = QtGui.QPainter(self)
+        painter.setPen(QtCore.Qt.NoPen)
+        painter.setBrush(QtGui.QColor(54, 93, 171))
+        painter.setRenderHint(painter.Antialiasing, True)
+        for point in self.points:
+            painter.drawEllipse(point, 6, 6)
 
 
 class Controller(object):
