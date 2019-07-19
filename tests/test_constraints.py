@@ -3,8 +3,8 @@ import unittest
 from time import time
 
 from cad.algebra import Point, Line, Solver, p2p, angleTo, SolutionNotFound
-from cad.algebra import CoincidentY, CoincidentX, Length, Parallel, Angle
-from cad.algebra import FixingX, FixingY, Vertical, Horizontal, Perpendicular
+from cad.constraints import Length, Horizontal, Vertical, FixingX, FixingY, \
+    CoincidentX, CoincidentY, Parallel, Angle, Perpendicular
 
 
 class ConstraintTestCase(unittest.TestCase):
