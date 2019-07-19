@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import List
+from typing import List, Generator
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.logging import logger
@@ -487,6 +487,13 @@ class Sketch(QtWidgets.QWidget):
         self.segments.append(segment)
         self.segmentAdded.emit(segment)
 
+    def getPoints(self) -> Generator:
+        for point in self.points:
+            yield point
+        for segment in self.segments:
+            yield segment.p1()
+            yield segment.p2()
+
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         point = event.localPos()
         self.mouseMoved.emit(point)
@@ -504,11 +511,8 @@ class Sketch(QtWidgets.QWidget):
         painter.setPen(QtCore.Qt.NoPen)
         painter.setBrush(QtGui.QColor(54, 93, 171))
         painter.setRenderHint(painter.Antialiasing, True)
-        for point in self.points:
+        for point in self.getPoints():
             painter.drawEllipse(point, 6, 6)
-        for segment in self.segments:
-            painter.drawEllipse(segment.p1(), 6, 6)
-            painter.drawEllipse(segment.p2(), 6, 6)
 
     def drawSegments(self) -> None:
         pen = QtGui.QPen(QtGui.QColor(54, 93, 171), 3)
