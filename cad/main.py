@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import List, Generator
+from typing import List, Generator, Iterable
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.logging import logger
@@ -456,6 +456,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(message)
 
 
+class Painter(QtGui.QPainter):
+
+    def drawCircle(self, point: Point, radius: int) -> None:
+        self.drawEllipse(point, radius, radius)
+
+    def drawCircles(self, points: Iterable, radius: int) -> None:
+        for point in points:
+            self.drawCircle(point, radius)
+
+
 class Sketch(QtWidgets.QWidget):
     mouseMoved = QtCore.Signal(Point)
     mousePressed = QtCore.Signal(Point)
@@ -507,12 +517,11 @@ class Sketch(QtWidgets.QWidget):
         self.drawSegments()
 
     def drawPoints(self) -> None:
-        painter = QtGui.QPainter(self)
+        painter = Painter(self)
         painter.setPen(QtCore.Qt.NoPen)
         painter.setBrush(QtGui.QColor(54, 93, 171))
-        painter.setRenderHint(painter.Antialiasing, True)
-        for point in self.getPoints():
-            painter.drawEllipse(point, 6, 6)
+        painter.setRenderHint(painter.Antialiasing)
+        painter.drawCircles(self.getPoints(), radius=6)
 
     def drawSegments(self) -> None:
         pen = QtGui.QPen(QtGui.QColor(54, 93, 171), 3)
