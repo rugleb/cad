@@ -472,6 +472,7 @@ class Sketch(QtWidgets.QWidget):
         self.controller: Controller = Controller(self)
 
         self.pointAdded.connect(self.repaint)
+        self.segmentAdded.connect(self.repaint)
 
         self.setMouseTracking(True)
 
@@ -496,6 +497,7 @@ class Sketch(QtWidgets.QWidget):
 
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
         self.drawPoints()
+        self.drawSegments()
 
     def drawPoints(self) -> None:
         painter = QtGui.QPainter(self)
@@ -504,6 +506,16 @@ class Sketch(QtWidgets.QWidget):
         painter.setRenderHint(painter.Antialiasing, True)
         for point in self.points:
             painter.drawEllipse(point, 6, 6)
+        for segment in self.segments:
+            painter.drawEllipse(segment.p1(), 6, 6)
+            painter.drawEllipse(segment.p2(), 6, 6)
+
+    def drawSegments(self) -> None:
+        pen = QtGui.QPen(QtGui.QColor(54, 93, 171), 3)
+        painter = QtGui.QPainter(self)
+        painter.setPen(pen)
+        painter.setRenderHint(painter.Antialiasing, True)
+        painter.drawLines(self.segments)
 
 
 class Controller(object):
@@ -532,14 +544,38 @@ class LineController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.sketch.mousePressed.connect(self.onMousePressed)
+        self.p1 = None
+        self.p2 = None
+
         self.sketch.mouseMoved.connect(self.onMouseMoved)
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def hasP1(self) -> bool:
+        return self.p1 is not None
+
+    def setP1(self, point: Point) -> None:
+        self.p1 = point
+
+        segment = Segment(self.p1, self.p1)
+        self.sketch.addSegment(segment)
+
+    def reset(self) -> None:
+        self.p1 = None
+        self.p2 = None
 
     def onMousePressed(self, point: Point) -> None:
-        pass
+        if not self.hasP1():
+            self.setP1(point)
+        else:
+            self.reset()
 
     def onMouseMoved(self, point: Point) -> None:
-        pass
+        if self.hasP1():
+            try:
+                self.sketch.segments[-1].setP2(point)
+                self.sketch.repaint()
+            except IndexError:
+                pass
 
 
 class ParallelController(Controller):
