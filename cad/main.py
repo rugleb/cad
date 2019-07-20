@@ -557,35 +557,26 @@ class LineController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.p1 = None
-        self.p2 = None
+        self.sketch.mousePressed.connect(self.begin)
 
-        self.sketch.mouseMoved.connect(self.onMouseMoved)
-        self.sketch.mousePressed.connect(self.onMousePressed)
-
-    def hasP1(self) -> bool:
-        return self.p1 is not None
-
-    def setP1(self, point: Point) -> None:
-        self.p1 = point
-
-        segment = Segment(self.p1, self.p1)
+    def begin(self, point: Point) -> None:
+        segment = Segment(point, point)
         self.sketch.addSegment(segment)
 
+        self.sketch.mousePressed.disconnect(self.begin)
+        self.sketch.mousePressed.connect(self.reset)
+
+        self.sketch.mouseMoved.connect(self.repaint)
+
     def reset(self) -> None:
-        self.p1 = None
-        self.p2 = None
+        self.sketch.mouseMoved.disconnect(self.repaint)
 
-    def onMousePressed(self, point: Point) -> None:
-        if not self.hasP1():
-            self.setP1(point)
-        else:
-            self.reset()
+        self.sketch.mousePressed.disconnect(self.reset)
+        self.sketch.mousePressed.connect(self.begin)
 
-    def onMouseMoved(self, point: Point) -> None:
-        if self.hasP1():
-            self.sketch.segments[-1].setP2(point)
-            self.sketch.repaint()
+    def repaint(self, point: Point) -> None:
+        self.sketch.segments[-1].setP2(point)
+        self.sketch.repaint()
 
 
 class ParallelController(Controller):
