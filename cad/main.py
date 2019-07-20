@@ -504,6 +504,10 @@ class Sketch(QtWidgets.QWidget):
             yield segment.p1()
             yield segment.p2()
 
+    def getSegments(self) -> Generator:
+        for segment in self.segments:
+            yield segment
+
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         point = event.localPos()
         self.mouseMoved.emit(point)
@@ -528,7 +532,7 @@ class Sketch(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setPen(pen)
         painter.setRenderHint(painter.Antialiasing, True)
-        painter.drawLines(self.segments)
+        painter.drawLines(self.getSegments())
 
 
 class Controller(object):
