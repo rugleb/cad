@@ -37,7 +37,7 @@ class DistanceTestCase(unittest.TestCase):
             (Line(1, 1, 3, 3), Point(3, 3), 0),
             (Line(1, 1, 3, 3), Point(0, 0), sqrt(2)),
             (Line(1, 1, 3, 3), Point(4, 4), sqrt(2)),
-            (Line(0, 0, 0, 4), Point(4, 3), 4),
+            (Line(0, 0, 0, 2), Point(4, 3), 4),
             (Line(0, 0, 4, 0), Point(3, 4), 4),
             (Line(3, 3, 1, 1), Point(1, 1), 0),
             (Line(3, 3, 1, 1), Point(2, 2), 0),

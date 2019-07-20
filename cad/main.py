@@ -4,7 +4,7 @@ import os
 from typing import List, Generator, Iterable
 from PySide2 import QtWidgets, QtGui, QtCore
 
-from cad.logging import logger
+from cad.log import logger
 
 
 Point = QtCore.QPointF
