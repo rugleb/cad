@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import List
+from typing import List, Generator, Iterable
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.logging import logger
@@ -76,8 +76,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.fileName: str = ''
 
-        sketch = self.createSketch()
-        self.setCentralWidget(sketch)
+        self.sketch = self.createSketch()
+        self.setCentralWidget(self.sketch)
 
         self.addToolBar(self.createDrawBar())
 
@@ -324,9 +324,9 @@ class MainWindow(QtWidgets.QMainWindow):
         title = 'Open file'
         options = FileDialog.DontUseNativeDialog
 
-        file, _ = FileDialog.getOpenFileName(self, title, '.', options=options)
-        if file:
-            self.setFileName(file)
+        name, _ = FileDialog.getOpenFileName(self, title, '.', options=options)
+        if name:
+            self.setFileName(name)
             self.load()
 
     def hasFile(self) -> bool:
@@ -346,9 +346,9 @@ class MainWindow(QtWidgets.QMainWindow):
         title = 'Save file as'
         options = FileDialog.DontUseNativeDialog
 
-        file, _ = FileDialog.getSaveFileName(self, title, '.', options=options)
-        if file:
-            self.setFileName(file)
+        name, _ = FileDialog.getSaveFileName(self, title, '.', options=options)
+        if name:
+            self.setFileName(name)
             self.dump()
 
     def dump(self) -> None:
@@ -380,32 +380,62 @@ class MainWindow(QtWidgets.QMainWindow):
     def cancel(self) -> None:
         self.logger.debug('Cancel action triggered')
 
+        controller = CancelController(self.sketch)
+        self.sketch.setController(controller)
+
     def point(self) -> None:
         self.logger.debug('Point action triggered')
+
+        controller = PointController(self.sketch)
+        self.sketch.setController(controller)
 
     def line(self) -> None:
         self.logger.debug('Line action triggered')
 
+        controller = LineController(self.sketch)
+        self.sketch.setController(controller)
+
     def parallel(self) -> None:
         self.logger.debug('Parallel action triggered')
+
+        controller = ParallelController(self.sketch)
+        self.sketch.setController(controller)
 
     def perpendicular(self) -> None:
         self.logger.debug('Perpendicular action triggered')
 
+        controller = PerpendicularController(self.sketch)
+        self.sketch.setController(controller)
+
     def coincident(self) -> None:
         self.logger.debug('Coincident action triggered')
+
+        controller = CoincidentController(self.sketch)
+        self.sketch.setController(controller)
 
     def fixed(self) -> None:
         self.logger.debug('Fixed action triggered')
 
+        controller = FixedController(self.sketch)
+        self.sketch.setController(controller)
+
     def angle(self) -> None:
         self.logger.debug('Angle action triggered')
+
+        controller = AngleController(self.sketch)
+        self.sketch.setController(controller)
 
     def vertical(self) -> None:
         self.logger.debug('Vertical action triggered')
 
+        controller = VerticalController(self.sketch)
+        self.sketch.setController(controller)
+
     def horizontal(self) -> None:
         self.logger.debug('Horizontal action triggered')
+
+        controller = HorizontalController(self.sketch)
+        self.sketch.setController(controller)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         ask = 'Are you sure you want to quit?'
@@ -416,14 +446,24 @@ class MainWindow(QtWidgets.QMainWindow):
         event.setAccepted(accepted)
 
     def updateWindowTitle(self) -> None:
-        file = self.fileName or 'Untitled'
-        title = f'CAD 2D - {file}'
+        fileName = self.fileName or 'Untitled'
+        title = f'CAD 2D - {fileName}'
         self.setWindowTitle(title)
 
     def updateStatusBar(self, p: QtCore.QPointF) -> None:
         x, y = p.x(), p.y()
         message = f'x: {x}, y: {y}'
         self.statusBar().showMessage(message)
+
+
+class Painter(QtGui.QPainter):
+
+    def drawCircle(self, point: Point, radius: int) -> None:
+        self.drawEllipse(point, radius, radius)
+
+    def drawCircles(self, points: Iterable, radius: int) -> None:
+        for point in points:
+            self.drawCircle(point, radius)
 
 
 class Sketch(QtWidgets.QWidget):
@@ -439,7 +479,15 @@ class Sketch(QtWidgets.QWidget):
         self.points: List[Point] = []
         self.segments: List[Segment] = []
 
+        self.controller: Controller = Controller(self)
+
+        self.pointAdded.connect(self.repaint)
+        self.segmentAdded.connect(self.repaint)
+
         self.setMouseTracking(True)
+
+    def setController(self, controller: Controller) -> None:
+        self.controller = controller
 
     def addPoint(self, point: Point) -> None:
         self.points.append(point)
@@ -449,6 +497,13 @@ class Sketch(QtWidgets.QWidget):
         self.segments.append(segment)
         self.segmentAdded.emit(segment)
 
+    def getPoints(self) -> Generator:
+        for point in self.points:
+            yield point
+        for segment in self.segments:
+            yield segment.p1()
+            yield segment.p2()
+
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         point = event.localPos()
         self.mouseMoved.emit(point)
@@ -456,3 +511,146 @@ class Sketch(QtWidgets.QWidget):
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         point = event.localPos()
         self.mousePressed.emit(point)
+
+    def paintEvent(self, event: QtGui.QPaintEvent) -> None:
+        self.drawPoints()
+        self.drawSegments()
+
+    def drawPoints(self) -> None:
+        painter = Painter(self)
+        painter.setPen(QtCore.Qt.NoPen)
+        painter.setBrush(QtGui.QColor(54, 93, 171))
+        painter.setRenderHint(painter.Antialiasing)
+        painter.drawCircles(self.getPoints(), radius=6)
+
+    def drawSegments(self) -> None:
+        pen = QtGui.QPen(QtGui.QColor(54, 93, 171), 3)
+        painter = QtGui.QPainter(self)
+        painter.setPen(pen)
+        painter.setRenderHint(painter.Antialiasing, True)
+        painter.drawLines(self.segments)
+
+
+class Controller(object):
+
+    def __init__(self, sketch: Sketch):
+        self.sketch = sketch
+
+
+class CancelController(Controller):
+    pass
+
+
+class PointController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        self.sketch.addPoint(point)
+
+
+class LineController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.begin)
+
+    def begin(self, point: Point) -> None:
+        segment = Segment(point, point)
+        self.sketch.addSegment(segment)
+
+        self.sketch.mousePressed.disconnect(self.begin)
+        self.sketch.mousePressed.connect(self.reset)
+
+        self.sketch.mouseMoved.connect(self.repaint)
+
+    def reset(self) -> None:
+        self.sketch.mouseMoved.disconnect(self.repaint)
+
+        self.sketch.mousePressed.disconnect(self.reset)
+        self.sketch.mousePressed.connect(self.begin)
+
+    def repaint(self, point: Point) -> None:
+        self.sketch.segments[-1].setP2(point)
+        self.sketch.repaint()
+
+
+class ParallelController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class PerpendicularController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class CoincidentController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class FixedController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class AngleController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class VerticalController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class HorizontalController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass

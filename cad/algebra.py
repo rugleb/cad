@@ -34,13 +34,10 @@ def p2l(point: Point, line: Point, rounded: int = ROUNDED) -> float:
 
 
 def p2s(point: Point, line: Line, rounded: int = ROUNDED) -> float:
-    dist = p2l(point, line, rounded)
-    if 0. == dist:
-        if line.x1() > line.x2():
-            line = Line(line.p2(), line.p1())
-        if line.x1() <= point.x() <= line.x2():
-            return 0.
-        if point.x() < line.x1():
-            return p2p(point, line.p1())
-        return p2p(point, line.p2())
-    return dist
+    if line.x1() <= point.x() <= line.x2():
+        return p2l(point, line, rounded)
+    if line.x2() <= point.x() <= line.x1():
+        return p2l(point, line, rounded)
+    if line.x2() < point.x():
+        return p2p(line.p2(), point, rounded)
+    return p2p(line.p1(), point, rounded)
