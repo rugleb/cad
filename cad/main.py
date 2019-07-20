@@ -584,11 +584,8 @@ class LineController(Controller):
 
     def onMouseMoved(self, point: Point) -> None:
         if self.hasP1():
-            try:
-                self.sketch.segments[-1].setP2(point)
-                self.sketch.repaint()
-            except IndexError:
-                pass
+            self.sketch.segments[-1].setP2(point)
+            self.sketch.repaint()
 
 
 class ParallelController(Controller):
