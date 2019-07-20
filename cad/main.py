@@ -111,6 +111,7 @@ class MainWindow(QtWidgets.QMainWindow):
         bar.addSeparator()
         bar.addAction(self.createParallelAction(bar))
         bar.addAction(self.createPerpendicularAction(bar))
+        bar.addAction(self.createLengthAction(bar))
         bar.addAction(self.createCoincidentAction(bar))
         bar.addAction(self.createFixedAction(bar))
         bar.addAction(self.createAngleAction(bar))
@@ -161,6 +162,14 @@ class MainWindow(QtWidgets.QMainWindow):
         action.setIcon(Icon(iconPath('perpendicular.png')))
         action.setCheckable(True)
         action.triggered.connect(self.perpendicular)
+        return action
+
+    def createLengthAction(self, bar: ToolBar) -> Action:
+        action = Action('Length constraint', bar)
+        action.setStatusTip('Enable length constraint')
+        action.setIcon(Icon(iconPath('length.png')))
+        action.setCheckable(True)
+        action.triggered.connect(self.length)
         return action
 
     def createCoincidentAction(self, bar: ToolBar) -> Action:
@@ -407,6 +416,12 @@ class MainWindow(QtWidgets.QMainWindow):
         controller = PerpendicularController(self.sketch)
         self.sketch.setController(controller)
 
+    def length(self) -> None:
+        self.logger.debug('Length action triggered')
+
+        controller = LengthController(self.sketch)
+        self.sketch.setController(controller)
+
     def coincident(self) -> None:
         self.logger.debug('Coincident action triggered')
 
@@ -532,7 +547,7 @@ class Sketch(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setPen(pen)
         painter.setRenderHint(painter.Antialiasing, True)
-        painter.drawLines(self.getSegments())
+        painter.drawLines(self.segments)
 
 
 class Controller(object):
@@ -595,6 +610,17 @@ class ParallelController(Controller):
 
 
 class PerpendicularController(Controller):
+
+    def __init__(self, sketch: Sketch):
+        super().__init__(sketch)
+
+        self.sketch.mousePressed.connect(self.onMousePressed)
+
+    def onMousePressed(self, point: Point) -> None:
+        pass
+
+
+class LengthController(Controller):
 
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
