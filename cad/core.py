@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import NewType
 
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
 from PySide2.QtCore import QPointF
@@ -8,6 +9,7 @@ from PySide2.QtCore import QPointF
 Point = QPointF
 Color = QColor
 
+Radius = NewType('Radius', float)
 
 DEFAULT_COLOR = Color(54, 93, 171)
 HIGHLIGHT_COLOR = Color(254,  137, 144)
@@ -26,8 +28,15 @@ class Brush(QBrush):
 
 class Painter(QPainter):
 
-    def drawCircle(self, center: Point, radius: float) -> None:
-        self.drawEllipse(center, radius, radius)
+    def drawCircle(self, center: Point, radius: Radius) -> None:
+        """Draws the circle positioned at center with a given radius.
+
+        :param Point center: Circle center
+        :param Radius radius: Circle radius
+        :return: None
+        """
+
+        return self.drawEllipse(center, radius, radius)
 
 
 class Drawable:
