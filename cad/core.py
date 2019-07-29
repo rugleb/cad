@@ -106,7 +106,7 @@ class Drawable:
         pass
 
     def pen(self) -> Pen:
-        """Returns the Pen class instance.
+        """Return the Pen class instance.
 
         :return: Instance of Pen class
         :rtype: Pen
@@ -115,10 +115,10 @@ class Drawable:
         pass
 
     def brush(self) -> Brush:
-        """Returns the Brush class instance.
+        """Return the Brush class instance.
 
         :return: Instance of Brush class
-        :rtype: Pen
+        :rtype: Brush
         """
 
         pass
