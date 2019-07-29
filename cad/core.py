@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import NewType
 
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
-from PySide2.QtCore import QPointF
+from PySide2.QtCore import QPointF, QObject
 
 Point = QPointF
 Color = QColor
@@ -44,6 +44,15 @@ class Drawable:
 
     This class defines the interface for manipulation of CAD drawable objects.
     """
+
+    def geometry(self) -> QObject:
+        """Return geometry of the object.
+
+        :return: Geometry of the object
+        :rtype: QObject
+        """
+
+        pass
 
     def color(self) -> Color:
         """Return the color of the invoking object.
