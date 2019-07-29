@@ -9,6 +9,13 @@ Point = QPointF
 Color = QColor
 
 
+DEFAULT_COLOR = Color(54, 93, 171)
+HIGHLIGHT_COLOR = Color(254,  137, 144)
+
+DEFAULT_WIDTH = 3.
+HIGHLIGHT_WIDTH = 5.
+
+
 class Pen(QPen):
     pass
 
