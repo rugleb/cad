@@ -42,7 +42,12 @@ class Drawable(ABC):
     This class defines the interface for manipulation of drawable objects.
     """
 
-    @abstractmethod
+    def __init__(self, geometry: QObject):
+        self._geometry = geometry
+
+        self._width = DEFAULT_WIDTH
+        self._color = DEFAULT_COLOR
+
     def geometry(self) -> QObject:
         """Return geometry of the object.
 
@@ -50,9 +55,8 @@ class Drawable(ABC):
         :rtype: QObject
         """
 
-        pass
+        return self._geometry
 
-    @abstractmethod
     def color(self) -> Color:
         """Return the color of the invoking object.
 
@@ -60,9 +64,8 @@ class Drawable(ABC):
         :rtype: QColor
         """
 
-        pass
+        return self._color
 
-    @abstractmethod
     def setColor(self, color: Color) -> None:
         """Edit the color of the object.
 
@@ -70,9 +73,8 @@ class Drawable(ABC):
         :return: None
         """
 
-        pass
+        self._color = color
 
-    @abstractmethod
     def width(self) -> float:
         """Return the drawing brush width of the object.
 
@@ -80,9 +82,8 @@ class Drawable(ABC):
         :rtype: float
         """
 
-        pass
+        return self._width
 
-    @abstractmethod
     def setWidth(self, width: float) -> None:
         """Edit the line width of the object.
 
@@ -90,34 +91,36 @@ class Drawable(ABC):
         :return: None
         """
 
-        pass
+        self._width = width
 
-    @abstractmethod
     def highlight(self) -> None:
         """Highlight the object.
 
         :return: None
         """
 
-        pass
+        self.setWidth(HIGHLIGHT_WIDTH)
+        self.setColor(HIGHLIGHT_COLOR)
 
-    @abstractmethod
     def unHighlight(self) -> None:
         """Unhighlight the invoking object.
 
         :return: None
         """
 
-        pass
+        self.setWidth(DEFAULT_WIDTH)
+        self.setColor(DEFAULT_COLOR)
 
-    @abstractmethod
     def isHighlighted(self) -> bool:
         """Determine if the object is highlighted.
 
         :return: None
         """
 
-        pass
+        if self.width() == HIGHLIGHT_WIDTH:
+            if self.color() == HIGHLIGHT_COLOR:
+                return True
+        return False
 
     @abstractmethod
     def pen(self) -> Pen:
@@ -129,7 +132,6 @@ class Drawable(ABC):
 
         pass
 
-    @abstractmethod
     def brush(self) -> Brush:
         """Return the Brush class instance.
 
@@ -137,7 +139,7 @@ class Drawable(ABC):
         :rtype: Brush
         """
 
-        pass
+        return Brush(self.color())
 
     @abstractmethod
     def draw(self, painter: Painter) -> None:
