@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from abc import abstractmethod
-from typing import NewType
+from abc import abstractmethod, ABC
 
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
-from PySide2.QtCore import QPointF, QObject
+from PySide2.QtCore import QPointF, QObject, Qt
 
 Point = QPointF
 Color = QColor
-
-Radius = NewType('Radius', float)
 
 DEFAULT_COLOR = Color(54, 93, 171)
 HIGHLIGHT_COLOR = Color(254,  137, 144)
@@ -28,7 +25,7 @@ class Brush(QBrush):
 
 class Painter(QPainter):
 
-    def drawCircle(self, center: Point, radius: Radius) -> None:
+    def drawCircle(self, center: Point, radius: float) -> None:
         """Draws the circle positioned at center with a given radius.
 
         :param Point center: Circle center
@@ -39,12 +36,13 @@ class Painter(QPainter):
         return self.drawEllipse(center, radius, radius)
 
 
-class Drawable:
+class Drawable(ABC):
     """The Drawable interface.
 
     This class defines the interface for manipulation of CAD drawable objects.
     """
 
+    @abstractmethod
     def geometry(self) -> QObject:
         """Return geometry of the object.
 
@@ -54,6 +52,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def color(self) -> Color:
         """Return the color of the invoking object.
 
@@ -63,6 +62,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def setColor(self, color: Color) -> None:
         """Edit the color of the object.
 
@@ -72,6 +72,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def width(self) -> float:
         """Return the drawing brush width of the object.
 
@@ -81,6 +82,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def setWidth(self, width: float) -> None:
         """Edit the line width of the object.
 
@@ -90,6 +92,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def highlight(self) -> None:
         """Highlight the object.
 
@@ -98,6 +101,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def unHighlight(self) -> None:
         """Unhighlight the invoking object.
 
@@ -106,6 +110,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def isHighlighted(self) -> bool:
         """Determine if the object is highlighted.
 
@@ -114,6 +119,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def pen(self) -> Pen:
         """Return the Pen class instance.
 
@@ -123,6 +129,7 @@ class Drawable:
 
         pass
 
+    @abstractmethod
     def brush(self) -> Brush:
         """Return the Brush class instance.
 
