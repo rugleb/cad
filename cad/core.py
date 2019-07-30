@@ -117,8 +117,8 @@ class Drawable(ABC):
         :return: None
         """
 
-        if self.width() == HIGHLIGHT_WIDTH:
-            if self.color() == HIGHLIGHT_COLOR:
+        if self.width() is HIGHLIGHT_WIDTH:
+            if self.color() is HIGHLIGHT_COLOR:
                 return True
         return False
 
