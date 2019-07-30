@@ -39,7 +39,7 @@ class Painter(QPainter):
 class Drawable(ABC):
     """The Drawable interface.
 
-    This class defines the interface for manipulation of CAD drawable objects.
+    This class defines the interface for manipulation of drawable objects.
     """
 
     @abstractmethod
