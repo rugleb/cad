@@ -5,8 +5,8 @@ from abc import abstractmethod, ABC
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
 from PySide2.QtCore import QPointF, QObject, Qt
 
-Point = QPointF
 Color = QColor
+Point = QPointF
 
 DEFAULT_COLOR = Color(54, 93, 171)
 HIGHLIGHT_COLOR = Color(254,  137, 144)
@@ -150,3 +150,31 @@ class Drawable(ABC):
         """
 
         pass
+
+
+class SmartPoint(Drawable):
+
+    def pen(self) -> Pen:
+        """Return the Pen class instance.
+
+        :return: Instance of Pen class
+        :rtype: Pen
+        """
+
+        return Qt.NoPen
+
+    def draw(self, painter: Painter) -> None:
+        """Draws the object by given Painter.
+
+        :param Painter painter:
+        :return: None
+        """
+
+        pen = self.pen()
+        brush = self.brush()
+        center = self.geometry()
+        radius = self.width()
+
+        painter.setPen(pen)
+        painter.setBrush(brush)
+        painter.drawCircle(center, radius)
