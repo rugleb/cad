@@ -81,7 +81,7 @@ class Drawable:
 
         pass
 
-    def setWidth(self, width: float) -> float:
+    def setWidth(self, width: float) -> None:
         """Edit the line width of the object.
 
         :param float width: New brush width
