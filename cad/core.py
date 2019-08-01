@@ -6,14 +6,9 @@ from enum import Enum
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
 from PySide2.QtCore import QPointF, QObject, Qt
 
+
 Color = QColor
 Point = QPointF
-
-DEFAULT_COLOR = Color(54, 93, 171)
-HIGHLIGHT_COLOR = Color(254,  137, 144)
-
-DEFAULT_WIDTH = 3.
-HIGHLIGHT_WIDTH = 5.
 
 
 class Pen(QPen):
@@ -175,7 +170,7 @@ class SmartPoint(Drawable):
         return Qt.NoPen
 
     def draw(self, painter: Painter) -> None:
-        """Draws the object by given Painter.
+        """Draws the Point by given Painter.
 
         :param Painter painter:
         :return: None
