@@ -19,23 +19,6 @@ class Brush(QBrush):
     pass
 
 
-class DrawStyle(Enum):
-    """This enum type defines the drawing styles used in this CAD.
-
-    For uniformity of display of objects, it is necessary to use
-    only those styles which are described in this class.
-    """
-
-    def __new__(cls, color: Color, width: float):
-        obj = object.__new__(cls)
-        obj.width = width
-        obj.color = color
-        return obj
-
-    Default = Color(54, 93, 171), 5         # default drawing style
-    Highlight = Color(254,  137, 144), 3    # style for selected objects
-
-
 class Painter(QPainter):
 
     def drawCircle(self, center: Point, radius: float) -> None:
@@ -49,17 +32,34 @@ class Painter(QPainter):
         return self.drawEllipse(center, radius, radius)
 
 
+class DrawStyle(Enum):
+    """This enum type defines the drawing styles used in this CAD.
+
+    For uniformity of display of objects, it is necessary to use
+    only those styles which are described in this class.
+    """
+
+    def __new__(cls, color: Color, width: float):
+        obj = object.__new__(cls)
+        obj.width = width
+        obj.color = color
+        return obj
+
+    Default = Color(54, 93, 171), 5.         # default drawing style
+    Highlight = Color(254,  137, 144), 3.    # style for selected objects
+
+
 class Drawable(ABC):
     """The Drawable interface.
 
     This class defines the interface for manipulation of drawable objects.
     """
 
-    def __init__(self, geometry: QObject):
+    def __init__(self, geometry: QObject, style: DrawStyle):
         self._geometry = geometry
+        self._style = style
 
-        self._style = DrawStyle.Default
-
+    @property
     def geometry(self) -> QObject:
         """Return geometry of the object.
 
@@ -69,6 +69,7 @@ class Drawable(ABC):
 
         return self._geometry
 
+    @property
     def style(self) -> DrawStyle:
         """Return the drawing style of the object.
 
@@ -86,6 +87,7 @@ class Drawable(ABC):
 
         self._style = style
 
+    @property
     def color(self) -> Color:
         """Return the color of the invoking object.
 
@@ -93,8 +95,9 @@ class Drawable(ABC):
         :rtype: QColor
         """
 
-        return self.style().color
+        return self.style.color
 
+    @property
     def width(self) -> float:
         """Return the drawing brush width of the object.
 
@@ -102,7 +105,7 @@ class Drawable(ABC):
         :rtype: float
         """
 
-        return self.style().width
+        return self.style.width
 
     def highlight(self) -> None:
         """Highlight the object.
@@ -126,9 +129,9 @@ class Drawable(ABC):
         :return: None
         """
 
-        return self.style() is DrawStyle.Highlight
+        return self.style is DrawStyle.Highlight
 
-    @abstractmethod
+    @property
     def pen(self) -> Pen:
         """Return the Pen class instance.
 
@@ -136,8 +139,9 @@ class Drawable(ABC):
         :rtype: Pen
         """
 
-        pass
+        return Qt.NoPen
 
+    @property
     def brush(self) -> Brush:
         """Return the Brush class instance.
 
@@ -145,7 +149,7 @@ class Drawable(ABC):
         :rtype: Brush
         """
 
-        return Brush(self.color())
+        return Brush(self.color)
 
     @abstractmethod
     def draw(self, painter: Painter) -> None:
@@ -160,6 +164,7 @@ class Drawable(ABC):
 
 class SmartPoint(Drawable):
 
+    @property
     def pen(self) -> Pen:
         """Return the Pen class instance.
 
@@ -169,6 +174,26 @@ class SmartPoint(Drawable):
 
         return Qt.NoPen
 
+    @property
+    def point(self) -> Point:
+        """Alias for geometry property.
+
+        :return: Instance of Point class
+        :rtype: Point
+        """
+
+        return self.geometry
+
+    @property
+    def radius(self) -> float:
+        """Returns the radius of the drawing brush.
+
+        :return: Drawing brush radius
+        :rtype: float
+        """
+
+        return self.width * 2
+
     def draw(self, painter: Painter) -> None:
         """Draws the Point by given Painter.
 
@@ -176,14 +201,9 @@ class SmartPoint(Drawable):
         :return: None
         """
 
-        pen = self.pen()
-        brush = self.brush()
-        center = self.geometry()
-        radius = self.width()
-
-        painter.setPen(pen)
-        painter.setBrush(brush)
-        painter.drawCircle(center, radius)
+        painter.setPen(self.pen)
+        painter.setBrush(self.brush)
+        painter.drawCircle(self.point, self.radius)
 
 
 class SmartSegment(Drawable):
@@ -195,9 +215,17 @@ class SmartSegment(Drawable):
         :rtype: Pen
         """
 
-        color = self.color()
-        width = self.width()
-        return Pen(color, width)
+        return Pen(self.color, self.width)
+
+    @property
+    def segment(self) -> Segment:
+        """Alias for geometry property.
+
+        :return: Instance of Segment class
+        :rtype: Segment
+        """
+
+        return self.geometry
 
     def draw(self, painter: Painter) -> None:
         """Draws the Segment by given Painter.
@@ -206,8 +234,5 @@ class SmartSegment(Drawable):
         :return: None
         """
 
-        pen = self.pen()
-        segment = self.geometry()
-
-        painter.setPen(pen)
-        painter.drawLine(segment)
+        painter.setPen(self.pen)
+        painter.drawLine(self.segment)
