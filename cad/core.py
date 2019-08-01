@@ -4,11 +4,11 @@ from abc import abstractmethod, ABC
 from enum import Enum
 
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
-from PySide2.QtCore import QPointF, QObject, Qt
-
+from PySide2.QtCore import QPointF, QObject, Qt, QLineF
 
 Color = QColor
 Point = QPointF
+Segment = QLineF
 
 
 class Pen(QPen):
@@ -184,3 +184,30 @@ class SmartPoint(Drawable):
         painter.setPen(pen)
         painter.setBrush(brush)
         painter.drawCircle(center, radius)
+
+
+class SmartSegment(Drawable):
+
+    def pen(self) -> Pen:
+        """Return the Pen class instance.
+
+        :return: Instance of Pen class
+        :rtype: Pen
+        """
+
+        color = self.color()
+        width = self.width()
+        return Pen(color, width)
+
+    def draw(self, painter: Painter) -> None:
+        """Draws the Segment by given Painter.
+
+        :param Painter painter:
+        :return: None
+        """
+
+        pen = self.pen()
+        segment = self.geometry()
+
+        painter.setPen(pen)
+        painter.drawLine(segment)
