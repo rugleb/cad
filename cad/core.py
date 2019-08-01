@@ -63,9 +63,6 @@ class Drawable(ABC):
     def __init__(self, geometry: QObject):
         self._geometry = geometry
 
-        self._width = DEFAULT_WIDTH
-        self._color = DEFAULT_COLOR
-
         self._style = DrawStyle.Default
 
     def geometry(self) -> QObject:
@@ -86,7 +83,7 @@ class Drawable(ABC):
 
         return self._style
 
-    def setStyle(self, style: DrawStyle):
+    def setStyle(self, style: DrawStyle) -> None:
         """Edit the drawing style of the object.
 
         :return: None
@@ -101,16 +98,7 @@ class Drawable(ABC):
         :rtype: QColor
         """
 
-        return self._color
-
-    def setColor(self, color: Color) -> None:
-        """Edit the color of the object.
-
-        :param QColor color: A new color object
-        :return: None
-        """
-
-        self._color = color
+        return self.style().color
 
     def width(self) -> float:
         """Return the drawing brush width of the object.
@@ -119,16 +107,7 @@ class Drawable(ABC):
         :rtype: float
         """
 
-        return self._width
-
-    def setWidth(self, width: float) -> None:
-        """Edit the line width of the object.
-
-        :param float width: New brush width
-        :return: None
-        """
-
-        self._width = width
+        return self.style().width
 
     def highlight(self) -> None:
         """Highlight the object.
