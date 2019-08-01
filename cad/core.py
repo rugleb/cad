@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
+from enum import Enum
 
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
 from PySide2.QtCore import QPointF, QObject, Qt
@@ -21,6 +22,23 @@ class Pen(QPen):
 
 class Brush(QBrush):
     pass
+
+
+class DrawStyle(Enum):
+    """This enum type defines the drawing styles used in this CAD.
+
+    For uniformity of display of objects, it is necessary to use
+    only those styles which are described in this class.
+    """
+
+    def __new__(cls, color: Color, width: float):
+        obj = object.__new__(cls)
+        obj.width = width
+        obj.color = color
+        return obj
+
+    Default = Color(54, 93, 171), 5         # default drawing style
+    Highlight = Color(254,  137, 144), 3    # style for selected objects
 
 
 class Painter(QPainter):
