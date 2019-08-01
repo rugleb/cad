@@ -66,6 +66,8 @@ class Drawable(ABC):
         self._width = DEFAULT_WIDTH
         self._color = DEFAULT_COLOR
 
+        self._style = DrawStyle.Default
+
     def geometry(self) -> QObject:
         """Return geometry of the object.
 
@@ -74,6 +76,23 @@ class Drawable(ABC):
         """
 
         return self._geometry
+
+    def style(self) -> DrawStyle:
+        """Return the drawing style of the object.
+
+        :return: Drawing style
+        :rtype: DrawStyle
+        """
+
+        return self._style
+
+    def setStyle(self, style: DrawStyle):
+        """Edit the drawing style of the object.
+
+        :return: None
+        """
+
+        self._style = style
 
     def color(self) -> Color:
         """Return the color of the invoking object.
@@ -117,8 +136,7 @@ class Drawable(ABC):
         :return: None
         """
 
-        self.setWidth(HIGHLIGHT_WIDTH)
-        self.setColor(HIGHLIGHT_COLOR)
+        self.setStyle(DrawStyle.Highlight)
 
     def unHighlight(self) -> None:
         """Unhighlight the invoking object.
@@ -126,8 +144,7 @@ class Drawable(ABC):
         :return: None
         """
 
-        self.setWidth(DEFAULT_WIDTH)
-        self.setColor(DEFAULT_COLOR)
+        self.setStyle(DrawStyle.Default)
 
     def isHighlighted(self) -> bool:
         """Determine if the object is highlighted.
@@ -135,10 +152,7 @@ class Drawable(ABC):
         :return: None
         """
 
-        if self.width() is HIGHLIGHT_WIDTH:
-            if self.color() is HIGHLIGHT_COLOR:
-                return True
-        return False
+        return self.style() is DrawStyle.Highlight
 
     @abstractmethod
     def pen(self) -> Pen:
