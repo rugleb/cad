@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 from enum import Enum
-from typing import Generator, List, Iterator
 
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
 from PySide2.QtCore import QPointF, QObject, Qt, QLineF
@@ -237,16 +236,3 @@ class SmartSegment(Drawable):
 
         painter.setPen(self.pen)
         painter.drawLine(self.segment)
-
-
-class Container(list):
-
-    def first(self) -> SmartPoint:
-        return self[0]
-
-    def last(self) -> SmartPoint:
-        return self[-1]
-
-    def all(self) -> Generator:
-        for i in self:
-            yield i
