@@ -31,6 +31,15 @@ class Painter(QPainter):
 
         return self.drawEllipse(center, radius, radius)
 
+    def drawSegment(self, segment: Segment) -> None:
+        """Draws a segment using the current pen.
+
+        :param Segment segment:
+        :return: None
+        """
+
+        return self.drawLine(segment)
+
 
 class DrawStyle(Enum):
     """This enum type defines the drawing styles used in this CAD.
@@ -235,4 +244,4 @@ class SmartSegment(Drawable):
         """
 
         painter.setPen(self.pen)
-        painter.drawLine(self.segment)
+        painter.drawSegment(self.segment)
