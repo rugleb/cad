@@ -1,4 +1,4 @@
-from cad.core import Segment, Point, Line
+from cad.core import Segment, Point
 
 
 def dotProduct(p1: Point, p2: Point) -> float:
@@ -22,14 +22,14 @@ def p2p(p1: Point, p2: Point) -> float:
     :rtype: float
     """
 
-    return Line(p1, p2).length()
+    return Segment(p1, p2).length()
 
 
-def p2l(point: Point, line: Line) -> float:
+def p2l(point: Point, line: Segment) -> float:
     """Returns the distance between point and line.
 
     :param Point point:
-    :param Line line:
+    :param Segment line:
     :return: distance between point and line
     :rtype: float
     """
