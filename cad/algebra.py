@@ -7,7 +7,6 @@ def dotProduct(p1: Point, p2: Point) -> float:
     :param Point p1: First point
     :param Point p2: Second point
     :return: Dot product of p1 and p2
-    :rtype: float
     """
 
     return Point.dotProduct(p1, p2)
@@ -16,31 +15,29 @@ def dotProduct(p1: Point, p2: Point) -> float:
 def p2p(p1: Point, p2: Point) -> float:
     """Returns the distance between two points.
 
-    :param Point p1: Starting point
-    :param Point p2: Ending point
-    :return: distance between two points
-    :rtype: float
+    :param Point p1: First point
+    :param Point p2: Second point
+    :return: Distance between two points
     """
 
     return Segment(p1, p2).length()
 
 
-def p2l(point: Point, line: Segment) -> float:
+def p2l(point: Point, segment: Segment) -> float:
     """Returns the distance between point and line.
 
     :param Point point:
-    :param Segment line:
-    :return: distance between point and line
-    :rtype: float
+    :param Segment segment:
+    :return: Distance between point and line
     """
 
-    if line.length() > 0:
+    if segment.length() > 0:
         x0, y0 = point.toTuple()
-        x1, y1, x2, y2 = line.toTuple()
+        x1, y1, x2, y2 = segment.toTuple()
         square = (y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1
-        return abs(square) / line.length()
+        return abs(square) / segment.length()
 
-    return p2p(line.p1(), point)
+    return p2p(segment.p1(), point)
 
 
 def p2s(point: Point, segment: Segment) -> float:
@@ -48,8 +45,7 @@ def p2s(point: Point, segment: Segment) -> float:
 
     :param Point point:
     :param Segment segment:
-    :return: distance between point and segment
-    :rtype: float
+    :return: Distance between point and segment
     """
 
     p1, p2 = segment.points()
@@ -75,7 +71,6 @@ def angle(s1: Segment, s2: Segment) -> float:
     :param Segment s1:
     :param Segment s2:
     :return: Angle between s1 and s2
-    :rtype: float
     """
 
     return s1.angleTo(s2)
