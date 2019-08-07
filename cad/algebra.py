@@ -1,10 +1,4 @@
-import numpy as np
-
 from cad.core import Segment, Point, Line
-
-
-def sqrt(x: float) -> float:
-    return np.sqrt(x)
 
 
 def dotProduct(p1: Point, p2: Point) -> float:
