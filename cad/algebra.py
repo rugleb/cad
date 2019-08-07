@@ -1,15 +1,22 @@
 import numpy as np
 
-from PySide2.QtCore import QLineF, QPointF
-
-from cad.core import Segment
-
-Line = QLineF
-Point = QPointF
+from cad.core import Segment, Point, Line
 
 
 def sqrt(x: float) -> float:
     return np.sqrt(x)
+
+
+def dotProduct(p1: Point, p2: Point) -> float:
+    """Returns the dot product of p1 and p2.
+
+    :param Point p1: First point
+    :param Point p2: Second point
+    :return: Dot product of p1 and p2
+    :rtype: float
+    """
+
+    return Point.dotProduct(p1, p2)
 
 
 def p2p(p1: Point, p2: Point) -> float:
@@ -37,7 +44,7 @@ def p2l(point: Point, line: Line) -> float:
         x0, y0 = point.toTuple()
         x1, y1, x2, y2 = line.toTuple()
         square = (y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1
-        return np.abs(square) / line.length()
+        return abs(square) / line.length()
 
     return p2p(line.p1(), point)
 

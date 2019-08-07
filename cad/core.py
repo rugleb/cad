@@ -8,6 +8,7 @@ from PySide2.QtCore import QPointF, QObject, Qt, QLineF
 
 Color = QColor
 Point = QPointF
+Line = QLineF
 
 
 class Segment(QLineF):
