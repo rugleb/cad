@@ -2,11 +2,9 @@ from abc import abstractmethod
 from typing import List
 
 import numpy as np
-from PySide2.QtCore import QLineF, QPointF
 
+from cad.core import Point
 
-Line = QLineF
-Point = QPointF
 Points = List[Point]
 
 Array = np.ndarray
