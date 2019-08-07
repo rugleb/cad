@@ -8,7 +8,40 @@ from PySide2.QtCore import QPointF, QObject, Qt, QLineF
 
 Color = QColor
 Point = QPointF
-Segment = QLineF
+Line = QLineF
+
+
+class Segment(QLineF):
+    """The Segment class represents a two-dimensional segment
+    on a plane using floating-point precision.
+    """
+
+    def isVertical(self) -> bool:
+        """Checks if the segment is vertical.
+
+        :return: Vertical or not
+        :rtype: bool
+        """
+
+        return self.x1() == self.x2()
+
+    def isHorizontal(self) -> bool:
+        """Checks if the segment is horizontal.
+
+        :return: Horizontal or not
+        :rtype: bool
+        """
+
+        return self.y1() == self.y2()
+
+    def points(self) -> tuple:
+        """Returns the tuple of points.
+
+        :return: Segment points
+        :rtype: tuple
+        """
+
+        return self.p1(), self.p2()
 
 
 class Pen(QPen):

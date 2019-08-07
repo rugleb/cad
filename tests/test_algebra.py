@@ -1,57 +1,113 @@
 import unittest
 
-from cad.algebra import Point, Line, p2p, p2l, p2s, sqrt
+import numpy as np
+
+from cad.algebra import Point, Segment, p2p, p2l, p2s, angle
 
 
-class DistanceTestCase(unittest.TestCase):
+class AlgebraTestCase(unittest.TestCase):
 
-    def test_point_2_point_method(self):
+    def assertClose(self, expected: float, actual: float):
+        message = f'Values are not close: {expected} !~ {actual}.'
+        expr = np.isclose(expected, actual)
+        self.assertTrue(expr, message)
+
+    def test_p2p_method(self):
         cases = [
             (Point(0, 0), Point(5, 0), 5),
             (Point(0, 0), Point(0, 5), 5),
-            (Point(0, 0), Point(5, 5), sqrt(50, 2)),
-            (Point(5, 5), Point(0, 0), sqrt(50, 2)),
+            (Point(0, 0), Point(5, 5), np.sqrt(50)),
+            (Point(5, 5), Point(0, 0), np.sqrt(50)),
         ]
 
         for p1, p2, expected in cases:
             actual = p2p(p1, p2)
-            self.assertEqual(expected, actual)
+            self.assertClose(expected, actual)
 
-    def test_point_2_line_method(self):
+    def test_p2l_method(self):
         cases = [
-            (Line(0, 0, 5, 5), Point(0, 0), 0),
-            (Line(0, 0, 5, 5), Point(5, 5), 0),
-            (Line(4, 4, 4, 0), Point(0, 4), 4),
-            (Line(1, 1, 2, 2), Point(0, 0), 0),
-            (Line(4, 4, 4, 4), Point(5, 5), sqrt(2)),
+            (Point(0, 0), Segment(1, 1, 1, 1), np.sqrt(2)),
+            (Point(2, 2), Segment(1, 1, 1, 1), np.sqrt(2)),
+
+            # diagonal segment
+            (Point(0, 0), Segment(1, 1, 2, 2), 0),
+            (Point(1, 1), Segment(1, 1, 2, 2), 0),
+            (Point(2, 2), Segment(1, 1, 2, 2), 0),
+            (Point(3, 3), Segment(1, 1, 2, 2), 0),
+            (Point(1, 0), Segment(1, 1, 2, 2), np.sqrt(2) / 2),
+            (Point(2, 3), Segment(1, 1, 2, 2), np.sqrt(2) / 2),
+
+            # vertical segment
+            (Point(1, 0), Segment(1, 1, 1, 2), 0),
+            (Point(1, 1), Segment(1, 1, 1, 2), 0),
+            (Point(1, 2), Segment(1, 1, 1, 2), 0),
+            (Point(1, 3), Segment(1, 1, 1, 2), 0),
+            (Point(0, 0), Segment(1, 1, 1, 2), 1),
+            (Point(2, 2), Segment(1, 1, 1, 2), 1),
+
+            # horizontal segment
+            (Point(0, 1), Segment(1, 1, 2, 1), 0),
+            (Point(1, 1), Segment(1, 1, 2, 1), 0),
+            (Point(2, 1), Segment(1, 1, 2, 1), 0),
+            (Point(3, 1), Segment(1, 1, 2, 1), 0),
+            (Point(0, 0), Segment(1, 1, 2, 1), 1),
+            (Point(2, 2), Segment(1, 1, 2, 1), 1),
         ]
 
-        for line, point, expected in cases:
-            actual = p2l(point, line)
-            self.assertEqual(expected, actual)
+        for point, segment, expected in cases:
+            actual = p2l(point, segment)
+            self.assertClose(expected, actual)
 
-    def test_point_2_segment_method(self):
+    def test_p2s_method(self):
         cases = [
-            (Line(1, 1, 3, 3), Point(1, 1), 0),
-            (Line(1, 1, 3, 3), Point(2, 2), 0),
-            (Line(1, 1, 3, 3), Point(3, 3), 0),
-            (Line(1, 1, 3, 3), Point(0, 0), sqrt(2)),
-            (Line(1, 1, 3, 3), Point(4, 4), sqrt(2)),
-            (Line(0, 0, 0, 2), Point(4, 3), 4),
-            (Line(0, 0, 4, 0), Point(3, 4), 4),
-            (Line(3, 3, 1, 1), Point(1, 1), 0),
-            (Line(3, 3, 1, 1), Point(2, 2), 0),
-            (Line(3, 3, 1, 1), Point(3, 3), 0),
-            (Line(3, 3, 1, 1), Point(0, 0), sqrt(2)),
-            (Line(3, 3, 1, 1), Point(4, 4), sqrt(2)),
-            (Line(0, 4, 0, 0), Point(4, 3), 4),
-            (Line(4, 0, 0, 0), Point(3, 4), 4),
-            (Line(0, 3, 3, 0), Point(0, 0), sqrt(18) / 2),
-            (Line(3, 0, 0, 3), Point(0, 0), sqrt(18) / 2),
+            # diagonal segment
+            (Point(0, 0), Segment(1, 1, 2, 2), np.sqrt(2)),
+            (Point(1, 1), Segment(1, 1, 2, 2), 0),
+            (Point(2, 2), Segment(1, 1, 2, 2), 0),
+            (Point(3, 3), Segment(1, 1, 2, 2), np.sqrt(2)),
+            (Point(1, 0), Segment(1, 1, 2, 2), 1),
+            (Point(2, 3), Segment(1, 1, 2, 2), 1),
+
+            (Point(1, 3), Segment(1, 1, 3, 3), np.sqrt(8) / 2),
+            (Point(3, 1), Segment(1, 1, 3, 3), np.sqrt(8) / 2),
+
+            # vertical segment
+            (Point(1, 0), Segment(1, 1, 1, 2), 1),
+            (Point(1, 1), Segment(1, 1, 1, 2), 0),
+            (Point(1, 2), Segment(1, 1, 1, 2), 0),
+            (Point(1, 3), Segment(1, 1, 1, 2), 1),
+            (Point(0, 0), Segment(1, 1, 1, 2), np.sqrt(2)),
+            (Point(2, 3), Segment(1, 1, 1, 2), np.sqrt(2)),
+            (Point(0, 2), Segment(1, 1, 1, 2), 1),
+            (Point(2, 2), Segment(1, 1, 1, 2), 1),
+
+            # # horizontal segment
+            (Point(0, 1), Segment(1, 1, 2, 1), 1),
+            (Point(1, 1), Segment(1, 1, 2, 1), 0),
+            (Point(2, 1), Segment(1, 1, 2, 1), 0),
+            (Point(3, 1), Segment(1, 1, 2, 1), 1),
+            (Point(0, 0), Segment(1, 1, 2, 1), np.sqrt(2)),
+            (Point(3, 2), Segment(1, 1, 2, 1), np.sqrt(2)),
+            (Point(1, 2), Segment(1, 1, 2, 1), 1),
+            (Point(1, 0), Segment(1, 1, 2, 1), 1),
         ]
 
-        for line, point, expected in cases:
-            actual = p2s(point, line)
+        for point, segment, expected in cases:
+            actual = p2s(point, segment)
+            self.assertClose(expected, actual)
+
+    def test_angle_method(self):
+        cases = [
+            (Segment(0, 0, 5, 0), Segment(0, 0, 5, 0), 0),
+            (Segment(0, 0, 5, 5), Segment(0, 0, 5, 0), 45),
+            (Segment(0, 0, 0, 5), Segment(0, 0, 5, 0), 90),
+            (Segment(5, 0, 0, 0), Segment(0, 0, 5, 0), 180),
+            (Segment(5, 5, 0, 0), Segment(0, 0, 5, 0), 225),
+            (Segment(5, 5, 0, 0), Segment(0, 0, 0, 5), 135),
+        ]
+
+        for s1, s2, expected in cases:
+            actual = angle(s1, s2)
             self.assertEqual(expected, actual)
 
 
