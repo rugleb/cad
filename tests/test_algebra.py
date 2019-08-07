@@ -8,8 +8,9 @@ from cad.algebra import Point, Segment, p2p, p2l, p2s
 class DistanceTestCase(unittest.TestCase):
 
     def assertClose(self, expected: float, actual: float):
+        message = f'Values are not close: {expected} !~ {actual}.'
         expr = np.isclose(expected, actual)
-        self.assertTrue(expr)
+        self.assertTrue(expr, message)
 
     def test_p2p_method(self):
         cases = [
