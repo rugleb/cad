@@ -25,11 +25,29 @@ class DistanceTestCase(unittest.TestCase):
 
     def test_p2l_method(self):
         cases = [
-            (Point(0, 0), Segment(0, 0, 5, 5), 0),
-            (Point(5, 5), Segment(0, 0, 5, 5), 0),
-            (Point(0, 4), Segment(4, 4, 4, 0), 4),
+            # diagonal segment
             (Point(0, 0), Segment(1, 1, 2, 2), 0),
-            (Point(5, 5), Segment(4, 4, 4, 4), np.sqrt(2)),
+            (Point(1, 1), Segment(1, 1, 2, 2), 0),
+            (Point(2, 2), Segment(1, 1, 2, 2), 0),
+            (Point(3, 3), Segment(1, 1, 2, 2), 0),
+            (Point(1, 0), Segment(1, 1, 2, 2), np.sqrt(2) / 2),
+            (Point(2, 3), Segment(1, 1, 2, 2), np.sqrt(2) / 2),
+
+            # vertical segment
+            (Point(1, 0), Segment(1, 1, 1, 2), 0),
+            (Point(1, 1), Segment(1, 1, 1, 2), 0),
+            (Point(1, 2), Segment(1, 1, 1, 2), 0),
+            (Point(1, 3), Segment(1, 1, 1, 2), 0),
+            (Point(0, 0), Segment(1, 1, 1, 2), 1),
+            (Point(2, 2), Segment(1, 1, 1, 2), 1),
+
+            # horizontal segment
+            (Point(0, 1), Segment(1, 1, 2, 1), 0),
+            (Point(1, 1), Segment(1, 1, 2, 1), 0),
+            (Point(2, 1), Segment(1, 1, 2, 1), 0),
+            (Point(3, 1), Segment(1, 1, 2, 1), 0),
+            (Point(0, 0), Segment(1, 1, 2, 1), 1),
+            (Point(2, 2), Segment(1, 1, 2, 1), 1),
         ]
 
         for point, segment, expected in cases:
