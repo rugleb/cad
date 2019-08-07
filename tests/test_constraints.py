@@ -5,7 +5,7 @@ import numpy as np
 from time import time
 
 from cad.solver import Solver, SolutionNotFound
-from cad.algebra import Point, Line, p2p, angle
+from cad.algebra import Point, Segment, p2p, angle
 from cad.constraints import Length, Vertical, FixingX, FixingY, \
     CoincidentX, CoincidentY, Parallel, Angle, Perpendicular, Horizontal
 
@@ -49,18 +49,18 @@ class ConstraintTestCase(unittest.TestCase):
         self.assertClose(p1.y(), p2.y())
 
     def assertParallel(self, p1: Point, p2: Point, p3: Point, p4: Point):
-        l1 = Line(p1, p2)
-        l2 = Line(p3, p4)
+        l1 = Segment(p1, p2)
+        l2 = Segment(p3, p4)
         value = np.round(angle(l1, l2))
         self.assertIn(value, [0, 180, 360])
 
-    def assertAngle(self, l1: Line, l2: Line, value: float):
+    def assertAngle(self, l1: Segment, l2: Segment, value: float):
         actual = angle(l1, l2)
         self.assertClose(actual, value)
 
     def assertPerpendicular(self, p1: Point, p2: Point, p3: Point, p4: Point):
-        l1 = Line(p1, p2)
-        l2 = Line(p3, p4)
+        l1 = Segment(p1, p2)
+        l2 = Segment(p3, p4)
         value = np.round(angle(l1, l2))
         self.assertIn(value, [90, 270])
 
@@ -206,8 +206,8 @@ class AngleConstraintTestCase(ConstraintTestCase):
         self.solver.addConstraint(constraint)
 
         p1, p2, p3, p4 = self.solver.recount()
-        l1 = Line(p1, p2)
-        l2 = Line(p3, p4)
+        l1 = Segment(p1, p2)
+        l2 = Segment(p3, p4)
         self.assertAngle(l1, l2, constraint.degrees)
 
 
