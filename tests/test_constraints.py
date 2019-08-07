@@ -3,7 +3,7 @@ import unittest
 from time import time
 
 from cad.solver import Solver, SolutionNotFound
-from cad.algebra import Point, Line, p2p, angleTo
+from cad.algebra import Point, Line, p2p, angle
 from cad.constraints import Length, Vertical, FixingX, FixingY, \
     CoincidentX, CoincidentY, Parallel, Angle, Perpendicular, Horizontal
 
@@ -46,17 +46,17 @@ class ConstraintTestCase(unittest.TestCase):
     def assertParallel(self, p1: Point, p2: Point, p3: Point, p4: Point):
         l1 = Line(p1, p2)
         l2 = Line(p3, p4)
-        value = angleTo(l1, l2, 0)
+        value = angle(l1, l2, 0)
         self.assertIn(value, [0, 180, 360])
 
     def assertAngle(self, l1: Line, l2: Line, value: float):
-        actual = angleTo(l1, l2, 0)
+        actual = angle(l1, l2, 0)
         self.assertEqual(actual, value)
 
     def assertPerpendicular(self, p1: Point, p2: Point, p3: Point, p4: Point):
         l1 = Line(p1, p2)
         l2 = Line(p3, p4)
-        value = angleTo(l1, l2, 0)
+        value = angle(l1, l2, 0)
         self.assertIn(value, [90, 270])
 
 

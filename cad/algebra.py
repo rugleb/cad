@@ -49,18 +49,30 @@ def p2l(point: Point, line: Line) -> float:
     return p2p(line.p1(), point)
 
 
-def p2s(point: Point, line: Line) -> float:
-    if line.x1() == line.x2():
-        return p2l(point, line)
-    if line.x1() > line.x2():
-        line = Line(line.p2(), line.p1())
-    if line.x1() <= point.x() <= line.x2():
-        return p2l(point, line)
-    if line.x2() < point.x():
-        return p2p(line.p2(), point)
-    return p2p(line.p1(), point)
+def p2s(point: Point, segment: Segment) -> float:
+    """Returns the distance between point and segment.
+
+    :param Point point:
+    :param Segment segment:
+    :return: distance between point and segment
+    :rtype: float
+    """
+
+    if segment.x1() == segment.x2():
+        return p2l(point, segment)
+
+    if segment.x1() > segment.x2():
+        segment = Segment(segment.p2(), segment.p1())
+
+    if segment.x1() <= point.x() <= segment.x2():
+        return p2l(point, segment)
+
+    if segment.x2() < point.x():
+        return p2p(segment.p2(), point)
+
+    return p2p(segment.p1(), point)
 
 
-def angleTo(l1: Line, l2: Line):
+def angle(l1: Line, l2: Line):
     value = l1.angleTo(l2)
     return np.round(value)
