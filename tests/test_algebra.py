@@ -68,6 +68,9 @@ class AlgebraTestCase(unittest.TestCase):
             (Point(1, 0), Segment(1, 1, 2, 2), 1),
             (Point(2, 3), Segment(1, 1, 2, 2), 1),
 
+            (Point(1, 3), Segment(1, 1, 3, 3), np.sqrt(8) / 2),
+            (Point(3, 1), Segment(1, 1, 3, 3), np.sqrt(8) / 2),
+
             # vertical segment
             (Point(1, 0), Segment(1, 1, 1, 2), 1),
             (Point(1, 1), Segment(1, 1, 1, 2), 0),
