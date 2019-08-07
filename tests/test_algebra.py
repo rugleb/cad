@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 from cad.algebra import Point, Line, p2p, p2l, p2s, sqrt
 
 
@@ -9,13 +11,13 @@ class DistanceTestCase(unittest.TestCase):
         cases = [
             (Point(0, 0), Point(5, 0), 5),
             (Point(0, 0), Point(0, 5), 5),
-            (Point(0, 0), Point(5, 5), sqrt(50, 2)),
-            (Point(5, 5), Point(0, 0), sqrt(50, 2)),
+            (Point(0, 0), Point(5, 5), sqrt(50)),
+            (Point(5, 5), Point(0, 0), sqrt(50)),
         ]
 
         for p1, p2, expected in cases:
             actual = p2p(p1, p2)
-            self.assertEqual(expected, actual)
+            self.assertTrue(np.isclose(expected, actual))
 
     def test_point_2_line_method(self):
         cases = [
@@ -28,7 +30,7 @@ class DistanceTestCase(unittest.TestCase):
 
         for line, point, expected in cases:
             actual = p2l(point, line)
-            self.assertEqual(expected, actual)
+            self.assertTrue(np.isclose(expected, actual))
 
     def test_point_2_segment_method(self):
         cases = [
@@ -52,7 +54,7 @@ class DistanceTestCase(unittest.TestCase):
 
         for line, point, expected in cases:
             actual = p2s(point, line)
-            self.assertEqual(expected, actual)
+            self.assertTrue(np.isclose(expected, actual))
 
 
 if __name__ == '__main__':
