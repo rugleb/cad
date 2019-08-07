@@ -56,21 +56,33 @@ class DistanceTestCase(unittest.TestCase):
 
     def test_point_2_segment_method(self):
         cases = [
-            (Point(1, 1), Segment(1, 1, 3, 3), 0),
-            (Point(2, 2), Segment(1, 1, 3, 3), 0),
-            (Point(3, 3), Segment(1, 1, 3, 3), 0),
-            (Point(0, 0), Segment(1, 1, 3, 3), np.sqrt(2)),
-            (Point(4, 4), Segment(1, 1, 3, 3), np.sqrt(2)),
-            (Point(3, 4), Segment(0, 0, 4, 0), 4),
-            (Point(1, 1), Segment(3, 3, 1, 1), 0),
-            (Point(2, 2), Segment(3, 3, 1, 1), 0),
-            (Point(3, 3), Segment(3, 3, 1, 1), 0),
-            (Point(0, 0), Segment(3, 3, 1, 1), np.sqrt(2)),
-            (Point(4, 4), Segment(3, 3, 1, 1), np.sqrt(2)),
-            (Point(4, 3), Segment(0, 4, 0, 0), 4),
-            (Point(3, 4), Segment(4, 0, 0, 0), 4),
-            (Point(0, 0), Segment(0, 3, 3, 0), np.sqrt(18) / 2),
-            (Point(0, 0), Segment(3, 0, 0, 3), np.sqrt(18) / 2),
+            # diagonal segment
+            (Point(0, 0), Segment(1, 1, 2, 2), np.sqrt(2)),
+            (Point(1, 1), Segment(1, 1, 2, 2), 0),
+            (Point(2, 2), Segment(1, 1, 2, 2), 0),
+            (Point(3, 3), Segment(1, 1, 2, 2), np.sqrt(2)),
+            (Point(1, 0), Segment(1, 1, 2, 2), 1),
+            (Point(2, 3), Segment(1, 1, 2, 2), 1),
+
+            # vertical segment
+            (Point(1, 0), Segment(1, 1, 1, 2), 1),
+            (Point(1, 1), Segment(1, 1, 1, 2), 0),
+            (Point(1, 2), Segment(1, 1, 1, 2), 0),
+            (Point(1, 3), Segment(1, 1, 1, 2), 1),
+            (Point(0, 0), Segment(1, 1, 1, 2), np.sqrt(2)),
+            (Point(2, 3), Segment(1, 1, 1, 2), np.sqrt(2)),
+            (Point(0, 2), Segment(1, 1, 1, 2), 1),
+            (Point(2, 2), Segment(1, 1, 1, 2), 1),
+
+            # # horizontal segment
+            (Point(0, 1), Segment(1, 1, 2, 1), 1),
+            (Point(1, 1), Segment(1, 1, 2, 1), 0),
+            (Point(2, 1), Segment(1, 1, 2, 1), 0),
+            (Point(3, 1), Segment(1, 1, 2, 1), 1),
+            (Point(0, 0), Segment(1, 1, 2, 1), np.sqrt(2)),
+            (Point(3, 2), Segment(1, 1, 2, 1), np.sqrt(2)),
+            (Point(1, 2), Segment(1, 1, 2, 1), 1),
+            (Point(1, 0), Segment(1, 1, 2, 1), 1),
         ]
 
         for point, segment, expected in cases:
