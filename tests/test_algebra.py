@@ -26,6 +26,9 @@ class AlgebraTestCase(unittest.TestCase):
 
     def test_p2l_method(self):
         cases = [
+            (Point(0, 0), Segment(1, 1, 1, 1), np.sqrt(2)),
+            (Point(2, 2), Segment(1, 1, 1, 1), np.sqrt(2)),
+
             # diagonal segment
             (Point(0, 0), Segment(1, 1, 2, 2), 0),
             (Point(1, 1), Segment(1, 1, 2, 2), 0),
