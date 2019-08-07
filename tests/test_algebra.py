@@ -55,7 +55,7 @@ class AlgebraTestCase(unittest.TestCase):
             actual = p2l(point, segment)
             self.assertClose(expected, actual)
 
-    def test_point_2_segment_method(self):
+    def test_p2s_method(self):
         cases = [
             # diagonal segment
             (Point(0, 0), Segment(1, 1, 2, 2), np.sqrt(2)),
