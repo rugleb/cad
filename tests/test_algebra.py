@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from cad.algebra import Point, Segment, p2p, p2l, p2s
+from cad.algebra import Point, Segment, p2p, p2l, p2s, angle
 
 
 class AlgebraTestCase(unittest.TestCase):
@@ -89,6 +89,20 @@ class AlgebraTestCase(unittest.TestCase):
         for point, segment, expected in cases:
             actual = p2s(point, segment)
             self.assertClose(expected, actual)
+
+    def test_angle_method(self):
+        cases = [
+            (Segment(0, 0, 5, 0), Segment(0, 0, 5, 0), 0),
+            (Segment(0, 0, 5, 5), Segment(0, 0, 5, 0), 45),
+            (Segment(0, 0, 0, 5), Segment(0, 0, 5, 0), 90),
+            (Segment(5, 0, 0, 0), Segment(0, 0, 5, 0), 180),
+            (Segment(5, 5, 0, 0), Segment(0, 0, 5, 0), 225),
+            (Segment(5, 5, 0, 0), Segment(0, 0, 0, 5), 135),
+        ]
+
+        for s1, s2, expected in cases:
+            actual = angle(s1, s2)
+            self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':
