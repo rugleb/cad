@@ -5,7 +5,7 @@ import numpy as np
 from cad.algebra import Point, Segment, p2p, p2l, p2s
 
 
-class DistanceTestCase(unittest.TestCase):
+class AlgebraTestCase(unittest.TestCase):
 
     def assertClose(self, expected: float, actual: float):
         message = f'Values are not close: {expected} !~ {actual}.'
