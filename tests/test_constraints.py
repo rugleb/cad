@@ -3,60 +3,63 @@ import unittest
 from time import time
 
 from cad.solver import Solver, SolutionNotFound
-from cad.algebra import Point, Line, p2p, angle
+from cad.algebra import Point, Line, p2p, angle, np
 from cad.constraints import Length, Vertical, FixingX, FixingY, \
     CoincidentX, CoincidentY, Parallel, Angle, Perpendicular, Horizontal
 
 
 class ConstraintTestCase(unittest.TestCase):
 
+    def assertClose(self, expected: float, actual: float):
+        self.assertTrue(np.isclose(expected, actual, 1e-1))
+
     def setUp(self) -> None:
         self.solver = Solver()
 
     def assertLength(self, p1: Point, p2: Point, length: float):
         actual = p2p(p1, p2)
-        self.assertEqual(length, actual)
+        self.assertClose(length, actual)
 
     def assertCoincidentX(self, p1: Point, p2: Point):
-        self.assertEqual(p1.x(), p2.x())
+        self.assertClose(p1.x(), p2.x())
 
     def assertCoincidentY(self, p1: Point, p2: Point):
-        self.assertEqual(p1.y(), p2.y())
+        self.assertClose(p1.y(), p2.y())
 
     def assertCoincident(self, p1: Point, p2: Point):
         self.assertCoincidentX(p1, p2)
         self.assertCoincidentY(p1, p2)
 
     def assertFixingX(self, point: Point, lock: Point):
-        self.assertEqual(point.x(), lock.x())
+        self.assertClose(point.x(), lock.x())
 
     def assertFixingY(self, point: Point, lock: Point):
-        self.assertEqual(point.y(), lock.y())
+        self.assertClose(point.y(), lock.y())
 
     def assertFixing(self, point: Point, lock: Point):
         self.assertFixingX(point, lock)
         self.assertFixingY(point, lock)
 
     def assertVertical(self, p1: Point, p2: Point):
-        self.assertEqual(p1.x(), p2.x())
+        self.assertClose(p1.x(), p2.x())
 
     def assertHorizontal(self, p1: Point, p2: Point):
-        self.assertEqual(p1.y(), p2.y())
+        self.assertClose(p1.y(), p2.y())
 
     def assertParallel(self, p1: Point, p2: Point, p3: Point, p4: Point):
         l1 = Line(p1, p2)
         l2 = Line(p3, p4)
-        value = angle(l1, l2, 0)
+        value = np.round(angle(l1, l2))
         self.assertIn(value, [0, 180, 360])
 
     def assertAngle(self, l1: Line, l2: Line, value: float):
-        actual = angle(l1, l2, 0)
-        self.assertEqual(actual, value)
+        actual = angle(l1, l2)
+        self.assertClose(actual, value)
 
     def assertPerpendicular(self, p1: Point, p2: Point, p3: Point, p4: Point):
         l1 = Line(p1, p2)
         l2 = Line(p3, p4)
-        value = angle(l1, l2, 0)
+        value = np.round(angle(l1, l2))
         self.assertIn(value, [90, 270])
 
 
@@ -256,7 +259,7 @@ class ComplexConstraintsTestCase(ConstraintTestCase):
         self.assertHorizontal(points[8], points[0])
         self.assertLength(points[8], points[0], 20)
 
-        self.assertLess(calc_time, 0.05)
+        self.assertLess(calc_time, 0.1)
 
 
 class SolutionNotFoundTestCase(ConstraintTestCase):

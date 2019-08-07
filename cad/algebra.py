@@ -58,19 +58,21 @@ def p2s(point: Point, segment: Segment) -> float:
     :rtype: float
     """
 
-    if segment.x1() == segment.x2():
-        return p2l(point, segment)
+    p1, p2 = segment.points()
 
-    if segment.x1() > segment.x2():
-        segment = Segment(segment.p2(), segment.p1())
+    v = p2 - p1
+    w = point - p1
 
-    if segment.x1() <= point.x() <= segment.x2():
-        return p2l(point, segment)
+    c1 = dotProduct(w, v)
+    if c1 <= 0:
+        return p2p(point, p1)
 
-    if segment.x2() < point.x():
-        return p2p(segment.p2(), point)
+    c2 = dotProduct(v, v)
+    if c2 <= c1:
+        return p2p(point, p2)
 
-    return p2p(segment.p1(), point)
+    p = p1 + c1 / c2 * v
+    return p2p(point, p)
 
 
 def angle(s1: Segment, s2: Segment) -> float:
