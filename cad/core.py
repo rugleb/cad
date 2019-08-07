@@ -34,6 +34,15 @@ class Segment(QLineF):
 
         return self.y1() == self.y2()
 
+    def points(self) -> tuple:
+        """Returns the tuple of points.
+
+        :return: Segment points
+        :rtype: tuple
+        """
+
+        return self.p1(), self.p2()
+
 
 class Pen(QPen):
     pass
