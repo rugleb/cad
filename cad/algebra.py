@@ -73,6 +73,13 @@ def p2s(point: Point, segment: Segment) -> float:
     return p2p(segment.p1(), point)
 
 
-def angle(l1: Line, l2: Line):
-    value = l1.angleTo(l2)
-    return np.round(value)
+def angle(s1: Segment, s2: Segment) -> float:
+    """Returns tha angle between s1 and s2 in degrees.
+
+    :param Segment s1:
+    :param Segment s2:
+    :return: Angle between s1 and s2
+    :rtype: float
+    """
+
+    return s1.angleTo(s2)
