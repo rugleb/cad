@@ -21,6 +21,15 @@ class SegmentTestCase(unittest.TestCase):
         segment = core.Segment(10, 10, 20, 20)
         self.assertFalse(segment.isHorizontal())
 
+    def test_points_method(self):
+        p1 = core.Point(10, 10)
+        p2 = core.Point(20, 20)
+        segment = core.Segment(p1, p2)
+
+        expected = p1, p2
+        actual = segment.points()
+        self.assertEqual(expected, actual)
+
 
 class DrawStyleTestCase(unittest.TestCase):
 
