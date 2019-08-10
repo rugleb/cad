@@ -386,38 +386,6 @@ class SmartSegment(Drawable):
         return p2s(cursor, self.segment) < self.width / 2
 
 
-class PointsCollection:
-
-    def __init__(self):
-        self.points = []
-
-    def size(self) -> int:
-        return len(self.points)
-
-    def isEmpty(self) -> bool:
-        return self.size() == 0
-
-    def isNotEmpty(self) -> bool:
-        return not self.isEmpty()
-
-    def first(self) -> SmartPoint:
-        return self.points[-1]
-
-    def last(self) -> SmartPoint:
-        return self.points[-1]
-
-    def all(self) -> Generator:
-        for point in self.points:
-            yield point
-
-    def create(self, x: float, y: float) -> SmartPoint:
-        geometry = Point(x, y)
-        style = DrawStyle.Default
-        point = SmartPoint(geometry, style)
-        self.points.append(point)
-        return point
-
-
 def dotProduct(p1: Point, p2: Point) -> float:
     """Returns the dot product of p1 and p2.
 
