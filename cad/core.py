@@ -4,8 +4,8 @@ from abc import abstractmethod
 from enum import Enum
 from typing import Generator
 
-from PySide2 import QtCore
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
+from PySide2.QtCore import Signal
 from PySide2.QtCore import QPointF, QObject, Qt, QLineF
 
 
@@ -120,7 +120,7 @@ class Drawable(QObject):
     This class defines the interface for manipulation of drawable objects.
     """
 
-    styleChanged = QtCore.Signal()
+    styleChanged = Signal()
 
     def __init__(self, geometry: QObject, style: DrawStyle):
         super().__init__()
