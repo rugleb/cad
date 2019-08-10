@@ -248,16 +248,6 @@ class SmartPoint(Drawable):
 
         return self.geometry
 
-    @property
-    def radius(self) -> float:
-        """Returns the radius of the drawing brush.
-
-        :return: Drawing brush radius
-        :rtype: float
-        """
-
-        return self.width * 2
-
     def draw(self, painter: Painter) -> None:
         """Draws the Point by given Painter.
 
@@ -267,7 +257,7 @@ class SmartPoint(Drawable):
 
         painter.setPen(self.pen)
         painter.setBrush(self.brush)
-        painter.drawCircle(self.point, self.radius)
+        painter.drawCircle(self.point, self.width)
 
 
 class SmartSegment(Drawable):
