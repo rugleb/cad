@@ -228,6 +228,16 @@ class Drawable(ABC):
 
 class SmartPoint(Drawable):
 
+    @classmethod
+    def fromPoint(cls, point: Point) -> SmartPoint:
+        """Creates a new object instance by the given Point.
+
+        :param Point point:
+        :return: SmartPoint instance
+        """
+
+        return SmartPoint(point, DrawStyle.Default)
+
     @property
     def pen(self) -> Pen:
         """Return the Pen class instance.
@@ -261,6 +271,28 @@ class SmartPoint(Drawable):
 
 
 class SmartSegment(Drawable):
+
+    @classmethod
+    def fromPoint(cls, point: Point) -> SmartSegment:
+        """Creates a new object instance by the given Point.
+
+        :param Point point:
+        :return: SmartPoint instance
+        """
+
+        return cls(point, point)
+
+    @classmethod
+    def fromPoints(cls, p1: Point, p2: Point) -> SmartSegment:
+        """Creates a new object instance by the given Points.
+
+        :param Point p1: Start point
+        :param Point p2: End point
+        :return: SmartSegment instance
+        """
+
+        geometry = Segment(p1, p2)
+        return cls(geometry, DrawStyle.Default)
 
     @property
     def pen(self) -> Pen:
