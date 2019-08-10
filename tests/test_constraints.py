@@ -4,8 +4,8 @@ import numpy as np
 
 from time import time
 
+from cad.core import Point, Segment, p2p, angle
 from cad.solver import Solver, SolutionNotFound
-from cad.algebra import Point, Segment, p2p, angle
 from cad.constraints import Length, Vertical, FixingX, FixingY, \
     CoincidentX, CoincidentY, Parallel, Angle, Perpendicular, Horizontal
 
