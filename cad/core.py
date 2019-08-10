@@ -262,6 +262,7 @@ class SmartPoint(Drawable):
 
 class SmartSegment(Drawable):
 
+    @property
     def pen(self) -> Pen:
         """Return the Pen class instance.
 
