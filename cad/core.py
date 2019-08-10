@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 from enum import Enum
+from typing import Generator
 
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
 from PySide2.QtCore import QPointF, QObject, Qt, QLineF
@@ -299,3 +300,35 @@ class SmartSegment(Drawable):
 
         painter.setPen(self.pen)
         painter.drawSegment(self.segment)
+
+
+class PointsCollection:
+
+    def __init__(self):
+        self.points = []
+
+    def size(self) -> int:
+        return len(self.points)
+
+    def isEmpty(self) -> bool:
+        return self.size() == 0
+
+    def isNotEmpty(self) -> bool:
+        return not self.isEmpty()
+
+    def first(self) -> SmartPoint:
+        return self.points[-1]
+
+    def last(self) -> SmartPoint:
+        return self.points[-1]
+
+    def all(self) -> Generator:
+        for point in self.points:
+            yield point
+
+    def create(self, x: float, y: float) -> SmartPoint:
+        geometry = Point(x, y)
+        style = DrawStyle.Default
+        point = SmartPoint(geometry, style)
+        self.points.append(point)
+        return point
