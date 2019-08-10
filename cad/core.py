@@ -333,6 +333,9 @@ class SmartSegment(Drawable):
         painter.setPen(self.pen)
         painter.drawSegment(self.segment)
 
+        for point in self.points():
+            point.draw(painter)
+
 
 class PointsCollection:
 
