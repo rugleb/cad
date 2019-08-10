@@ -492,10 +492,16 @@ class Sketch(QtWidgets.QWidget):
         self.controller = controller
 
     def addPoint(self, point: SmartPoint) -> None:
+        point.styleChanged.connect(self.repaint)
+        self.mouseMoved.connect(point.onMouseMoved)
+
         self.points.append(point)
         self.pointAdded.emit(point)
 
     def addSegment(self, segment: SmartSegment) -> None:
+        segment.styleChanged.connect(self.repaint)
+        self.mouseMoved.connect(segment.onMouseMoved)
+
         self.segments.append(segment)
         self.segmentAdded.emit(segment)
 
