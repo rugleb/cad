@@ -6,7 +6,9 @@ from enum import Enum
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
 from PySide2.QtCore import QPointF, QObject, Qt, QLineF
 
-Color = QColor
+
+class Color(QColor):
+    pass
 
 
 class Point(QPointF):
