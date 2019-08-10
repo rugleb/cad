@@ -30,6 +30,14 @@ class SegmentTestCase(unittest.TestCase):
         actual = segment.points()
         self.assertEqual(expected, actual)
 
+    def test_coordinates_method(self):
+        x1, y1, x2, y2 = 0, 5, 10, 20
+        segment = core.Segment(x1, y1, x2, y2)
+
+        expected = x1, y1, x2, y2
+        actual = segment.coordinates()
+        self.assertEqual(expected, actual)
+
 
 class DrawStyleTestCase(unittest.TestCase):
 

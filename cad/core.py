@@ -7,8 +7,18 @@ from PySide2.QtGui import QPainter, QColor, QPen, QBrush
 from PySide2.QtCore import QPointF, QObject, Qt, QLineF
 
 Color = QColor
-Point = QPointF
-Line = QLineF
+
+
+class Point(QPointF):
+
+    def coordinates(self) -> tuple:
+        """Returns the tuple of coordinates.
+
+        :return: Point coordinates
+        :rtype: tuple
+        """
+
+        return self.x(), self.y()
 
 
 class Segment(QLineF):
@@ -42,6 +52,15 @@ class Segment(QLineF):
         """
 
         return self.p1(), self.p2()
+
+    def coordinates(self) -> tuple:
+        """Returns the tuple of coordinates.
+
+        :return: Segment coordinates
+        :rtype: tuple
+        """
+
+        return self.x1(), self.y1(), self.x2(), self.y2()
 
 
 class Pen(QPen):

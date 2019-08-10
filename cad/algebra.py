@@ -32,8 +32,8 @@ def p2l(point: Point, segment: Segment) -> float:
     """
 
     if segment.length() > 0:
-        x0, y0 = point.toTuple()
-        x1, y1, x2, y2 = segment.toTuple()
+        x0, y0 = point.coordinates()
+        x1, y1, x2, y2 = segment.coordinates()
         square = (y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1
         return abs(square) / segment.length()
 
