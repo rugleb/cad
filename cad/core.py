@@ -280,7 +280,7 @@ class SmartSegment(Drawable):
         :return: SmartPoint instance
         """
 
-        return cls(point, point)
+        return SmartSegment.fromPoints(point, point)
 
     @classmethod
     def fromPoints(cls, p1: Point, p2: Point) -> SmartSegment:
@@ -292,7 +292,7 @@ class SmartSegment(Drawable):
         """
 
         geometry = Segment(p1, p2)
-        return cls(geometry, DrawStyle.Default)
+        return SmartSegment(geometry, DrawStyle.Default)
 
     @property
     def pen(self) -> Pen:
@@ -302,7 +302,7 @@ class SmartSegment(Drawable):
         :rtype: Pen
         """
 
-        return Pen(self.color, self.width)
+        return Pen(self.color, self.width * 0.5)
 
     @property
     def segment(self) -> Segment:

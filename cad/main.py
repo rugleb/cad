@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import os
-from typing import List, Generator, Iterable
+from typing import List
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.log import logger
-
-
-Point = QtCore.QPointF
-Segment = QtCore.QLineF
+from cad.core import Point, SmartPoint, SmartSegment, Painter
 
 
 def iconPath(name: str) -> str:
@@ -471,28 +468,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(message)
 
 
-class Painter(QtGui.QPainter):
-
-    def drawCircle(self, point: Point, radius: int) -> None:
-        self.drawEllipse(point, radius, radius)
-
-    def drawCircles(self, points: Iterable, radius: int) -> None:
-        for point in points:
-            self.drawCircle(point, radius)
-
-
 class Sketch(QtWidgets.QWidget):
     mouseMoved = QtCore.Signal(Point)
     mousePressed = QtCore.Signal(Point)
 
-    pointAdded = QtCore.Signal(Point)
-    segmentAdded = QtCore.Signal(Segment)
+    pointAdded = QtCore.Signal(SmartPoint)
+    segmentAdded = QtCore.Signal(SmartSegment)
 
     def __init__(self, parent: MainWindow):
         super().__init__(parent)
 
-        self.points: List[Point] = []
-        self.segments: List[Segment] = []
+        self.points: List[SmartPoint] = []
+        self.segments: List[SmartSegment] = []
 
         self.controller: Controller = Controller(self)
 
@@ -504,24 +491,13 @@ class Sketch(QtWidgets.QWidget):
     def setController(self, controller: Controller) -> None:
         self.controller = controller
 
-    def addPoint(self, point: Point) -> None:
+    def addPoint(self, point: SmartPoint) -> None:
         self.points.append(point)
         self.pointAdded.emit(point)
 
-    def addSegment(self, segment: Segment) -> None:
+    def addSegment(self, segment: SmartSegment) -> None:
         self.segments.append(segment)
         self.segmentAdded.emit(segment)
-
-    def getPoints(self) -> Generator:
-        for point in self.points:
-            yield point
-        for segment in self.segments:
-            yield segment.p1()
-            yield segment.p2()
-
-    def getSegments(self) -> Generator:
-        for segment in self.segments:
-            yield segment
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         point = event.localPos()
@@ -532,22 +508,19 @@ class Sketch(QtWidgets.QWidget):
         self.mousePressed.emit(point)
 
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
-        self.drawPoints()
-        self.drawSegments()
-
-    def drawPoints(self) -> None:
         painter = Painter(self)
-        painter.setPen(QtCore.Qt.NoPen)
-        painter.setBrush(QtGui.QColor(54, 93, 171))
         painter.setRenderHint(painter.Antialiasing)
-        painter.drawCircles(self.getPoints(), radius=6)
 
-    def drawSegments(self) -> None:
-        pen = QtGui.QPen(QtGui.QColor(54, 93, 171), 3)
-        painter = QtGui.QPainter(self)
-        painter.setPen(pen)
-        painter.setRenderHint(painter.Antialiasing, True)
-        painter.drawLines(self.segments)
+        self.drawPoints(painter)
+        self.drawSegments(painter)
+
+    def drawPoints(self, painter: Painter) -> None:
+        for point in self.points:
+            point.draw(painter)
+
+    def drawSegments(self, painter: Painter) -> None:
+        for segment in self.segments:
+            segment.draw(painter)
 
 
 class Controller(object):
@@ -567,7 +540,8 @@ class PointController(Controller):
 
         self.sketch.mousePressed.connect(self.onMousePressed)
 
-    def onMousePressed(self, point: Point) -> None:
+    def onMousePressed(self, cursor: Point) -> None:
+        point = SmartPoint.fromPoint(cursor)
         self.sketch.addPoint(point)
 
 
@@ -579,7 +553,7 @@ class LineController(Controller):
         self.sketch.mousePressed.connect(self.begin)
 
     def begin(self, point: Point) -> None:
-        segment = Segment(point, point)
+        segment = SmartSegment.fromPoint(point)
         self.sketch.addSegment(segment)
 
         self.sketch.mousePressed.disconnect(self.begin)
@@ -594,7 +568,7 @@ class LineController(Controller):
         self.sketch.mousePressed.connect(self.begin)
 
     def repaint(self, point: Point) -> None:
-        self.sketch.segments[-1].setP2(point)
+        self.sketch.segments[-1].geometry.setP2(point)
         self.sketch.repaint()
 
 
