@@ -274,7 +274,7 @@ class SmartSegment(Drawable):
 
     @classmethod
     def fromPoint(cls, point: Point) -> SmartSegment:
-        """Creates a new object instance by the given Point.
+        """Create a new object instance by the given Point.
 
         :param Point point:
         :return: SmartPoint instance
@@ -284,7 +284,7 @@ class SmartSegment(Drawable):
 
     @classmethod
     def fromPoints(cls, p1: Point, p2: Point) -> SmartSegment:
-        """Creates a new object instance by the given Points.
+        """Create a new object instance by the given Points.
 
         :param Point p1: Start point
         :param Point p2: End point
@@ -313,6 +313,15 @@ class SmartSegment(Drawable):
         """
 
         return self.geometry
+
+    def points(self) -> Generator:
+        """Return the Generator of SmartPoints.
+
+        :return: SmartPoints generator
+        """
+
+        for p in self.segment.points():
+            yield SmartPoint.fromPoint(p)
 
     def draw(self, painter: Painter) -> None:
         """Draws the Segment by given Painter.
