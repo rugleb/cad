@@ -5,8 +5,7 @@ from enum import Enum
 from typing import Generator
 
 from PySide2.QtGui import QPainter, QColor, QPen, QBrush
-from PySide2.QtCore import Signal
-from PySide2.QtCore import QPointF, QObject, Qt, QLineF
+from PySide2.QtCore import QPointF, QObject, Qt, QLineF, Signal
 
 
 class Color(QColor):
