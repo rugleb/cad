@@ -7,7 +7,7 @@ from PySide2 import QtWidgets, QtGui, QtCore
 from cad.log import logger
 from cad.core import Point, SmartPoint, SmartSegment, Painter
 from cad.constraints import Parallel, Perpendicular, Length, CoincidentX, \
-    CoincidentY, Horizontal
+    CoincidentY, Horizontal, Vertical
 
 
 def iconPath(name: str) -> str:
@@ -809,8 +809,17 @@ class VerticalController(Controller):
 
         self.sketch.mousePressed.connect(self.onMousePressed)
 
-    def onMousePressed(self, point: Point) -> None:
-        pass
+    def onMousePressed(self, cursor: Point) -> None:
+        try:
+            segment = self.sketch.closestSegment(cursor)
+
+            p1, p2 = segment.segment().points()
+            constraint = Vertical(p1, p2)
+
+            logger.debug('Vertical constraint created')
+
+        except KeyError:
+            pass
 
 
 class HorizontalController(Controller):
