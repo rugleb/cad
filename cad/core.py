@@ -246,10 +246,10 @@ class Drawable(QObject):
             return None
 
         if self.isClose(cursor):
-            self.highlight()
+            return self.highlight()
 
-        elif self.isHighlighted():
-            self.unHighlight()
+        if self.isHighlighted():
+            return self.unHighlight()
 
     @abstractmethod
     def isClose(self, cursor: Point) -> bool:
