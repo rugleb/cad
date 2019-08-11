@@ -7,7 +7,7 @@ from PySide2 import QtWidgets, QtGui, QtCore
 from cad.log import logger
 from cad.core import Point, SmartPoint, SmartSegment, Painter
 from cad.constraints import Parallel, Perpendicular, Length, CoincidentX, \
-    CoincidentY, Horizontal, Vertical, FixingX, FixingY
+    CoincidentY, Horizontal, Vertical, FixingX, FixingY, Angle
 
 
 def iconPath(name: str) -> str:
@@ -806,10 +806,54 @@ class AngleController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.sketch.mousePressed.connect(self.onMousePressed)
+        self.segment1: SmartSegment = None
+        self.segment2: SmartSegment = None
 
-    def onMousePressed(self, point: Point) -> None:
-        pass
+        self.sketch.mousePressed.connect(self.setSegment1)
+
+    def setSegment1(self, cursor: Point) -> None:
+        try:
+            self.segment1 = self.sketch.closestSegment(cursor)
+
+            self.sketch.mousePressed.disconnect(self.setSegment1)
+
+            self.segment1.highlight()
+            self.segment1.disableMouseTracking()
+
+            self.sketch.mousePressed.connect(self.setSegment2)
+
+        except KeyError:
+            pass
+
+    def setSegment2(self, cursor: Point) -> None:
+        try:
+            self.segment2 = self.sketch.closestSegment(cursor)
+
+            self.sketch.mousePressed.disconnect(self.setSegment2)
+
+            self.segment2.highlight()
+            self.segment2.disableMouseTracking()
+
+            p1, p2 = self.segment1.segment().points()
+            p3, p4 = self.segment2.segment().points()
+
+            constraint = Angle(p1, p2, p3, p4, 45)
+            logger.debug('Angle constraint created')
+
+        except KeyError:
+            pass
+
+    def __del__(self) -> None:
+        try:
+            self.segment1.unHighlight()
+            self.segment1.enableMouseTracking()
+
+            self.segment2.unHighlight()
+            self.segment2.enableMouseTracking()
+
+            self.sketch.repaint()
+        except AttributeError:
+            pass
 
 
 class VerticalController(Controller):
