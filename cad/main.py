@@ -7,7 +7,7 @@ from PySide2 import QtWidgets, QtGui, QtCore
 from cad.log import logger
 from cad.core import Point, SmartPoint, SmartSegment, Painter
 from cad.constraints import Parallel, Perpendicular, Length, CoincidentX, \
-    CoincidentY, Horizontal, Vertical
+    CoincidentY, Horizontal, Vertical, FixingX, FixingY
 
 
 def iconPath(name: str) -> str:
@@ -787,8 +787,18 @@ class FixedController(Controller):
 
         self.sketch.mousePressed.connect(self.onMousePressed)
 
-    def onMousePressed(self, point: Point) -> None:
-        pass
+    def onMousePressed(self, cursor: Point) -> None:
+        try:
+            point = self.sketch.closestPoint(cursor)
+            loc = Point(50, 50)
+
+            constraint1 = FixingX(point.point(), loc)
+            constraint2 = FixingY(point.point(), loc)
+
+            logger.debug('Fixed constraint created')
+
+        except KeyError:
+            pass
 
 
 class AngleController(Controller):
