@@ -7,13 +7,11 @@ from cad.core import Point
 
 Points = List[Point]
 
-Array = np.ndarray
-
 
 class Constraint(object):    # pragma: no cover
 
     @abstractmethod
-    def apply(self, points: Points, x: Array, y: Array, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         pass
 
 
@@ -27,7 +25,7 @@ class Length(Constraint):
         self.p2 = p2
         self.length = length
 
-    def apply(self, points: Points, x: Array, y: Array, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i1 = points.index(self.p1) * 2
         i2 = points.index(self.p2) * 2
 
@@ -49,7 +47,7 @@ class Horizontal(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, points: Points, x: Array, y: Array, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i1 = points.index(self.p1) * 2 + 1
         i2 = points.index(self.p2) * 2 + 1
 
@@ -65,7 +63,7 @@ class Vertical(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, points: Points, x: Array, y: Array, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i1 = points.index(self.p1) * 2
         i2 = points.index(self.p2) * 2
 
@@ -81,7 +79,7 @@ class FixingX(Constraint):
         self.point = point
         self.lock = lock
 
-    def apply(self, points: Points, x: list, y: list, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i = points.index(self.point) * 2
 
         y[i] += x[n]
@@ -95,7 +93,7 @@ class FixingY(Constraint):
         self.point = point
         self.lock = lock
 
-    def apply(self, points: Points, x: list, y: list, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i = points.index(self.point) * 2 + 1
 
         y[i] += x[n]
@@ -109,7 +107,7 @@ class CoincidentX(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, points: Points, x: Array, y: Array, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i1 = points.index(self.p1) * 2
         i2 = points.index(self.p2) * 2
 
@@ -125,7 +123,7 @@ class CoincidentY(Constraint):
         self.p1 = p1
         self.p2 = p2
 
-    def apply(self, points: Points, x: Array, y: Array, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i1 = points.index(self.p1) * 2 + 1
         i2 = points.index(self.p2) * 2 + 1
 
@@ -143,7 +141,7 @@ class Parallel(Constraint):
         self.p3 = p3
         self.p4 = p4
 
-    def apply(self, points: Points, x: Array, y: Array, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i1 = points.index(self.p1) * 2
         i2 = points.index(self.p2) * 2
         i3 = points.index(self.p3) * 2
@@ -180,7 +178,7 @@ class Angle(Constraint):
     def radians(self) -> float:
         return np.pi / 180 * self.degrees
 
-    def apply(self, points: Points, x: Array, y: Array, n: int):
+    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
         i1 = points.index(self.p1) * 2
         i2 = points.index(self.p2) * 2
         i3 = points.index(self.p3) * 2

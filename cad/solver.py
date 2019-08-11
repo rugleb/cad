@@ -3,23 +3,15 @@ from typing import List
 import numpy as np
 
 from scipy.optimize import fsolve
-from PySide2.QtCore import QPointF
 
+from cad.core import Point
 from cad.constraints import Constraints, Constraint
-
-
-Array = np.ndarray
-
-Point = QPointF
-Points = List[Point]
-
-ROUNDED = 2
 
 
 class Solver(object):
 
     def __init__(self):
-        self.points: Points = []
+        self.points: List[Point] = []
         self.constraints: Constraints = []
 
     def addPoint(self, point: Point) -> None:
@@ -28,7 +20,7 @@ class Solver(object):
     def addConstraint(self, constraint: Constraint) -> None:
         self.constraints.append(constraint)
 
-    def system(self, x: Array) -> Array:
+    def system(self, x: np.ndarray) -> np.ndarray:
         y = np.zeros(x.shape, x.dtype)
 
         for i, point in enumerate(self.points):
@@ -45,7 +37,7 @@ class Solver(object):
         return len(self.points) * 2 + len(self.constraints)
 
     @property
-    def x0(self) -> Array:
+    def x0(self) -> np.ndarray:
         size = self.size()
         x = np.zeros(size, np.float)
         for i, point in enumerate(self.points):
@@ -53,16 +45,16 @@ class Solver(object):
             x[i * 2 + 1] = point.y()
         return x
 
-    def solve(self, rounded: int = ROUNDED) -> Array:
+    def solve(self) -> np.ndarray:
         opt = {'maxfev': 1000, 'xtol': 1e-4, 'full_output': True}
         output = fsolve(self.system, self.x0, **opt)
         solution, info, status, message = output
         if status != 1:
             raise SolutionNotFound(info, message)
-        return solution.round(rounded)
+        return solution
 
-    def recount(self, rounded: int = ROUNDED) -> Points:
-        solution = self.solve(rounded)
+    def recount(self) -> List[Point]:
+        solution = self.solve().round(2)
         for i, point in enumerate(self.points):
             point.setX(solution[i * 2 + 0])
             point.setY(solution[i * 2 + 1])
