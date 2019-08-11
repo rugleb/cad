@@ -106,9 +106,15 @@ class DrawStyle(Enum):
 
     def __new__(cls, color: Color, width: float):
         obj = object.__new__(cls)
-        obj.width = width
-        obj.color = color
+        obj._width = width
+        obj._color = color
         return obj
+
+    def width(self) -> float:
+        return self._width
+
+    def color(self) -> Color:
+        return self._color
 
     Default = Color(54, 93, 171), 5.         # default drawing style
     Highlight = Color(254, 137, 144), 6.     # style for selected objects
@@ -138,7 +144,6 @@ class Drawable(QObject):
 
         return self._geometry
 
-    @property
     def style(self) -> DrawStyle:
         """Return the drawing style of the object.
 
@@ -159,7 +164,6 @@ class Drawable(QObject):
 
             self.styleChanged.emit()
 
-    @property
     def color(self) -> Color:
         """Return the color of the invoking object.
 
@@ -167,9 +171,8 @@ class Drawable(QObject):
         :rtype: QColor
         """
 
-        return self.style.color
+        return self.style().color()
 
-    @property
     def width(self) -> float:
         """Return the drawing brush width of the object.
 
@@ -177,7 +180,7 @@ class Drawable(QObject):
         :rtype: float
         """
 
-        return self.style.width
+        return self.style().color()
 
     def highlight(self) -> None:
         """Highlight the object.
@@ -203,7 +206,6 @@ class Drawable(QObject):
 
         return self.style is DrawStyle.Highlight
 
-    @property
     def pen(self) -> Pen:
         """Return the Pen class instance.
 
@@ -213,7 +215,6 @@ class Drawable(QObject):
 
         return Qt.NoPen
 
-    @property
     def brush(self) -> Brush:
         """Return the Brush class instance.
 
@@ -269,7 +270,6 @@ class SmartPoint(Drawable):
 
         return SmartPoint(point, DrawStyle.Default)
 
-    @property
     def pen(self) -> Pen:
         """Return the Pen class instance.
 
@@ -279,7 +279,6 @@ class SmartPoint(Drawable):
 
         return Qt.NoPen
 
-    @property
     def point(self) -> Point:
         """Alias for geometry property.
 
@@ -296,9 +295,13 @@ class SmartPoint(Drawable):
         :return: None
         """
 
-        painter.setPen(self.pen)
-        painter.setBrush(self.brush)
-        painter.drawCircle(self.point, self.width)
+        brush = self.color()
+        center = self.point()
+        radius = self.width()
+
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(brush)
+        painter.drawCircle(center, radius)
 
     def isClose(self, cursor: Point) -> bool:
         """Determines whether the cursor is close to the object.
@@ -307,7 +310,10 @@ class SmartPoint(Drawable):
         :return: Close or not
         """
 
-        return p2p(cursor, self.point) < self.width
+        center = self.point()
+        radius = self.width()
+
+        return p2p(cursor, center) < radius
 
 
 class SmartSegment(Drawable):
@@ -334,7 +340,6 @@ class SmartSegment(Drawable):
         geometry = Segment(p1, p2)
         return SmartSegment(geometry, DrawStyle.Default)
 
-    @property
     def pen(self) -> Pen:
         """Return the Pen class instance.
 
@@ -342,9 +347,11 @@ class SmartSegment(Drawable):
         :rtype: Pen
         """
 
-        return Pen(self.color, self.width / 2)
+        brush = self.color()
+        radius = self.width() / 2
 
-    @property
+        return Pen(brush, radius)
+
     def segment(self) -> Segment:
         """Alias for geometry property.
 
@@ -360,8 +367,10 @@ class SmartSegment(Drawable):
         :return: SmartPoints generator
         """
 
-        for p in self.segment.points():
-            yield SmartPoint(p, self.style)
+        style = self.style()
+
+        for p in self.segment().points():
+            yield SmartPoint(p, style)
 
     def draw(self, painter: Painter) -> None:
         """Draws the Segment by given Painter.
@@ -370,8 +379,11 @@ class SmartSegment(Drawable):
         :return: None
         """
 
-        painter.setPen(self.pen)
-        painter.drawSegment(self.segment)
+        pen = self.pen()
+        segment = self.segment()
+
+        painter.setPen(pen)
+        painter.drawSegment(segment)
 
         for point in self.points():
             point.draw(painter)
@@ -383,7 +395,10 @@ class SmartSegment(Drawable):
         :return: Close or not
         """
 
-        return p2s(cursor, self.segment) < self.width / 2
+        radius = self.width() / 2
+        segment = self.segment()
+
+        return p2s(cursor, segment) < radius
 
 
 def dotProduct(p1: Point, p2: Point) -> float:

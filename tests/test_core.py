@@ -45,8 +45,8 @@ class DrawStyleTestCase(unittest.TestCase):
 
     def test_on_types(self):
         for style in core.DrawStyle:
-            self.assertIsInstance(style.width, float)
-            self.assertIsInstance(style.color, core.Color)
+            self.assertIsInstance(style.width(), float)
+            self.assertIsInstance(style.color(), core.Color)
 
 
 class AlgebraTestCase(unittest.TestCase):
