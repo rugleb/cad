@@ -6,7 +6,8 @@ from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.log import logger
 from cad.core import Point, SmartPoint, SmartSegment, Painter
-from cad.constraints import Parallel, Perpendicular, Length
+from cad.constraints import Parallel, Perpendicular, Length, CoincidentX, \
+    CoincidentY
 
 
 def iconPath(name: str) -> str:
@@ -535,6 +536,12 @@ class Sketch(QtWidgets.QWidget):
                 return segment
         raise KeyError
 
+    def closestPoint(self, cursor: Point) -> SmartPoint:
+        for point in self.points:
+            if point.isClose(cursor):
+                return point
+        raise KeyError
+
 
 class Controller(object):
 
@@ -711,7 +718,7 @@ class LengthController(Controller):
             p1, p2 = segment.segment().points()
             constraint = Length(p1, p2, 100)
 
-            logger.debug('Length constraint enabled')
+            logger.debug('Length constraint created')
 
         except KeyError:
             pass
@@ -722,10 +729,55 @@ class CoincidentController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.sketch.mousePressed.connect(self.onMousePressed)
+        self.point1: SmartPoint = None
+        self.point2: SmartPoint = None
 
-    def onMousePressed(self, point: Point) -> None:
-        pass
+        self.sketch.mousePressed.connect(self.setPoint1)
+
+    def setPoint1(self, cursor: Point) -> None:
+        try:
+            self.point1 = self.sketch.closestPoint(cursor)
+
+            self.sketch.mousePressed.disconnect(self.setPoint1)
+
+            self.point1.highlight()
+            self.point1.disableMouseTracking()
+
+            self.sketch.mousePressed.connect(self.setPoint2)
+
+        except KeyError:
+            pass
+
+    def setPoint2(self, cursor: Point) -> None:
+        try:
+            self.point2 = self.sketch.closestPoint(cursor)
+
+            self.sketch.mousePressed.disconnect(self.setPoint2)
+
+            self.point2.highlight()
+            self.point2.disableMouseTracking()
+
+            p1 = self.point1.point()
+            p2 = self.point2.point()
+
+            constraint1 = CoincidentX(p1, p2)
+            constraint2 = CoincidentY(p1, p2)
+            logger.debug('Coincident constraint created')
+
+        except KeyError:
+            pass
+
+    def __del__(self) -> None:
+        try:
+            self.point1.unHighlight()
+            self.point1.enableMouseTracking()
+
+            self.point2.unHighlight()
+            self.point2.enableMouseTracking()
+
+            self.sketch.repaint()
+        except AttributeError:
+            pass
 
 
 class FixedController(Controller):
