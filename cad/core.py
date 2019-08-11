@@ -260,14 +260,14 @@ class Drawable(QObject):
 
         pass
 
-    def setMouseTracking(self, status: bool) -> Drawable:
+    def setMouseTracking(self, enable: bool) -> Drawable:
         """Update mouse tracking mode status.
 
-        :param bool status: Enable or not
+        :param bool enable: Enable or not
         :return: self
         """
 
-        self._tracking = status
+        self._tracking = enable
 
         return self
 

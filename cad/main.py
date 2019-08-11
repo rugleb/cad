@@ -7,7 +7,8 @@ from PySide2 import QtWidgets, QtGui, QtCore
 from cad.log import logger
 from cad.core import Point, SmartPoint, SmartSegment, Painter
 from cad.constraints import Parallel, Perpendicular, Length, CoincidentX, \
-    CoincidentY, Horizontal, Vertical, FixingX, FixingY, Angle
+    CoincidentY, Horizontal, Vertical, FixingX, FixingY, Angle, Constraint
+from cad.solver import Solver
 
 
 def iconPath(name: str) -> str:
@@ -482,6 +483,8 @@ class Sketch(QtWidgets.QWidget):
 
         self.points: List[SmartPoint] = []
         self.segments: List[SmartSegment] = []
+
+        self.solver = Solver()
 
         self.controller: Controller = Controller(self)
 
