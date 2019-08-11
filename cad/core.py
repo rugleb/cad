@@ -179,7 +179,7 @@ class Drawable(QObject):
         :rtype: float
         """
 
-        return self.style().color()
+        return self.style().width()
 
     def highlight(self) -> None:
         """Highlight the object.
@@ -203,7 +203,7 @@ class Drawable(QObject):
         :return: None
         """
 
-        return self.style is DrawStyle.Highlight
+        return self.style() is DrawStyle.Highlight
 
     def pen(self) -> Pen:
         """Return the Pen class instance.
@@ -241,10 +241,10 @@ class Drawable(QObject):
         """
 
         if self.isClose(cursor):
-            return self.highlight()
+            self.highlight()
 
-        if self.isHighlighted():
-            return self.unHighlight()
+        elif self.isHighlighted():
+            self.unHighlight()
 
     @abstractmethod
     def isClose(self, cursor: Point) -> bool:
