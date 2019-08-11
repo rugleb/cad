@@ -133,6 +133,8 @@ class Drawable(QObject):
         self._geometry = geometry
         self._style = style
 
+        self._tracking = True
+
     @property
     def geometry(self) -> QObject:
         """Return geometry of the object.
@@ -240,6 +242,9 @@ class Drawable(QObject):
         :return: None
         """
 
+        if not self.isMouseTracked():
+            return None
+
         if self.isClose(cursor):
             self.highlight()
 
@@ -255,6 +260,41 @@ class Drawable(QObject):
         """
 
         pass
+
+    def setMouseTracking(self, status: bool) -> Drawable:
+        """Update mouse tracking mode status.
+
+        :param bool status: Enable or not
+        :return: self
+        """
+
+        self._tracking = status
+
+        return self
+
+    def enableMouseTracking(self) -> Drawable:
+        """Enable mouse tracking mode.
+
+        :return: self
+        """
+
+        return self.setMouseTracking(True)
+
+    def disableMouseTracking(self) -> Drawable:
+        """Disable mouse tracking mode.
+
+        :return: self
+        """
+
+        return self.setMouseTracking(False)
+
+    def isMouseTracked(self) -> bool:
+        """Checks whether the mouse position is tracked.
+
+        :return: Tracked or not
+        """
+
+        return self._tracking
 
 
 class SmartPoint(Drawable):

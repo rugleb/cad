@@ -559,7 +559,7 @@ class LineController(Controller):
         self.sketch.mousePressed.connect(self.begin)
 
     def begin(self, point: Point) -> None:
-        segment = SmartSegment.fromPoint(point)
+        segment = SmartSegment.fromPoint(point).disableMouseTracking()
         self.sketch.addSegment(segment)
 
         self.sketch.mousePressed.disconnect(self.begin)
@@ -572,6 +572,8 @@ class LineController(Controller):
 
         self.sketch.mousePressed.disconnect(self.reset)
         self.sketch.mousePressed.connect(self.begin)
+
+        self.sketch.segments[-1].enableMouseTracking()
 
     def repaint(self, point: Point) -> None:
         self.sketch.segments[-1].geometry.setP2(point)
