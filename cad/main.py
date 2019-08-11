@@ -6,7 +6,7 @@ from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.log import logger
 from cad.core import Point, SmartPoint, SmartSegment, Painter
-from cad.constraints import Parallel, Perpendicular
+from cad.constraints import Parallel, Perpendicular, Length
 
 
 def iconPath(name: str) -> str:
@@ -583,7 +583,7 @@ class LineController(Controller):
         self.sketch.segments[-1].enableMouseTracking()
 
     def repaint(self, point: Point) -> None:
-        self.sketch.segments[-1].geometry.setP2(point)
+        self.sketch.segments[-1].geometry().setP2(point)
         self.sketch.repaint()
 
 
@@ -704,8 +704,17 @@ class LengthController(Controller):
 
         self.sketch.mousePressed.connect(self.onMousePressed)
 
-    def onMousePressed(self, point: Point) -> None:
-        pass
+    def onMousePressed(self, cursor: Point) -> None:
+        try:
+            segment = self.sketch.closestSegment(cursor)
+
+            p1, p2 = segment.segment().points()
+            constraint = Length(p1, p2, 100)
+
+            logger.debug('Length constraint enabled')
+
+        except KeyError:
+            pass
 
 
 class CoincidentController(Controller):

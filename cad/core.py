@@ -135,7 +135,6 @@ class Drawable(QObject):
 
         self._tracking = True
 
-    @property
     def geometry(self) -> QObject:
         """Return geometry of the object.
 
@@ -325,7 +324,7 @@ class SmartPoint(Drawable):
         :rtype: Point
         """
 
-        return self.geometry
+        return self.geometry()
 
     def draw(self, painter: Painter) -> None:
         """Draws the Point by given Painter.
@@ -398,7 +397,7 @@ class SmartSegment(Drawable):
         :rtype: Segment
         """
 
-        return self.geometry
+        return self.geometry()
 
     def points(self) -> Generator:
         """Return the Generator of SmartPoints.
