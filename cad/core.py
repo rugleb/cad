@@ -127,7 +127,7 @@ class Drawable(QObject):
 
     styleChanged = Signal()
 
-    def __init__(self, geometry: QObject, style: DrawStyle):
+    def __init__(self, geometry, style: DrawStyle):
         super().__init__()
 
         self._geometry = geometry
@@ -135,14 +135,17 @@ class Drawable(QObject):
 
         self._tracking = True
 
-    def geometry(self) -> QObject:
+    def geometry(self):
         """Return geometry of the object.
 
         :return: Geometry of the object
-        :rtype: QObject
+        :rtype:
         """
 
         return self._geometry
+
+    def setGeometry(self, geometry) -> None:
+        self._geometry = geometry
 
     def style(self) -> DrawStyle:
         """Return the drawing style of the object.
@@ -366,6 +369,15 @@ class SmartSegment(Drawable):
 
         return SmartSegment.fromPoints(point, point)
 
+    def geometry(self):
+        """Return geometry of the object.
+
+        :return: Geometry of the object
+        :rtype: list
+        """
+
+        return self._geometry
+
     @classmethod
     def fromPoints(cls, p1: Point, p2: Point) -> SmartSegment:
         """Create a new object instance by the given Points.
@@ -375,8 +387,9 @@ class SmartSegment(Drawable):
         :return: SmartSegment instance
         """
 
-        geometry = Segment(p1, p2)
-        return SmartSegment(geometry, DrawStyle.Default)
+        geometry = [p1, p2]
+        style = DrawStyle.Default
+        return SmartSegment(geometry, style)
 
     def pen(self) -> Pen:
         """Return the Pen class instance.
@@ -390,15 +403,6 @@ class SmartSegment(Drawable):
 
         return Pen(brush, radius)
 
-    def segment(self) -> Segment:
-        """Alias for geometry property.
-
-        :return: Instance of Segment class
-        :rtype: Segment
-        """
-
-        return self.geometry()
-
     def points(self) -> Generator:
         """Return the Generator of SmartPoints.
 
@@ -407,7 +411,7 @@ class SmartSegment(Drawable):
 
         style = self.style()
 
-        for p in self.segment().points():
+        for p in self.geometry():
             yield SmartPoint(p, style)
 
     def draw(self, painter: Painter) -> None:
@@ -418,10 +422,10 @@ class SmartSegment(Drawable):
         """
 
         pen = self.pen()
-        segment = self.segment()
+        p1, p2 = self.geometry()
 
         painter.setPen(pen)
-        painter.drawSegment(segment)
+        painter.drawLine(p1, p2)
 
         for point in self.points():
             point.draw(painter)
@@ -434,7 +438,7 @@ class SmartSegment(Drawable):
         """
 
         radius = self.width() / 2
-        segment = self.segment()
+        segment = Segment(*self.geometry())
 
         return p2s(cursor, segment) < radius
 

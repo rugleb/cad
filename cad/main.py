@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import os
-from typing import List
+from typing import List, Generator
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.log import logger
-from cad.core import Point, SmartPoint, SmartSegment, Painter
+from cad.core import Point, SmartPoint, SmartSegment, Painter, Segment
 from cad.constraints import Parallel, Perpendicular, Length, CoincidentX, \
     CoincidentY, Horizontal, Vertical, FixingX, FixingY, Angle, Constraint
-from cad.solver import Solver
+from cad.solver import Solver, SolutionNotFound
 
 
 def iconPath(name: str) -> str:
@@ -545,6 +545,46 @@ class Sketch(QtWidgets.QWidget):
                 return point
         raise KeyError
 
+    def addConstraint(self, constraint: Constraint) -> None:
+        self.solver.addConstraint(constraint)
+        self.recount()
+
+    def addConstraints(self, constraints: List[Constraint]) -> None:
+        self.solver.constraints.extend(constraints)
+        self.recount()
+
+    def generator(self) -> Generator[Point]:
+        for point in self.points:
+            yield point.point()
+        for segment in self.segments:
+            yield segment.geometry()[0]
+            yield segment.geometry()[1]
+
+    def recount(self):
+        points = list(self.generator())
+        self.solver.points = points
+
+        try:
+            points = self.solver.recount()
+        except SolutionNotFound:
+            logger.debug('Solution not found')
+        else:
+            logger.debug('System solved')
+
+            for i, point in enumerate(self.points):
+                point.setGeometry(points[i])
+
+            i = len(self.points)
+            for j, segment in enumerate(self.segments):
+                p1 = points[i + j * 2 + 0]
+                p2 = points[i + j * 2 + 1]
+                geometry = (p1, p2)
+                segment.setGeometry(geometry)
+
+            logger.debug('Geometry updated')
+
+            self.repaint()
+
 
 class Controller(object):
 
@@ -593,7 +633,7 @@ class LineController(Controller):
         self.sketch.segments[-1].enableMouseTracking()
 
     def repaint(self, point: Point) -> None:
-        self.sketch.segments[-1].geometry().setP2(point)
+        self.sketch.segments[-1].geometry()[1] = point
         self.sketch.repaint()
 
 
@@ -630,11 +670,13 @@ class ParallelController(Controller):
             self.segment2.highlight()
             self.segment2.disableMouseTracking()
 
-            p1, p2 = self.segment1.segment().points()
-            p3, p4 = self.segment2.segment().points()
+            p1, p2 = self.segment1.geometry()
+            p3, p4 = self.segment2.geometry()
 
             constraint = Parallel(p1, p2, p3, p4)
             logger.debug('Parallel constraint created')
+
+            self.sketch.addConstraint(constraint)
 
         except KeyError:
             pass
@@ -685,11 +727,13 @@ class PerpendicularController(Controller):
             self.segment2.highlight()
             self.segment2.disableMouseTracking()
 
-            p1, p2 = self.segment1.segment().points()
-            p3, p4 = self.segment2.segment().points()
+            p1, p2 = self.segment1.geometry()
+            p3, p4 = self.segment2.geometry()
 
             constraint = Perpendicular(p1, p2, p3, p4)
             logger.debug('Perpendicular constraint created')
+
+            self.sketch.addConstraint(constraint)
 
         except KeyError:
             pass
@@ -718,10 +762,12 @@ class LengthController(Controller):
         try:
             segment = self.sketch.closestSegment(cursor)
 
-            p1, p2 = segment.segment().points()
+            p1, p2 = segment.geometry()
             constraint = Length(p1, p2, 100)
 
             logger.debug('Length constraint created')
+
+            self.sketch.addConstraint(constraint)
 
         except KeyError:
             pass
@@ -765,6 +811,9 @@ class CoincidentController(Controller):
 
             constraint1 = CoincidentX(p1, p2)
             constraint2 = CoincidentY(p1, p2)
+
+            self.sketch.addConstraints([constraint1, constraint2])
+
             logger.debug('Coincident constraint created')
 
         except KeyError:
@@ -795,10 +844,12 @@ class FixedController(Controller):
             point = self.sketch.closestPoint(cursor)
             loc = Point(50, 50)
 
-            constraint1 = FixingX(point.point(), loc)
-            constraint2 = FixingY(point.point(), loc)
+            constraint1 = FixingX(point.point(), loc.x())
+            constraint2 = FixingY(point.point(), loc.y())
 
             logger.debug('Fixed constraint created')
+
+            self.sketch.addConstraints([constraint1, constraint2])
 
         except KeyError:
             pass
@@ -837,11 +888,13 @@ class AngleController(Controller):
             self.segment2.highlight()
             self.segment2.disableMouseTracking()
 
-            p1, p2 = self.segment1.segment().points()
-            p3, p4 = self.segment2.segment().points()
+            p1, p2 = self.segment1.geometry()
+            p3, p4 = self.segment2.geometry()
 
             constraint = Angle(p1, p2, p3, p4, 45)
             logger.debug('Angle constraint created')
+
+            self.sketch.addConstraint(constraint)
 
         except KeyError:
             pass
@@ -870,10 +923,12 @@ class VerticalController(Controller):
         try:
             segment = self.sketch.closestSegment(cursor)
 
-            p1, p2 = segment.segment().points()
+            p1, p2 = segment.geometry()
             constraint = Vertical(p1, p2)
 
             logger.debug('Vertical constraint created')
+
+            self.sketch.addConstraint(constraint)
 
         except KeyError:
             pass
@@ -890,10 +945,12 @@ class HorizontalController(Controller):
         try:
             segment = self.sketch.closestSegment(cursor)
 
-            p1, p2 = segment.segment().points()
+            p1, p2 = segment.geometry()
             constraint = Horizontal(p1, p2)
 
             logger.debug('Horizontal constraint created')
+
+            self.sketch.addConstraint(constraint)
 
         except KeyError:
             pass
