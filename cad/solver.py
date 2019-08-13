@@ -46,7 +46,7 @@ class Solver(object):
         return x
 
     def solve(self) -> np.ndarray:
-        opt = {'maxfev': 1000, 'xtol': 1e-4, 'full_output': True}
+        opt = {'maxfev': 3000, 'xtol': 1e-8, 'full_output': True}
         output = fsolve(self.system, self.x0, **opt)
         solution, info, status, message = output
         if status != 1:
