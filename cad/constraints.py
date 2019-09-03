@@ -1,211 +1,153 @@
 from abc import abstractmethod
+from numpy import ndarray, cos, pi, sqrt
 from typing import List
-
-import numpy as np
 
 from cad.core import Point
 
+Index = int
 Points = List[Point]
 
 
-class Constraint(object):    # pragma: no cover
+class Constraint(object):
 
     @abstractmethod
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
+    def resolve(self, x: ndarray, y: ndarray, n: Index) -> None:
         pass
 
 
 Constraints = List[Constraint]
 
 
-class Length(Constraint):
+class LengthConstraint(Constraint):
 
-    def __init__(self, p1: Point, p2: Point, length: float):
-        self.p1 = p1
-        self.p2 = p2
+    def __init__(self, i1: Index, i2: Index, length: float):
+        self.i1 = i1
+        self.i2 = i2
         self.length = length
 
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i1 = points.index(self.p1) * 2
-        i2 = points.index(self.p2) * 2
+    def resolve(self, x: ndarray, y: ndarray, n: Index) -> None:
+        dx = x[self.i2 + 0] - x[self.i1 + 0]
+        dy = x[self.i2 + 1] - x[self.i1 + 1]
 
-        dx = x[i2 + 0] - x[i1 + 0]
-        dy = x[i2 + 1] - x[i1 + 1]
+        y[self.i2] += 2 * x[n] * dx
+        y[self.i1] -= 2 * x[n] * dx
 
-        y[i2] += 2 * x[n] * dx
-        y[i1] -= 2 * x[n] * dx
-
-        y[i2 + 1] += 2 * x[n] * dy
-        y[i1 + 1] -= 2 * x[n] * dy
+        y[self.i2 + 1] += 2 * x[n] * dy
+        y[self.i1 + 1] -= 2 * x[n] * dy
 
         y[n] = dx ** 2 + dy ** 2 - self.length ** 2
 
 
-class Horizontal(Constraint):
+class HorizontalConstraint(Constraint):
 
-    def __init__(self, p1: Point, p2: Point):
-        self.p1 = p1
-        self.p2 = p2
+    def __init__(self, i1: Index, i2: Index):
+        self.i1 = i1
+        self.i2 = i2
 
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i1 = points.index(self.p1) * 2 + 1
-        i2 = points.index(self.p2) * 2 + 1
+    def resolve(self, x: ndarray, y: ndarray, n: Index) -> None:
+        y[self.i2] += x[n]
+        y[self.i1] -= x[n]
 
-        y[i2] += x[n]
-        y[i1] -= x[n]
-
-        y[n] = x[i2] - x[i1]
+        y[n] = x[self.i2] - x[self.i1]
 
 
-class Vertical(Constraint):
+class VerticalConstraint(Constraint):
 
-    def __init__(self, p1: Point, p2: Point):
-        self.p1 = p1
-        self.p2 = p2
+    def __init__(self, i1: Index, i2: Index):
+        self.i1 = i1
+        self.i2 = i2
 
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i1 = points.index(self.p1) * 2
-        i2 = points.index(self.p2) * 2
+    def resolve(self, x: ndarray, y: ndarray, n: Index) -> None:
+        y[self.i2] += x[n]
+        y[self.i1] -= x[n]
 
-        y[i2] += x[n]
-        y[i1] -= x[n]
-
-        y[n] = x[i2] - x[i1]
+        y[n] = x[self.i2] - x[self.i1]
 
 
-class FixingX(Constraint):
+class FixedConstraint(Constraint):
 
-    def __init__(self, point: Point, lock: float):
-        self.point = point
+    def __init__(self, i: Index, lock: float):
+        self.i = i
         self.lock = lock
 
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i = points.index(self.point) * 2
+    def resolve(self, x: ndarray, y: ndarray, n: Index) -> None:
+        y[self.i] += x[n]
 
-        y[i] += x[n]
-
-        y[n] = x[i] - self.lock
+        y[n] = x[self.i] - self.lock
 
 
-class FixingY(Constraint):
+class CoincidentConstraint(Constraint):
 
-    def __init__(self, point: Point, lock: float):
-        self.point = point
-        self.lock = lock
+    def __init__(self, i1: Index, i2: Index):
+        self.i1 = i1
+        self.i2 = i2
 
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i = points.index(self.point) * 2 + 1
+    def resolve(self, x: ndarray, y: ndarray, n: Index) -> None:
+        y[self.i2] += x[n]
+        y[self.i1] -= x[n]
 
-        y[i] += x[n]
-
-        y[n] = x[i] - self.lock
-
-
-class CoincidentX(Constraint):
-
-    def __init__(self, p1: Point, p2: Point):
-        self.p1 = p1
-        self.p2 = p2
-
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i1 = points.index(self.p1) * 2
-        i2 = points.index(self.p2) * 2
-
-        y[i2] += x[n]
-        y[i1] -= x[n]
-
-        y[n] = x[i2] - x[i1]
+        y[n] = x[self.i2] - x[self.i1]
 
 
-class CoincidentY(Constraint):
+class ParallelConstraint(Constraint):
 
-    def __init__(self, p1: Point, p2: Point):
-        self.p1 = p1
-        self.p2 = p2
+    def __init__(self, i1: Index, i2: Index, i3: Index, i4: Index):
+        self.i1 = i1
+        self.i2 = i2
+        self.i3 = i3
+        self.i4 = i4
 
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i1 = points.index(self.p1) * 2 + 1
-        i2 = points.index(self.p2) * 2 + 1
+    def resolve(self, x: ndarray, y: ndarray, n: Index) -> None:
+        ax = x[self.i1] - x[self.i2]
+        bx = x[self.i3] - x[self.i4]
+        ay = x[self.i1 + 1] - x[self.i2 + 1]
+        by = x[self.i3 + 1] - x[self.i4 + 1]
 
-        y[i2] += x[n]
-        y[i1] -= x[n]
+        y[self.i1] += x[n] * by
+        y[self.i2] -= x[n] * by
+        y[self.i3] -= x[n] * ay
+        y[self.i4] += x[n] * ay
 
-        y[n] = x[i2] - x[i1]
-
-
-class Parallel(Constraint):
-
-    def __init__(self, p1: Point, p2: Point, p3: Point, p4: Point):
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-        self.p4 = p4
-
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i1 = points.index(self.p1) * 2
-        i2 = points.index(self.p2) * 2
-        i3 = points.index(self.p3) * 2
-        i4 = points.index(self.p4) * 2
-
-        ax = x[i1] - x[i2]
-        bx = x[i3] - x[i4]
-        ay = x[i1 + 1] - x[i2 + 1]
-        by = x[i3 + 1] - x[i4 + 1]
-
-        y[i1] += x[n] * by
-        y[i2] -= x[n] * by
-        y[i3] -= x[n] * ay
-        y[i4] += x[n] * ay
-
-        y[i1 + 1] -= x[n] * bx
-        y[i2 + 1] += x[n] * bx
-        y[i3 + 1] += x[n] * ax
-        y[i4 + 1] -= x[n] * ax
+        y[self.i1 + 1] -= x[n] * bx
+        y[self.i2 + 1] += x[n] * bx
+        y[self.i3 + 1] += x[n] * ax
+        y[self.i4 + 1] -= x[n] * ax
 
         y[n] = ax * by - ay * bx
 
 
-class Angle(Constraint):
+class AngleConstraint(Constraint):
 
-    def __init__(self, p1: Point, p2: Point, p3: Point, p4: Point, degrees):
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-        self.p4 = p4
-        self.degrees = degrees
+    def __init__(self, i1: Index, i2: Index, i3: Index, i4: Index, degrees):
+        self.i1 = i1
+        self.i2 = i2
+        self.i3 = i3
+        self.i4 = i4
+        self.angle = cos(pi / 180 * degrees)
 
-    @property
-    def radians(self) -> float:
-        return np.pi / 180 * self.degrees
+    def resolve(self, x: ndarray, y: ndarray, n: Index) -> None:
+        ax = x[self.i1] - x[self.i2]
+        bx = x[self.i3] - x[self.i4]
+        ay = x[self.i1 + 1] - x[self.i2 + 1]
+        by = x[self.i3 + 1] - x[self.i4 + 1]
 
-    def apply(self, points: Points, x: np.ndarray, y: np.ndarray, n: int):
-        i1 = points.index(self.p1) * 2
-        i2 = points.index(self.p2) * 2
-        i3 = points.index(self.p3) * 2
-        i4 = points.index(self.p4) * 2
+        l1 = sqrt(ax ** 2 + ay ** 2)
+        l2 = sqrt(bx ** 2 + by ** 2)
 
-        ax = x[i1] - x[i2]
-        bx = x[i3] - x[i4]
-        ay = x[i1 + 1] - x[i2 + 1]
-        by = x[i3 + 1] - x[i4 + 1]
+        y[self.i1] += x[n] * ay * (bx * ay - ax * by) / (l1 ** 3 * l2)
+        y[self.i2] += x[n] * ay * (ax * by - bx * ay) / (l1 ** 3 * l2)
+        y[self.i3] += x[n] * by * (ax * by - bx * ay) / (l1 * l2 ** 3)
+        y[self.i4] += x[n] * by * (bx * ay - ax * by) / (l1 * l2 ** 3)
 
-        l1 = np.sqrt(ax ** 2 + ay ** 2)
-        l2 = np.sqrt(bx ** 2 + by ** 2)
+        y[self.i1 + 1] += x[n] * ax * (ax * by - bx * ay) / (l1 ** 3 * l2)
+        y[self.i2 + 1] += x[n] * ax * (bx * ay - ax * by) / (l1 ** 3 * l2)
+        y[self.i3 + 1] += x[n] * bx * (bx * ay - ax * by) / (l1 * l2 ** 3)
+        y[self.i4 + 1] += x[n] * bx * (ax * by - bx * ay) / (l1 * l2 ** 3)
 
-        y[i1] += x[n] * (ay * (bx * ay - ax * by) / (l1 ** 3 * l2))
-        y[i2] += x[n] * (ay * (ax * by - bx * ay) / (l1 ** 3 * l2))
-        y[i3] += x[n] * (by * (ax * by - bx * ay) / (l1 * l2 ** 3))
-        y[i4] += x[n] * (by * (bx * ay - ax * by) / (l1 * l2 ** 3))
-
-        y[i1 + 1] += x[n] * (ax * (ax * by - bx * ay) / (l1 ** 3 * l2))
-        y[i2 + 1] += x[n] * (ax * (bx * ay - ax * by) / (l1 ** 3 * l2))
-        y[i3 + 1] += x[n] * (bx * (bx * ay - ax * by) / (l1 * l2 ** 3))
-        y[i4 + 1] += x[n] * (bx * (ax * by - bx * ay) / (l1 * l2 ** 3))
-
-        y[n] = (ax * bx + ay * by) / (l1 * l2) - np.cos(self.radians)
+        y[n] = (ax * bx + ay * by) / (l1 * l2) - self.angle
 
 
-class Perpendicular(Angle):
+class PerpendicularConstraint(AngleConstraint):
 
-    def __init__(self, p1: Point, p2: Point, p3: Point, p4: Point):
-        super().__init__(p1, p2, p3, p4, 90)
+    def __init__(self, i1: Index, i2: Index, i3: Index, i4: Index):
+        super().__init__(i1, i2, i3, i4, 90)

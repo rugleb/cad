@@ -29,7 +29,7 @@ class Solver(object):
 
         n = len(self.points) * 2
         for i, constraint in enumerate(self.constraints):
-            constraint.apply(self.points, x, y, n + i)
+            constraint.resolve(x, y, n + i)
 
         return y
 
@@ -46,7 +46,7 @@ class Solver(object):
         return x
 
     def solve(self) -> np.ndarray:
-        opt = {'maxfev': 3000, 'xtol': 1e-8, 'full_output': True}
+        opt = {'maxfev': 1000, 'xtol': 1e-4, 'full_output': True}
         output = fsolve(self.system, self.x0, **opt)
         solution, info, status, message = output
         if status != 1:
@@ -54,7 +54,7 @@ class Solver(object):
         return solution
 
     def recount(self) -> List[Point]:
-        solution = self.solve().round(2)
+        solution = self.solve().round()
         for i, point in enumerate(self.points):
             point.setX(solution[i * 2 + 0])
             point.setY(solution[i * 2 + 1])

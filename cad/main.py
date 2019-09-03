@@ -5,10 +5,11 @@ from typing import List, Generator
 from PySide2 import QtWidgets, QtGui, QtCore
 
 from cad.log import logger
-from cad.core import Point, SmartPoint, SmartSegment, Painter, Segment
-from cad.constraints import Parallel, Perpendicular, Length, CoincidentX, \
-    CoincidentY, Horizontal, Vertical, FixingX, FixingY, Angle, Constraint
-from cad.solver import Solver, SolutionNotFound
+from cad.core import Point, SmartPoint, SmartSegment, Painter
+from cad.solver import Solver, SolutionNotFound, Constraint
+from cad.constraints import Index, ParallelConstraint, LengthConstraint, \
+    PerpendicularConstraint, HorizontalConstraint, CoincidentConstraint, \
+    VerticalConstraint
 
 
 def iconPath(name: str) -> str:
@@ -185,6 +186,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.setStatusTip('Enable fixed constraint')
         action.setIcon(Icon(iconPath('fixed.png')))
         action.setCheckable(True)
+        action.setDisabled(True)
         action.triggered.connect(self.fixed)
         return action
 
@@ -193,6 +195,7 @@ class MainWindow(QtWidgets.QMainWindow):
         action.setStatusTip('Enable angle constraint')
         action.setIcon(Icon(iconPath('angle.png')))
         action.setCheckable(True)
+        action.setDisabled(True)
         action.triggered.connect(self.angle)
         return action
 
@@ -431,14 +434,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def fixed(self) -> None:
         self.logger.debug('Fixed action triggered')
 
-        controller = FixedController(self.sketch)
-        self.sketch.setController(controller)
-
     def angle(self) -> None:
         self.logger.debug('Angle action triggered')
-
-        controller = AngleController(self.sketch)
-        self.sketch.setController(controller)
 
     def vertical(self) -> None:
         self.logger.debug('Vertical action triggered')
@@ -478,6 +475,9 @@ class Sketch(QtWidgets.QWidget):
     pointAdded = QtCore.Signal(SmartPoint)
     segmentAdded = QtCore.Signal(SmartSegment)
 
+    mousePressedOnPoint = QtCore.Signal(Index)
+    mousePressedOnSegment = QtCore.Signal(Index)
+
     def __init__(self, parent: MainWindow):
         super().__init__(parent)
 
@@ -490,6 +490,9 @@ class Sketch(QtWidgets.QWidget):
 
         self.pointAdded.connect(self.repaint)
         self.segmentAdded.connect(self.repaint)
+
+        self.mousePressed.connect(self.emitPressedPointIndex)
+        self.mousePressed.connect(self.emitPressedSegmentIndex)
 
         self.setMouseTracking(True)
 
@@ -518,6 +521,16 @@ class Sketch(QtWidgets.QWidget):
         point = event.localPos()
         self.mousePressed.emit(point)
 
+    def emitPressedPointIndex(self, cursor: Point) -> None:
+        for i, point in enumerate(self.points):
+            if point.isClose(cursor):
+                return self.mousePressedOnPoint.emit(i)
+
+    def emitPressedSegmentIndex(self, cursor: Point) -> None:
+        for i, segment in enumerate(self.segments):
+            if segment.isClose(cursor):
+                return self.mousePressedOnSegment.emit(i)
+
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
         painter = Painter(self)
         painter.setRenderHint(painter.Antialiasing)
@@ -533,24 +546,8 @@ class Sketch(QtWidgets.QWidget):
         for segment in self.segments:
             segment.draw(painter)
 
-    def closestSegment(self, cursor: Point) -> SmartSegment:
-        for segment in self.segments:
-            if segment.isClose(cursor):
-                return segment
-        raise KeyError
-
-    def closestPoint(self, cursor: Point) -> SmartPoint:
-        for point in self.points:
-            if point.isClose(cursor):
-                return point
-        raise KeyError
-
     def addConstraint(self, constraint: Constraint) -> None:
         self.solver.addConstraint(constraint)
-        self.recount()
-
-    def addConstraints(self, constraints: List[Constraint]) -> None:
-        self.solver.constraints.extend(constraints)
         self.recount()
 
     def generator(self) -> Generator[Point]:
@@ -561,8 +558,7 @@ class Sketch(QtWidgets.QWidget):
             yield segment.geometry()[1]
 
     def recount(self):
-        points = list(self.generator())
-        self.solver.points = points
+        self.solver.points = list(self.generator())
 
         try:
             points = self.solver.recount()
@@ -642,55 +638,49 @@ class ParallelController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.segment1: SmartSegment = None
-        self.segment2: SmartSegment = None
+        self.i = None
+        self.j = None
 
-        self.sketch.mousePressed.connect(self.setSegment1)
+        self.sketch.mousePressedOnSegment.connect(self.setFirstSegmentIndex)
 
-    def setSegment1(self, cursor: Point) -> None:
-        try:
-            self.segment1 = self.sketch.closestSegment(cursor)
+    def setFirstSegmentIndex(self, i: Index) -> None:
+        self.i = i
+        self.sketch.mousePressedOnSegment.disconnect(self.setFirstSegmentIndex)
 
-            self.sketch.mousePressed.disconnect(self.setSegment1)
+        segment = self.sketch.segments[i]
 
-            self.segment1.highlight()
-            self.segment1.disableMouseTracking()
+        segment.highlight()
+        segment.disableMouseTracking()
 
-            self.sketch.mousePressed.connect(self.setSegment2)
+        self.sketch.mousePressedOnSegment.connect(self.setSecondSegmentIndex)
 
-        except KeyError:
-            pass
+    def setSecondSegmentIndex(self, j: Index) -> None:
+        self.j = j
+        self.sketch.mousePressedOnSegment.disconnect(self.setSecondSegmentIndex)
 
-    def setSegment2(self, cursor: Point) -> None:
-        try:
-            self.segment2 = self.sketch.closestSegment(cursor)
+        segment = self.sketch.segments[j]
 
-            self.sketch.mousePressed.disconnect(self.setSegment2)
+        segment.highlight()
+        segment.disableMouseTracking()
 
-            self.segment2.highlight()
-            self.segment2.disableMouseTracking()
+        points = len(self.sketch.points) * 2
 
-            p1, p2 = self.segment1.geometry()
-            p3, p4 = self.segment2.geometry()
+        i1, i2 = points + self.i * 4, points + self.i * 4 + 2
+        i3, i4 = points + self.j * 4, points + self.j * 4 + 2
 
-            constraint = Parallel(p1, p2, p3, p4)
-            logger.debug('Parallel constraint created')
-
-            self.sketch.addConstraint(constraint)
-
-        except KeyError:
-            pass
+        constraint = ParallelConstraint(i1, i2, i3, i4)
+        self.sketch.addConstraint(constraint)
 
     def __del__(self) -> None:
         try:
-            self.segment1.unHighlight()
-            self.segment1.enableMouseTracking()
+            self.sketch.segments[self.i].unHighlight()
+            self.sketch.segments[self.i].enableMouseTracking()
 
-            self.segment2.unHighlight()
-            self.segment2.enableMouseTracking()
+            self.sketch.segments[self.j].unHighlight()
+            self.sketch.segments[self.j].enableMouseTracking()
 
             self.sketch.repaint()
-        except AttributeError:
+        except (AttributeError, TypeError):
             pass
 
 
@@ -699,55 +689,49 @@ class PerpendicularController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.segment1: SmartSegment = None
-        self.segment2: SmartSegment = None
+        self.i = None
+        self.j = None
 
-        self.sketch.mousePressed.connect(self.setSegment1)
+        self.sketch.mousePressedOnSegment.connect(self.setFirstSegmentIndex)
 
-    def setSegment1(self, cursor: Point) -> None:
-        try:
-            self.segment1 = self.sketch.closestSegment(cursor)
+    def setFirstSegmentIndex(self, i: Index) -> None:
+        self.i = i
+        self.sketch.mousePressedOnSegment.disconnect(self.setFirstSegmentIndex)
 
-            self.sketch.mousePressed.disconnect(self.setSegment1)
+        segment = self.sketch.segments[i]
 
-            self.segment1.highlight()
-            self.segment1.disableMouseTracking()
+        segment.highlight()
+        segment.disableMouseTracking()
 
-            self.sketch.mousePressed.connect(self.setSegment2)
+        self.sketch.mousePressedOnSegment.connect(self.setSecondSegmentIndex)
 
-        except KeyError:
-            pass
+    def setSecondSegmentIndex(self, j: Index) -> None:
+        self.j = j
+        self.sketch.mousePressedOnSegment.disconnect(self.setSecondSegmentIndex)
 
-    def setSegment2(self, cursor: Point) -> None:
-        try:
-            self.segment2 = self.sketch.closestSegment(cursor)
+        segment = self.sketch.segments[j]
 
-            self.sketch.mousePressed.disconnect(self.setSegment2)
+        segment.highlight()
+        segment.disableMouseTracking()
 
-            self.segment2.highlight()
-            self.segment2.disableMouseTracking()
+        points = len(self.sketch.points) * 2
 
-            p1, p2 = self.segment1.geometry()
-            p3, p4 = self.segment2.geometry()
+        i1, i2 = points + self.i * 4, points + self.i * 4 + 2
+        i3, i4 = points + self.j * 4, points + self.j * 4 + 2
 
-            constraint = Perpendicular(p1, p2, p3, p4)
-            logger.debug('Perpendicular constraint created')
-
-            self.sketch.addConstraint(constraint)
-
-        except KeyError:
-            pass
+        constraint = PerpendicularConstraint(i1, i2, i3, i4)
+        self.sketch.addConstraint(constraint)
 
     def __del__(self) -> None:
         try:
-            self.segment1.unHighlight()
-            self.segment1.enableMouseTracking()
+            self.sketch.segments[self.i].unHighlight()
+            self.sketch.segments[self.i].enableMouseTracking()
 
-            self.segment2.unHighlight()
-            self.segment2.enableMouseTracking()
+            self.sketch.segments[self.j].unHighlight()
+            self.sketch.segments[self.j].enableMouseTracking()
 
             self.sketch.repaint()
-        except AttributeError:
+        except (AttributeError, TypeError):
             pass
 
 
@@ -756,21 +740,16 @@ class LengthController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.sketch.mousePressed.connect(self.onMousePressed)
+        self.sketch.mousePressedOnSegment.connect(self.onMousePressed)
 
-    def onMousePressed(self, cursor: Point) -> None:
-        try:
-            segment = self.sketch.closestSegment(cursor)
+    def onMousePressed(self, i: Index) -> None:
+        n = len(self.sketch.points) * 2
 
-            p1, p2 = segment.geometry()
-            constraint = Length(p1, p2, 100)
+        i1 = n + i * 4 + 0
+        i2 = n + i * 4 + 2
 
-            logger.debug('Length constraint created')
-
-            self.sketch.addConstraint(constraint)
-
-        except KeyError:
-            pass
+        constraint = LengthConstraint(i1, i2, 100)
+        self.sketch.addConstraint(constraint)
 
 
 class CoincidentController(Controller):
@@ -778,137 +757,43 @@ class CoincidentController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.point1: SmartPoint = None
-        self.point2: SmartPoint = None
+        self.i = None
+        self.j = None
 
-        self.sketch.mousePressed.connect(self.setPoint1)
+        self.sketch.mousePressedOnPoint.connect(self.setFirstPoint)
 
-    def setPoint1(self, cursor: Point) -> None:
-        try:
-            self.point1 = self.sketch.closestPoint(cursor)
+    def setFirstPoint(self, i: Index) -> None:
+        self.i = i
+        self.sketch.mousePressedOnPoint.disconnect(self.setFirstPoint)
 
-            self.sketch.mousePressed.disconnect(self.setPoint1)
+        self.sketch.points[i].highlight()
+        self.sketch.points[i].disableMouseTracking()
 
-            self.point1.highlight()
-            self.point1.disableMouseTracking()
+        self.sketch.mousePressedOnPoint.connect(self.setSecondPoint)
 
-            self.sketch.mousePressed.connect(self.setPoint2)
+    def setSecondPoint(self, j: Index) -> None:
+        self.j = j
+        self.sketch.mousePressedOnPoint.disconnect(self.setSecondPoint)
 
-        except KeyError:
-            pass
+        self.sketch.points[j].highlight()
+        self.sketch.points[j].disableMouseTracking()
 
-    def setPoint2(self, cursor: Point) -> None:
-        try:
-            self.point2 = self.sketch.closestPoint(cursor)
+        constraint1 = CoincidentConstraint(self.i * 2, self.j * 2)
+        self.sketch.addConstraint(constraint1)
 
-            self.sketch.mousePressed.disconnect(self.setPoint2)
-
-            self.point2.highlight()
-            self.point2.disableMouseTracking()
-
-            p1 = self.point1.point()
-            p2 = self.point2.point()
-
-            constraint1 = CoincidentX(p1, p2)
-            constraint2 = CoincidentY(p1, p2)
-
-            self.sketch.addConstraints([constraint1, constraint2])
-
-            logger.debug('Coincident constraint created')
-
-        except KeyError:
-            pass
+        constraint2 = CoincidentConstraint(self.i * 2 + 1, self.j * 2 + 1)
+        self.sketch.addConstraint(constraint2)
 
     def __del__(self) -> None:
         try:
-            self.point1.unHighlight()
-            self.point1.enableMouseTracking()
+            self.sketch.points[self.i].unHighlight()
+            self.sketch.points[self.i].enableMouseTracking()
 
-            self.point2.unHighlight()
-            self.point2.enableMouseTracking()
-
-            self.sketch.repaint()
-        except AttributeError:
-            pass
-
-
-class FixedController(Controller):
-
-    def __init__(self, sketch: Sketch):
-        super().__init__(sketch)
-
-        self.sketch.mousePressed.connect(self.onMousePressed)
-
-    def onMousePressed(self, cursor: Point) -> None:
-        try:
-            point = self.sketch.closestPoint(cursor)
-            loc = Point(50, 50)
-
-            constraint1 = FixingX(point.point(), loc.x())
-            constraint2 = FixingY(point.point(), loc.y())
-
-            logger.debug('Fixed constraint created')
-
-            self.sketch.addConstraints([constraint1, constraint2])
-
-        except KeyError:
-            pass
-
-
-class AngleController(Controller):
-
-    def __init__(self, sketch: Sketch):
-        super().__init__(sketch)
-
-        self.segment1: SmartSegment = None
-        self.segment2: SmartSegment = None
-
-        self.sketch.mousePressed.connect(self.setSegment1)
-
-    def setSegment1(self, cursor: Point) -> None:
-        try:
-            self.segment1 = self.sketch.closestSegment(cursor)
-
-            self.sketch.mousePressed.disconnect(self.setSegment1)
-
-            self.segment1.highlight()
-            self.segment1.disableMouseTracking()
-
-            self.sketch.mousePressed.connect(self.setSegment2)
-
-        except KeyError:
-            pass
-
-    def setSegment2(self, cursor: Point) -> None:
-        try:
-            self.segment2 = self.sketch.closestSegment(cursor)
-
-            self.sketch.mousePressed.disconnect(self.setSegment2)
-
-            self.segment2.highlight()
-            self.segment2.disableMouseTracking()
-
-            p1, p2 = self.segment1.geometry()
-            p3, p4 = self.segment2.geometry()
-
-            constraint = Angle(p1, p2, p3, p4, 45)
-            logger.debug('Angle constraint created')
-
-            self.sketch.addConstraint(constraint)
-
-        except KeyError:
-            pass
-
-    def __del__(self) -> None:
-        try:
-            self.segment1.unHighlight()
-            self.segment1.enableMouseTracking()
-
-            self.segment2.unHighlight()
-            self.segment2.enableMouseTracking()
+            self.sketch.points[self.j].unHighlight()
+            self.sketch.points[self.j].enableMouseTracking()
 
             self.sketch.repaint()
-        except AttributeError:
+        except (AttributeError, TypeError):
             pass
 
 
@@ -917,21 +802,12 @@ class VerticalController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.sketch.mousePressed.connect(self.onMousePressed)
+        self.sketch.mousePressedOnSegment.connect(self.onMousePressed)
 
-    def onMousePressed(self, cursor: Point) -> None:
-        try:
-            segment = self.sketch.closestSegment(cursor)
-
-            p1, p2 = segment.geometry()
-            constraint = Vertical(p1, p2)
-
-            logger.debug('Vertical constraint created')
-
-            self.sketch.addConstraint(constraint)
-
-        except KeyError:
-            pass
+    def onMousePressed(self, i: Index) -> None:
+        n = len(self.sketch.points) * 2 + i * 4
+        constraint = VerticalConstraint(n, n + 2)
+        self.sketch.addConstraint(constraint)
 
 
 class HorizontalController(Controller):
@@ -939,18 +815,9 @@ class HorizontalController(Controller):
     def __init__(self, sketch: Sketch):
         super().__init__(sketch)
 
-        self.sketch.mousePressed.connect(self.onMousePressed)
+        self.sketch.mousePressedOnSegment.connect(self.onMousePressed)
 
-    def onMousePressed(self, cursor: Point) -> None:
-        try:
-            segment = self.sketch.closestSegment(cursor)
-
-            p1, p2 = segment.geometry()
-            constraint = Horizontal(p1, p2)
-
-            logger.debug('Horizontal constraint created')
-
-            self.sketch.addConstraint(constraint)
-
-        except KeyError:
-            pass
+    def onMousePressed(self, i: Index) -> None:
+        n = len(self.sketch.points) * 2 + i * 4 + 1
+        constraint = HorizontalConstraint(n, n + 2)
+        self.sketch.addConstraint(constraint)
